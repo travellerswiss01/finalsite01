@@ -4,12 +4,13 @@ import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 
 const carouselScript='const offerCarousel='+readFileSync(new URL('../public/assets/app.js',import.meta.url),'utf8').split('const offerCarousel=')[1];
-function setup(reduced=false,audioSupported=true){
+function setup(reduced=false,audioSupported=true,withMosti=false){
+ const animations=[];let mostiButton,mostiSprite;
  const element=()=>({
   handlers:{},attrs:{},inert:false,hidden:true,textContent:'',
   style:{values:{},setProperty(name,value){this.values[name]=value;}},
   classList:{values:new Set(),add(name){this.values.add(name);},remove(name){this.values.delete(name);},contains(name){return this.values.has(name);},toggle(name,value){if(value)this.add(name);else this.remove(name);}},
-  addEventListener(type,fn){this.handlers[type]=fn;},setAttribute(name,value){this.attrs[name]=value;}
+  addEventListener(type,fn){this.handlers[type]=fn;},setAttribute(name,value){this.attrs[name]=value;},removeAttribute(name){delete this.attrs[name];},animate(frames,options){const animation={frames,options,cancelled:false,cancel(){this.cancelled=true;}};animations.push(animation);return animation;}
  });
  const slides=Array.from({length:5},element),images=Array.from({length:5},element);
  const figures=Array.from({length:7},element),bottles=figures.map(figure=>{const button=element();button.closest=selector=>selector==='[data-offer-image]'?images[3]:figure;return button;});
@@ -24,7 +25,14 @@ function setup(reduced=false,audioSupported=true){
  const carousel=element();carousel.contains=el=>bottles.includes(el)||Object.values(controls).includes(el);
  carousel.querySelectorAll=selector=>selector==='[data-offer-image]'?images:selector==='[data-vinegar-bottle]'?bottles:slides;
  carousel.querySelector=selector=>controls[selector];
- const document=element();document.activeElement=null;document.hidden=false;document.querySelector=selector=>selector==='[data-vinegar-dialog]'?dialog:carousel;
+ if(withMosti){
+  images[3].classList.add('vinegar-lineup-frame');images[3].clientWidth=700;
+  images[3].querySelector=()=>({getBoundingClientRect:()=>({width:450})});
+  images[3].append=button=>{mostiButton=button;};
+  bottles.forEach(button=>{button.querySelector=()=>element();});
+ }
+ const document=element();
+ if(withMosti)document.createElement=tag=>{const el=element();el.offsetWidth=128;el.append=sprite=>{mostiSprite=sprite;};return el;};document.activeElement=null;document.hidden=false;document.querySelector=selector=>selector==='[data-vinegar-dialog]'?dialog:carousel;
  const motion=element();motion.matches=reduced;
  let interval=null,id=0;const timeouts=new Map();
  const window={matchMedia:()=>motion,setInterval(fn){interval=fn;return 1;},clearInterval(){interval=null;},setTimeout(fn,ms){timeouts.set(++id,{fn,ms});return id;},clearTimeout(key){timeouts.delete(key);}};
@@ -36,7 +44,7 @@ function setup(reduced=false,audioSupported=true){
  }
  if(audioSupported)window.AudioContext=FakeAudioContext;
  vm.runInNewContext(carouselScript,{document,window});
- return {bottles,figures,images,controls,carousel,dialog,detailGrid,detailHeading,detailPhotos,document,motion,timeouts,audio,
+ return {mostiButton,mostiSprite,animations,bottles,figures,images,controls,carousel,dialog,detailGrid,detailHeading,detailPhotos,document,motion,timeouts,audio,
   next(){controls['[data-offer-next]'].handlers.click();},running:()=>interval!==null,
   finish(){const [key,timeout]=timeouts.entries().next().value;timeouts.delete(key);timeout.fn();}
  };
@@ -110,4 +118,27 @@ test('each bottle opens its own original photo, and the label overview restores 
  env.dialog.close();env.controls['[data-vinegar-open]'].handlers.click();
  assert.ok(env.detailPhotos.every(photo=>!photo.hidden));assert.equal(env.detailHeading.textContent,'Alle Originaletiketten');
  assert.equal(env.detailGrid.classList.contains('is-single'),false);
+});
+
+
+test('Mosti pauses rotation and cancels every animation when an original label is opened',()=>{
+ const env=setup(false,true,true);env.mostiSprite.handlers.load();
+ assert.equal(env.mostiButton.hidden,false);
+ env.mostiButton.handlers.click();assert.equal(env.animations.length,0);
+ for(let i=0;i<3;i++)env.next();
+ env.mostiButton.handlers.click();
+ assert.equal(env.animations.length,9);assert.equal(env.running(),false);
+ assert.equal(env.mostiButton.attrs['aria-busy'],'true');
+ env.mostiButton.handlers.click();assert.equal(env.animations.length,9);
+ env.bottles[2].handlers.click();
+ assert.equal(env.dialog.open,true);assert.ok(env.animations.every(a=>a.cancelled));
+ assert.equal(env.timeouts.size,0);assert.equal(env.mostiButton.attrs['aria-busy'],undefined);
+});
+test('Mosti respects reduced motion and finishes upright before rotation resumes',()=>{
+ const reduced=setup(true,true,true);for(let i=0;i<3;i++)reduced.next();
+ reduced.mostiButton.handlers.click();assert.equal(reduced.animations.length,0);
+ const env=setup(false,true,true);for(let i=0;i<3;i++)env.next();
+ env.mostiButton.handlers.click();env.finish();
+ assert.ok(env.animations.every(a=>a.cancelled));assert.equal(env.running(),true);
+ env.mostiButton.handlers.click();env.next();assert.ok(env.animations.every(a=>a.cancelled));
 });
