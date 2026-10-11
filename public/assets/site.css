@@ -7,3 +7,77 @@
   letter-spacing: -0.5px;
   white-space: nowrap;
 }
+
+
+/* Premium custom-gift card */
+.gift-image-premium {
+  position: relative;
+  aspect-ratio: 1.33;
+  overflow: hidden;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px 12px;
+  color: #17432b;
+  background: radial-gradient(ellipse at 50% 43%, #fff 0%, #fffaf1 43%, #f4e8d2 100%);
+}
+.gift-image-premium::before {
+  position: absolute;
+  z-index: -1;
+  inset: 15% 18%;
+  border: 1px solid #b8975a55;
+  border-radius: 50%;
+  content: "";
+}
+.gift-image-premium::after {
+  position: absolute;
+  z-index: -1;
+  inset: 19% 21%;
+  border: 1px solid #b8975a33;
+  border-radius: 50%;
+  content: "";
+}
+.gift-image-premium .icon {
+  width: clamp(112px, 9vw, 136px);
+  height: clamp(112px, 9vw, 136px);
+  filter: drop-shadow(0 8px 8px #60451c24);
+  stroke-width: 1.35;
+}
+.gift-kicker {
+  color: #84672f;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-align: center;
+}
+.gift-caption {
+  padding: 6px 13px;
+  border: 1px solid #b8975a66;
+  border-radius: 999px;
+  background: #fffdf7d9;
+  color: #46604a;
+  font-size: 12px;
+  letter-spacing: .04em;
+}
+.inquiry-card .card-body {
+  align-items: center;
+  text-align: center;
+  padding-inline: 14px;
+}
+.inquiry-card .card-body h2 {
+  margin: 2px 0 10px;
+}
+.inquiry-card .gift-description {
+  max-width: 30ch;
+  margin: 0 auto 14px;
+  color: #4f5d51;
+  font-size: 15px;
+  line-height: 1.45;
+  text-align: center;
+}
+.inquiry-card .card-body > .button {
+  align-self: stretch;
+}
