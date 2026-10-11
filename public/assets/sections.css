@@ -211,3 +211,6 @@
 /* Slightly closer framing for the plated main course and dessert. */
 .cooking-course-grid .cooking-course:nth-child(3) .cooking-course-photo img{transform:scale(1.18)!important}
 .cooking-course-grid .cooking-course:nth-child(4) .cooking-course-photo img{transform:scale(1.38)!important;transform-origin:50% 15%!important}
+
+/* Center the plated dessert itself within its close crop. */
+.cooking-course-grid .cooking-course:nth-child(4) .cooking-course-photo img{transform:translateX(-14%) scale(1.38)!important;transform-origin:50% 15%!important}
