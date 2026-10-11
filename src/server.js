@@ -1,5 +1,6 @@
 import {createServer as httpServer} from 'node:http';
 import {readFile,stat} from 'node:fs/promises';
+import {createReadStream} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {createStorefront,StorefrontError} from './storefront.js';
@@ -50,6 +51,22 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
     if(!requested.startsWith(publicDir+path.sep)||requested.includes('\0'))throw new StorefrontError('Datei nicht gefunden.',404);
     let file;try{file=await stat(requested);}catch{throw new StorefrontError('Datei nicht gefunden.',404);}
     if(!file.isFile())throw new StorefrontError('Datei nicht gefunden.',404);
+    if(path.extname(requested)==='.mp4'){
+     const headers={'Content-Type':'video/mp4','Accept-Ranges':'bytes','Cache-Control':'public, max-age=3600'};
+     const range=req.headers.range;
+     let start=0,end=file.size-1,status=200;
+     if(range){
+      const match=/^bytes=(\d*)-(\d*)$/.exec(range);
+      if(!match||(!match[1]&&!match[2])){res.writeHead(416,{...headers,'Content-Range':`bytes */${file.size}`});res.end();return;}
+      if(!match[1])start=Math.max(0,file.size-Number(match[2]));
+      else{start=Number(match[1]);if(match[2])end=Math.min(end,Number(match[2]));}
+      if(!Number.isSafeInteger(start)||!Number.isSafeInteger(end)||start>end||start>=file.size){res.writeHead(416,{...headers,'Content-Range':`bytes */${file.size}`});res.end();return;}
+      status=206;headers['Content-Range']=`bytes ${start}-${end}/${file.size}`;
+     }
+     headers['Content-Length']=end-start+1;res.writeHead(status,headers);
+     if(req.method==='HEAD'){res.end();return;}
+     const stream=createReadStream(requested,{start,end});res.on('close',()=>stream.destroy());stream.on('error',()=>res.destroy());stream.pipe(res);return;
+    }
     res.writeHead(200,{'Content-Type':types[path.extname(requested)]||'application/octet-stream','Cache-Control':'public, max-age=3600'});res.end(req.method==='HEAD'?undefined:await readFile(requested));return;
    }
    if(pathname.startsWith('/api/')){

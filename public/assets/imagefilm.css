@@ -1,0 +1,16 @@
+.imagefilm{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);align-items:center;gap:48px;margin-top:64px;margin-bottom:64px;padding:36px;background:#f8f4ed;border:1px solid #e5ddcf;border-radius:16px;color:#205532}
+.imagefilm-eyebrow{font-size:12px;font-weight:700;letter-spacing:2px;margin:0 0 18px;color:#755c32}
+.imagefilm-copy h2{font-size:clamp(30px,3.2vw,48px);line-height:1.12;letter-spacing:-1px;margin:0 0 20px}
+.imagefilm-copy>p:not(.imagefilm-eyebrow){font-size:17px;line-height:1.65;max-width:35ch;color:#49554b;margin:0 0 22px}
+.imagefilm-duration{font-size:13px;color:#6d7066}
+.imagefilm-media{position:relative;min-width:0;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#163b25;box-shadow:0 8px 28px #24351e14}
+.imagefilm-media video{display:block;width:100%;height:100%;object-fit:contain;background:#102a1b}
+.imagefilm-play{position:absolute;inset:0;border:0;width:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;cursor:pointer;background:linear-gradient(transparent 40%,#001a1480);color:white;font:inherit;font-weight:600;text-shadow:0 1px 4px #0008}
+.imagefilm-play-circle{display:grid;place-items:center;width:68px;height:68px;border:1px solid #ffffff90;border-radius:50%;background:#205532e8;font-size:22px;padding-left:4px;transition:transform .2s,background .2s;box-shadow:0 4px 20px #0003}
+.imagefilm-play:hover .imagefilm-play-circle{transform:scale(1.06);background:#205532}
+.imagefilm-play:focus-visible{outline:3px solid #d8ad65;outline-offset:-5px}
+.imagefilm-play[hidden],.imagefilm-error[hidden]{display:none}
+.imagefilm-error,.imagefilm-nojs{position:absolute;bottom:0;left:0;right:0;margin:0;padding:12px 16px;background:#fffdf4;color:#205532;font-size:14px;line-height:1.5}
+.imagefilm-error a,.imagefilm-nojs a{text-decoration:underline}
+@media(max-width:799px){.imagefilm{grid-template-columns:1fr;gap:24px;margin-top:40px;margin-bottom:40px;padding:24px}.imagefilm-copy h2{font-size:32px}.imagefilm-copy>p:not(.imagefilm-eyebrow){max-width:55ch}.imagefilm-eyebrow{font-size:11px;letter-spacing:1.5px}.imagefilm-play-circle{width:58px;height:58px}}
+@media(prefers-reduced-motion:reduce){.imagefilm-play-circle{transition:none}}

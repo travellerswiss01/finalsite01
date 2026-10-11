@@ -9,6 +9,14 @@ test('cart checkout uses Shopify generated URL and empty cart cannot checkout',(
 test('search, categories and sitemap contain real product routes',()=>run(async({origin})=>{const html=await(await fetch(origin+'/suche?q=Testprodukt')).text();assert.ok(html.includes('1 Produkt'));const sitemap=await(await fetch(origin+'/sitemap.xml')).text();assert.ok(sitemap.includes('/produkte/test-produkt'));assert.ok(!sitemap.includes('/warenkorb'));}));
 test('invalid cookie cannot crash the cart endpoint',()=>{assert.equal(readCartCookie('biottos_cart=%'),null);assert.equal(readCartCookie('biottos_cart=other'),null);assert.equal(readCartCookie('biottos_cart='+encodeURIComponent(cartFixture().id)),cartFixture().id);});
 
+test('imagefilm supports byte ranges, seeking and HEAD without downloading the whole video',()=>run(async({origin})=>{
+ const url=origin+'/assets/imagefilm.mp4';
+ const head=await fetch(url,{method:'HEAD'});assert.equal(head.status,200);assert.equal(head.headers.get('content-type'),'video/mp4');assert.equal(head.headers.get('accept-ranges'),'bytes');const size=Number(head.headers.get('content-length'));assert.ok(size>1000);
+ const first=await fetch(url,{headers:{Range:'bytes=0-31'}});assert.equal(first.status,206);assert.equal(first.headers.get('content-range'),`bytes 0-31/${size}`);assert.equal((await first.arrayBuffer()).byteLength,32);
+ const suffix=await fetch(url,{headers:{Range:'bytes=-16'}});assert.equal(suffix.status,206);assert.equal((await suffix.arrayBuffer()).byteLength,16);
+ for(const range of ['bytes=-0',`bytes=${size}-`,'bytes=30-10','bytes=0-1,3-4'])assert.equal((await fetch(url,{headers:{Range:range}})).status,416);
+}));
+
 test('serves styles, scripts and original images with correct MIME types',()=>run(async({origin})=>{for(const [file,type] of [['base.css','text/css'],['app.js','text/javascript'],['logo.png','image/png'],['hero.jpg','image/jpeg'],['suessmost-3-liter.webp','image/webp'],['lucia-kocht.jpg','image/jpeg'],['lucia-salate.webp','image/webp'],['lucia-hero-banner.webp','image/webp'],['firmen-geschenke.webp','image/webp'],['geschenk-auswahl.webp','image/webp'],['troepfli-heimat.webp','image/webp'],['essig-liegend.webp','image/webp'],['essig-original.webp','image/webp'],['essig-birnen.webp','image/webp'],['essig-balsamico.webp','image/webp'],['essig-himbeer.webp','image/webp'],['essig-holunder.webp','image/webp'],['essig-kirschen-birnen.webp','image/webp'],['essig-kirsch.webp','image/webp'],['saison-aepfel.webp','image/webp'],...Array.from({length:7},(_,i)=>[`lucia-menu-${i+1}.webp`,'image/webp'])]){const response=await fetch(origin+'/assets/'+file);assert.equal(response.status,200,file);assert.ok(response.headers.get('content-type').startsWith(type));assert.ok((await response.arrayBuffer()).byteLength>0);}assert.equal((await fetch(origin+'/assets/missing.css')).status,404);}));
 
 test('serverless adapter accepts a body already parsed by the platform',async()=>{
