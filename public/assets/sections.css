@@ -43,3 +43,7 @@
 /* Every offer uses exactly the same image area at each breakpoint. */
 .offer-carousel .hero-offer-image{width:70%;left:30%;height:100%}
 @media(max-width:599px){.offer-carousel .hero-offer-image{width:100%;left:0}}
+
+/* Turn the authentic photo; preserve every original label pixel. */
+.original-vinegar-frame{container-type:size;overflow:hidden;background:#fff}
+.original-vinegar-frame .original-vinegar-bottle{position:absolute;left:50%;top:50%;width:min(90cqw,190cqh);height:auto;max-width:none;transform:translate(-50%,-50%) rotate(90deg)}
