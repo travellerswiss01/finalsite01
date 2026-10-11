@@ -104,3 +104,17 @@
 .vinegar-detail-grid.is-single{grid-template-columns:minmax(0,480px);justify-content:center}
 .vinegar-detail-grid figure[hidden]{display:none}
 @media(max-width:599px){.vinegar-tools .vinegar-zoom{width:44px;justify-content:center}.vinegar-tools .vinegar-zoom span{display:none}}
+
+/* Animate only the existing announcement; retain its text, colour, type and height. */
+.announcement-marquee{width:100%;overflow:hidden}
+.announcement-marquee-track{display:flex;width:max-content;animation:announcement-marquee-scroll 60s linear infinite}
+.announcement-marquee-copy{display:flex;flex:0 0 auto;align-items:center;justify-content:center;gap:14px;white-space:nowrap;min-width:calc(100vw - 32px);padding-inline:32px}
+.announcement:hover .announcement-marquee-track{animation-play-state:paused}
+@keyframes announcement-marquee-scroll{to{transform:translateX(-50%)}}
+@media(max-width:599px){.announcement-marquee-track{animation-duration:24s}}
+@media(min-width:1600px){.announcement-marquee-track{animation-duration:75s}}
+@media(prefers-reduced-motion:reduce){
+ .announcement-marquee-track{animation:none;width:100%}
+ .announcement-marquee-copy{min-width:0;width:100%;padding:0;white-space:normal}
+ .announcement-marquee-copy+.announcement-marquee-copy{display:none}
+}
