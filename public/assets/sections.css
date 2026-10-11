@@ -207,3 +207,7 @@
 
 /* Keep the dessert garnish inside frame while preserving a close presentation. */
 .cooking-course-grid .cooking-course:nth-child(4) .cooking-course-photo img{transform:scale(1.25)!important;transform-origin:50% 26%!important}
+
+/* Slightly closer framing for the plated main course and dessert. */
+.cooking-course-grid .cooking-course:nth-child(3) .cooking-course-photo img{transform:scale(1.18)!important}
+.cooking-course-grid .cooking-course:nth-child(4) .cooking-course-photo img{transform:scale(1.38)!important;transform-origin:50% 15%!important}
