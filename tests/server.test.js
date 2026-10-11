@@ -45,3 +45,25 @@ test('accepts same-origin HTTPS cart requests behind Render proxy',async()=>{
   assert.equal(crossSite.status,403);
  }finally{app.closeAllConnections();await new Promise(resolve=>app.close(resolve));}
 });
+
+
+test('uses the request host for cart checks while keeping the configured canonical origin',async()=>{
+ const store={catalog:async()=>[],shop:async()=>null,cart:async()=>null,mutateCart:async()=>({cart:cartFixture(),warnings:[]})};
+ const app=createApp({store,origin:'https://canonical.example'});
+ await new Promise(resolve=>app.listen(0,'127.0.0.1',resolve));
+ const base='http://127.0.0.1:'+app.address().port;
+ try{
+  const headers={'Content-Type':'application/json','X-Forwarded-Proto':'https',Host:'alias.example',Origin:'https://alias.example'};
+  const body=JSON.stringify({variantId:'gid://shopify/ProductVariant/1',quantity:1});
+  const accepted=await fetch(base+'/api/cart/add',{method:'POST',headers,body});
+  assert.equal(accepted.status,200);
+  assert.match(accepted.headers.get('set-cookie')||'',/; Secure(?:;|$)/);
+  const rejected=await fetch(base+'/api/cart/add',{method:'POST',headers:{...headers,Origin:'https://attacker.example'},body});
+  assert.equal(rejected.status,403);
+  const crossSite=await fetch(base+'/api/cart/add',{method:'POST',headers:{...headers,'Sec-Fetch-Site':'cross-site'},body});
+  assert.equal(crossSite.status,403);
+  const page=await fetch(base+'/',{headers:{'X-Forwarded-Proto':'https',Host:'alias.example'}});
+  assert.equal(page.status,200);
+  assert.match(await page.text(),/rel="canonical" href="https:\/\/canonical\.example\//);
+ }finally{app.closeAllConnections();await new Promise(resolve=>app.close(resolve));}
+});
