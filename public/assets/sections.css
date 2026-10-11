@@ -33,3 +33,6 @@
 /* Display the complete cooking banner instead of cropping it with cover. */
 .hero-image.lucia-offer-banner{object-fit:contain;object-position:right center;background:#f8f4ed}
 @media(max-width:599px){.hero-image.lucia-offer-banner{object-position:right bottom}}
+
+.hero-offer-controls [data-offer-toggle]{display:grid;place-items:center}
+.offer-playback-icon{display:block;width:16px;height:16px}

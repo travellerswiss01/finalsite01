@@ -154,7 +154,7 @@ if(offerCarousel){
   });
  };
  const updateToggle=()=>{
-  toggle.textContent=paused?'Abspielen':'Pause';
+  toggle.innerHTML=paused?'<svg class="offer-playback-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="m8 4 12 8-12 8z"/></svg>':'<svg class="offer-playback-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
   toggle.setAttribute('aria-label',paused?'Automatischen Wechsel abspielen':'Automatischen Wechsel pausieren');
   toggle.setAttribute('aria-pressed',String(paused));
  };
