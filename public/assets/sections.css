@@ -198,3 +198,9 @@
 .cooking-course-grid .cooking-course:nth-child(2) .cooking-course-photo img{object-position:center 54%!important}
 .cooking-course-grid .cooking-course:nth-child(3) .cooking-course-photo img{object-position:center 62%!important}
 .cooking-course-grid .cooking-course:nth-child(4) .cooking-course-photo img{object-position:center 50%!important}
+
+/* Gentle per-course zoom keeps each dish prominent without losing its context. */
+.cooking-course-grid .cooking-course:nth-child(1) .cooking-course-photo img{transform:scale(1.12)!important}
+.cooking-course-grid .cooking-course:nth-child(2) .cooking-course-photo img{transform:scale(1.06)!important}
+.cooking-course-grid .cooking-course:nth-child(3) .cooking-course-photo img{transform:scale(1.08)!important}
+.cooking-course-grid .cooking-course:nth-child(4) .cooking-course-photo img{transform:scale(1.42)!important;transform-origin:50% 36%!important}
