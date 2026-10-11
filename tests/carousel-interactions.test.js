@@ -17,7 +17,7 @@ function setup(reduced=false){
  controls['[data-vinegar-open]']=element();
  const dialog=element(),close=element();dialog.open=false;dialog.querySelector=()=>close;dialog.showModal=()=>{dialog.open=true;};dialog.close=()=>{dialog.open=false;dialog.handlers.close();};
  const carousel=element();carousel.contains=el=>bottles.includes(el)||Object.values(controls).includes(el);
- carousel.querySelectorAll=selector=>selector==='[data-offer-image]'?images:selector==='[data-vinegar-domino]'?bottles:slides;
+ carousel.querySelectorAll=selector=>selector==='[data-offer-image]'?images:selector==='[data-vinegar-bottle]'?bottles:slides;
  carousel.querySelector=selector=>controls[selector];
  const document=element();document.activeElement=null;document.hidden=false;document.querySelector=selector=>selector==='[data-vinegar-dialog]'?dialog:carousel;
  const motion=element();motion.matches=reduced;
@@ -29,39 +29,41 @@ function setup(reduced=false){
   finish(){const [key,timeout]=timeouts.entries().next().value;timeouts.delete(key);timeout.fn();}
  };
 }
-test('a tap starts a staggered domino wave and pauses rotation until all bottles reset',()=>{
+test('hover gives a subtle fading ripple and pauses rotation until every bottle rests',()=>{
  const env=setup();for(let i=0;i<3;i++)env.next();
  env.bottles[2].handlers.pointerenter({pointerType:'touch'});assert.equal(env.timeouts.size,0);
- env.bottles[2].handlers.click();assert.equal(env.running(),false);
- assert.ok(env.figures.every(figure=>figure.classList.contains('is-domino')));
- assert.deepEqual(env.figures.map(figure=>figure.style.values['--domino-delay']),['440ms','220ms','0ms','220ms','440ms','660ms','880ms']);
- assert.ok(env.figures.every(figure=>figure.style.values['--domino-duration']==='2400ms'));
- assert.equal(env.figures[0].style.values['--domino-angle'],'-76deg');
- assert.equal(env.figures[6].style.values['--domino-angle'],'76deg');
- assert.equal([...env.timeouts.values()][0].ms,3280);
- env.bottles[4].handlers.click();assert.equal(env.timeouts.size,1);
+ env.bottles[2].handlers.pointerenter({pointerType:'mouse'});assert.equal(env.running(),false);
+ assert.ok(env.figures.every(figure=>figure.classList.contains('is-vinegar-sway')));
+ assert.deepEqual(env.figures.map(figure=>figure.style.values['--bottle-delay']),['140ms','70ms','0ms','70ms','140ms','210ms','280ms']);
+ assert.ok(env.figures.every(figure=>figure.style.values['--bottle-duration']==='1500ms'));
+ assert.equal(env.figures[2].style.values['--bottle-angle'],'3.5deg');
+ assert.equal(env.figures[1].style.values['--bottle-angle'],'-1.75deg');
+ assert.equal(env.figures[6].style.values['--bottle-angle'],'0.7deg');
+ assert.equal([...env.timeouts.values()][0].ms,1780);
+ env.bottles[4].handlers.pointerenter({pointerType:'mouse'});assert.equal(env.timeouts.size,1);
  env.carousel.handlers.mouseleave();assert.equal(env.running(),false);
- env.finish();assert.ok(env.figures.every(figure=>!figure.classList.contains('is-domino')));assert.equal(env.running(),true);
+ env.finish();assert.ok(env.figures.every(figure=>!figure.classList.contains('is-vinegar-sway')));assert.equal(env.running(),true);
 });
-test('mouse hover triggers the wave only on the active bottle slide',()=>{
+test('hover and keyboard focus trigger a ripple only on the active bottle slide',()=>{
  const env=setup();env.bottles[0].handlers.pointerenter({pointerType:'mouse'});assert.equal(env.timeouts.size,0);
  for(let i=0;i<3;i++)env.next();
- env.bottles[0].handlers.pointerenter({pointerType:'mouse'});assert.equal(env.timeouts.size,1);
- env.next();assert.equal(env.timeouts.size,0);assert.ok(env.figures.every(figure=>!figure.classList.contains('is-domino')));
+ env.bottles[0].handlers.focus();assert.equal(env.timeouts.size,1);
+ env.next();assert.equal(env.timeouts.size,0);assert.ok(env.figures.every(figure=>!figure.classList.contains('is-vinegar-sway')));
 });
-test('opening labels or hiding the page cancels the wave without restarting behind the dialog',()=>{
+test('clicking a bottle opens original labels and cancels motion; hiding the page also resets it',()=>{
  const env=setup();for(let i=0;i<3;i++)env.next();
- env.bottles[0].handlers.click();env.controls['[data-vinegar-open]'].handlers.click();
+ env.bottles[0].handlers.pointerenter({pointerType:'mouse'});env.bottles[0].handlers.click();
  assert.equal(env.timeouts.size,0);assert.equal(env.dialog.open,true);assert.equal(env.running(),false);
  env.dialog.close();assert.equal(env.running(),true);
- env.bottles[0].handlers.click();env.document.hidden=true;env.document.handlers.visibilitychange();
+ env.bottles[0].handlers.pointerenter({pointerType:'mouse'});env.document.hidden=true;env.document.handlers.visibilitychange();
  assert.equal(env.timeouts.size,0);assert.equal(env.running(),false);
 });
-test('reduced motion opens original labels without starting a domino animation',()=>{
+test('reduced motion keeps bottles still while allowing direct access to original labels',()=>{
  const env=setup(true);for(let i=0;i<3;i++)env.next();
- env.bottles[0].handlers.pointerenter({pointerType:'mouse'});assert.equal(env.dialog.open,false);
+ env.bottles[0].handlers.pointerenter({pointerType:'mouse'});env.bottles[0].handlers.focus();
+ assert.equal(env.timeouts.size,0);assert.equal(env.dialog.open,false);
  env.bottles[0].handlers.click();assert.equal(env.dialog.open,true);assert.equal(env.timeouts.size,0);
- const normal=setup();for(let i=0;i<3;i++)normal.next();normal.bottles[0].handlers.click();
+ const normal=setup();for(let i=0;i<3;i++)normal.next();normal.bottles[0].handlers.pointerenter({pointerType:'mouse'});
  normal.motion.matches=true;normal.motion.handlers.change({matches:true});
  assert.equal(normal.timeouts.size,0);assert.equal(normal.running(),false);
 });

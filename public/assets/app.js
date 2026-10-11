@@ -135,22 +135,22 @@ if(offerCarousel){
  const toggle=offerCarousel.querySelector('[data-offer-toggle]');
  const vinegarDialog=document.querySelector('[data-vinegar-dialog]');
  const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
- const bottles=[...offerCarousel.querySelectorAll('[data-vinegar-domino]')];
- let current=0,timer=null,dominoTimer=null,dominoRunning=false,paused=motion.matches,hovered=false;
+ const bottles=[...offerCarousel.querySelectorAll('[data-vinegar-bottle]')];
+ let current=0,timer=null,swayTimer=null,swayRunning=false,paused=motion.matches,hovered=false;
  const stop=()=>{if(timer!==null){window.clearInterval(timer);timer=null;}};
  const start=()=>{
   stop();
-  if(slides.length>1&&!paused&&!motion.matches&&!hovered&&!document.hidden&&!vinegarDialog?.open&&!dominoRunning&&!offerCarousel.contains(document.activeElement)){
+  if(slides.length>1&&!paused&&!motion.matches&&!hovered&&!document.hidden&&!vinegarDialog?.open&&!swayRunning&&!offerCarousel.contains(document.activeElement)){
    timer=window.setInterval(()=>show(current+1),6000);
   }
  };
- const resetDomino=()=>{
-  if(dominoTimer!==null){window.clearTimeout(dominoTimer);dominoTimer=null;}
-  dominoRunning=false;
-  bottles.forEach(button=>button.closest('.vinegar-lineup-item').classList.remove('is-domino'));
+ const resetSway=()=>{
+  if(swayTimer!==null){window.clearTimeout(swayTimer);swayTimer=null;}
+  swayRunning=false;
+  bottles.forEach(button=>button.closest('.vinegar-lineup-item').classList.remove('is-vinegar-sway'));
  };
  const show=index=>{
-  resetDomino();
+  resetSway();
   current=(index+slides.length)%slides.length;
   slides.forEach((slide,i)=>{
    const active=i===current;
@@ -174,27 +174,29 @@ if(offerCarousel){
  offerCarousel.addEventListener('mouseleave',()=>{hovered=false;start();});
  offerCarousel.addEventListener('focusin',stop);
  offerCarousel.addEventListener('focusout',event=>{if(!offerCarousel.contains(event.relatedTarget))window.setTimeout(start,0);});
- document.addEventListener('visibilitychange',()=>{if(document.hidden)resetDomino();start();});
- motion.addEventListener('change',event=>{if(event.matches){resetDomino();paused=true;updateToggle();}start();});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)resetSway();start();});
+ motion.addEventListener('change',event=>{if(event.matches){resetSway();paused=true;updateToggle();}start();});
 
- const openVinegar=()=>{if(vinegarDialog){resetDomino();stop();vinegarDialog.showModal();}};
- const playDomino=origin=>{
-  if(dominoRunning||!bottles[origin]?.closest('[data-offer-image]').classList.contains('is-active'))return;
+ const openVinegar=()=>{if(vinegarDialog){resetSway();stop();vinegarDialog.showModal();}};
+ const playSway=origin=>{
+  if(swayRunning||!bottles[origin]?.closest('[data-offer-image]').classList.contains('is-active'))return;
   if(motion.matches){openVinegar();return;}
-  const fallDelay=220,duration=2400;
-  dominoRunning=true;stop();
+  const rippleDelay=70,duration=1500;
+  swayRunning=true;stop();
   bottles.forEach((button,index)=>{
    const bottle=button.closest('.vinegar-lineup-item');
-   bottle.style.setProperty('--domino-delay',Math.abs(index-origin)*fallDelay+'ms');
-   bottle.style.setProperty('--domino-duration',duration+'ms');
-   bottle.style.setProperty('--domino-angle',index<origin?'-76deg':'76deg');
-   bottle.classList.add('is-domino');
+   bottle.style.setProperty('--bottle-delay',Math.abs(index-origin)*rippleDelay+'ms');
+   bottle.style.setProperty('--bottle-duration',duration+'ms');
+   const distance=Math.abs(index-origin),angle=3.5/(1+distance);
+   bottle.style.setProperty('--bottle-angle',(index<origin?-angle:angle)+'deg');
+   bottle.classList.add('is-vinegar-sway');
   });
-  dominoTimer=window.setTimeout(()=>{resetDomino();start();},duration+Math.max(origin,bottles.length-1-origin)*fallDelay);
+  swayTimer=window.setTimeout(()=>{resetSway();start();},duration+Math.max(origin,bottles.length-1-origin)*rippleDelay);
  };
  bottles.forEach((button,index)=>{
-  button.addEventListener('click',()=>playDomino(index));
-  button.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!motion.matches)playDomino(index);});
+  button.addEventListener('click',openVinegar);
+  button.addEventListener('focus',()=>{if(!motion.matches)playSway(index);});
+  button.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!motion.matches)playSway(index);});
  });
  offerCarousel.querySelector('[data-vinegar-open]')?.addEventListener('click',openVinegar);
  vinegarDialog?.querySelector('[data-vinegar-close]')?.addEventListener('click',()=>vinegarDialog.close());
