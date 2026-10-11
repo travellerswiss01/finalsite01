@@ -103,7 +103,7 @@ document.addEventListener('submit',async e=>{
   finally{setBusy(false);button.disabled=false;form.removeAttribute('aria-busy');}
  }
  if(e.target.id==='InquiryForm'){
-  e.preventDefault();const data=new FormData(e.target);const body=`Name: ${data.get('name')}\nE-Mail: ${data.get('email')}\n\n${data.get('message')}`;location.href=`mailto:biottoslaedeli@gmail.com?subject=${encodeURIComponent('Anfrage an Biottos Lädeli')}&body=${encodeURIComponent(body)}`;
+  e.preventDefault();const data=new FormData(e.target);const labels={date:'Datum',location:'Ort',guests:'Anzahl Gäste',occasion:'Anlass'};const details=[...data.entries()].filter(([key])=>!['name','email','message'].includes(key)).map(([key,value])=>`${labels[key]||key}: ${value}`);const body=[`Name: ${data.get('name')}`,`E-Mail: ${data.get('email')}`,...details,'',String(data.get('message')||'')].join('\n');const subject=e.target.dataset.subject||'Anfrage an Biottos Lädeli';location.href=`mailto:biottoslaedeli@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
  }
 });
 document.addEventListener('click',async e=>{
