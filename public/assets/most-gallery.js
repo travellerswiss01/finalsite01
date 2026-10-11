@@ -12,6 +12,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-most-gallery]'
  let animation;
  const update=(animate=false)=>{
   const option=select.selectedOptions[0];
+  gallery.dataset.mostSize=option.dataset.title.match(/^(3|5|10)\s*Liter/i)?.[1]||'';
   if(option.dataset.image&&image){
    image.removeAttribute('srcset');image.src=option.dataset.image;
    image.alt=option.dataset.alt||`Süssmost · ${option.dataset.title}`;

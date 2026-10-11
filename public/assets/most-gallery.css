@@ -8,3 +8,8 @@
 .most-size-controls{display:flex;justify-content:center;gap:10px;margin:20px 0 4px;flex-wrap:wrap}.most-size-controls button{min-height:44px;min-width:88px;border:1px solid #b8c3b6;border-radius:7px;background:transparent;color:#153e2c;padding:10px 16px;font-size:14px;transition:background .2s,color .2s}.most-size-controls button[aria-pressed=true]{background:#153e2c;border-color:#153e2c;color:#fff}.most-size-controls button:hover{border-color:#153e2c}.most-arrow[hidden],.most-size-controls[hidden]{display:none}
 @media(max-width:599px){.most-gallery{padding:16px}.most-gallery-stage{height:330px}.most-gallery .detail-main-image{padding:12px 48px}.most-arrow{width:44px;height:44px}.most-size-controls{gap:8px}.most-size-controls button{min-width:76px;padding:10px 12px}.most-gallery-caption p{font-size:26px}}
 @media(prefers-reduced-motion:reduce){.most-arrow,.most-size-controls button{transition:none}}
+
+/* Keep the original labels; give the larger capacity more visual presence. */
+.most-gallery[data-most-size="3"] .detail-main-image{scale:.82}
+.most-gallery[data-most-size="5"] .detail-main-image{scale:.74}
+.most-gallery[data-most-size="10"] .detail-main-image{scale:1}
