@@ -36,3 +36,6 @@
 
 .hero-offer-controls [data-offer-toggle]{display:grid;place-items:center}
 .offer-playback-icon{display:block;width:16px;height:16px}
+
+.hero-image.product-offer-banner{object-fit:contain;object-position:right center;background:#f8f4ed}
+@media(max-width:599px){.hero-image.product-offer-banner{object-position:right bottom}}

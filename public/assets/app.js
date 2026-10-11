@@ -139,7 +139,7 @@ if(offerCarousel){
  const start=()=>{
   stop();
   if(slides.length>1&&!paused&&!motion.matches&&!hovered&&!document.hidden&&!offerCarousel.contains(document.activeElement)){
-   timer=window.setInterval(()=>show(current+1),8000);
+   timer=window.setInterval(()=>show(current+1),6000);
   }
  };
  const show=index=>{

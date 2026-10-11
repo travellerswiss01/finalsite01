@@ -21,15 +21,18 @@ test('Lucia has a dedicated service page with the agreed offer and a prepared in
 
 test('homepage rotates matching gift and cooking photos without changing the hero structure',()=>{
  const page=home([]);
- assert.equal((page.match(/data-offer-image/g)||[]).length,2);
+ assert.equal((page.match(/data-offer-image/g)||[]).length,5);
  assert.match(page,/src="\/assets\/lucia-hero-banner\.webp"/);
  assert.match(page,/src="\/assets\/hero\.jpg"/);
  assert.match(page,/<h1 id="HeroHeading">Geschenke aus<br>dem Thurgau<\/h1>/);
  assert.match(page,/Geschenkkörbe entdecken/);
  assert.match(page,/Lucia kocht<br>für dich/);
  assert.match(page,/href="\/kochservice">Lucias Kochservice entdecken/);
- assert.equal((page.match(/data-offer-slide/g)||[]).length,2);
+ assert.equal((page.match(/data-offer-slide/g)||[]).length,5);
  assert.match(page,/aria-hidden="true" inert/);
+ for(const path of ["/kontakt","/geschenk-konfigurator","/saisonales"])assert.ok(page.includes(`href="${path}"`));
+ assert.match(page,/Firmengeschenke anfragen/);
+ assert.match(page,/Saisonales entdecken/);
 });
 
 test('Kochservice is linked and marked current in the site navigation',()=>{
