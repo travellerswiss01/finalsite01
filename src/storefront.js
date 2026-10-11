@@ -56,7 +56,7 @@ export function createStorefront({domain = process.env.SHOPIFY_STORE_DOMAIN || '
     const data=await graphql(queries.CART,{id});return data.cart;
   }
   async function mutateCart(action, id, variables={}) {
-    const operations={create:[queries.CREATE_CART,'cartCreate'],add:[queries.ADD_LINES,'cartLinesAdd'],update:[queries.UPDATE_LINES,'cartLinesUpdate'],remove:[queries.REMOVE_LINES,'cartLinesRemove']};
+    const operations={create:[queries.CREATE_CART,'cartCreate'],add:[queries.ADD_LINES,'cartLinesAdd'],update:[queries.UPDATE_LINES,'cartLinesUpdate'],remove:[queries.REMOVE_LINES,'cartLinesRemove'],note:[queries.CART_NOTE_UPDATE,'cartNoteUpdate']};
     const operation=operations[action];if(!operation)throw new StorefrontError('Ungültige Warenkorbaktion.',400);
     const data=await graphql(operation[0],{...(id?{cartId:id}:{}),...variables});const result=data[operation[1]];
     if (result.userErrors?.length) throw new StorefrontError(result.userErrors.map(e=>e.message).join(' '),422,result.userErrors);

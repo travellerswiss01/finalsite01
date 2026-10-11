@@ -16,4 +16,14 @@ test('failed inventory mutations preserve user errors',async()=>{
 test('cart warnings are returned with authoritative cart quantities',async()=>{
  const store=createStorefront({fetchImpl:async()=>respond({cartCreate:{cart:cartFixture(),userErrors:[],warnings:[{message:'Menge angepasst.'}]}})});const result=await store.mutateCart('create',null,{lines:[]});assert.equal(result.warnings[0].message,'Menge angepasst.');assert.equal(result.cart.totalQuantity,1);
 });
+test('cart note mutation stores the Shopify order note with the right variables',async()=>{
+ let request;
+ const store=createStorefront({fetchImpl:async(url,options)=>{request=JSON.parse(options.body);return respond({cartNoteUpdate:{cart:{...cartFixture(),note:'Grusskarte:\nAlles Liebe!'},userErrors:[],warnings:[]}});}});
+ const note='Grusskarte:\nAlles Liebe!';
+ const result=await store.mutateCart('note',cartFixture().id,{note});
+ assert.match(request.query,/cartNoteUpdate\(cartId: \$cartId, note: \$note\)/);
+ assert.equal(request.variables.cartId,cartFixture().id);
+ assert.equal(request.variables.note,note);
+ assert.equal(result.cart.note,note);
+});
 test('invalid store domains cannot turn the API proxy into an arbitrary URL proxy',()=>assert.throws(()=>createStorefront({domain:'attacker.example'}),/Domain/));

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {giftConfigurator} from '../src/render.js';
-import {normalizeCartAddLines} from '../src/server.js';
+import {normalizeCartAddLines,normalizeGreetingCard} from '../src/server.js';
 import {normalizedProduct} from './fixtures.js';
 
 test('configurator renders live catalog product, variant, accessible selection and price controls',()=>{
@@ -15,6 +15,8 @@ test('configurator renders live catalog product, variant, accessible selection a
  assert.match(html,/6 Liter · CHF 14\.00/);
  assert.match(html,/data-gift-quantity/);
  assert.match(html,/data-gift-total/);
+ assert.match(html,/id="GiftMessage"[^>]+maxlength="500"/);
+ assert.match(html,/Grusstext/);
  assert.match(html,/aria-live="polite"/);
 });
 
@@ -32,4 +34,11 @@ test('cart add rejects empty, oversized and invalid product selections',()=>{
  assert.throws(()=>normalizeCartAddLines({lines:Array.from({length:51},()=>({merchandiseId:'gid://shopify/ProductVariant/1',quantity:1}))}),error=>error.status===400);
  assert.throws(()=>normalizeCartAddLines({lines:[{merchandiseId:'https://example.com/variant/1',quantity:1}]}),error=>error.status===400);
  assert.throws(()=>normalizeCartAddLines({lines:[{merchandiseId:'gid://shopify/ProductVariant/1',quantity:0}]}),error=>error.status===400);
+});
+
+test('greeting card text is trimmed and limited to 500 characters',()=>{
+ assert.equal(normalizeGreetingCard('  Alles Liebe!  '),'Alles Liebe!');
+ assert.equal(normalizeGreetingCard(undefined),'');
+ assert.throws(()=>normalizeGreetingCard('x'.repeat(501)),error=>error.status===400);
+ assert.throws(()=>normalizeGreetingCard({text:'Hallo'}),error=>error.status===400);
 });

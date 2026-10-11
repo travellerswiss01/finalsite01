@@ -24,6 +24,11 @@ async function readJson(req){
 }
 const validQuantity=q=>Number.isInteger(q)&&q>=1&&q<=250;
 const validVariantId=id=>typeof id==='string'&&/^gid:\/\/shopify\/ProductVariant\/\d+$/.test(id);
+export function normalizeGreetingCard(value){
+ if(value===undefined)return '';
+ if(typeof value!=='string'||value.length>500)throw new StorefrontError('Der Grusstext darf höchstens 500 Zeichen lang sein.',400);
+ return value.trim();
+}
 export function normalizeCartAddLines(body){
  const lines=Array.isArray(body.lines)?body.lines:(body.variantId!==undefined?[{merchandiseId:body.variantId,quantity:body.quantity}]:null);
  if(!lines||lines.length<1||lines.length>50)throw new StorefrontError('Bitte wähle 1 bis 50 Produkte für dein Geschenk.',400);
@@ -68,8 +73,20 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
     let result;
     if(pathname==='/api/cart/add'){
       const lines=normalizeCartAddLines(body);
-      if(cartId&&!(await store.cart(cartId)))cartId=null;
-      result=await store.mutateCart(cartId?'add':'create',cartId,{lines});
+      const greeting=normalizeGreetingCard(body.greetingCard);
+      const existingCart=cartId?await store.cart(cartId):null;
+      if(cartId&&!existingCart)cartId=null;
+      const greetingNote=greeting?`Grusskarte:\n${greeting}`:'';
+      if(!cartId){
+       result=await store.mutateCart('create',null,{lines,...(greetingNote?{note:greetingNote}:{})});
+      }else{
+       result=await store.mutateCart('add',cartId,{lines});
+       if(greetingNote){
+        const priorNote=existingCart?.note?.trim();
+        const note=priorNote?`${priorNote}\n\n${greetingNote}`:greetingNote;
+        result=await store.mutateCart('note',result.cart.id,{note});
+       }
+      }
     }else{
       if(!cartId)throw new StorefrontError('Dein Warenkorb ist nicht mehr verfügbar. Bitte lade ihn erneut.',409);
       if(typeof body.lineId!=='string'||!body.lineId.startsWith('gid://shopify/CartLine/')||body.lineId.length>1000)throw new StorefrontError('Ungültige Warenkorbposition.',400);

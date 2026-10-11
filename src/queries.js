@@ -33,7 +33,7 @@ export const VARIANTS = `query Variants($id: ID!, $after: String) @inContext(cou
 }`;
 
 export const CART_FIELDS = `fragment CartFields on Cart {
-  id checkoutUrl totalQuantity
+  id checkoutUrl totalQuantity note
   cost { subtotalAmount { amount currencyCode } totalAmount { amount currencyCode } }
   lines(first: 250) {
     nodes {
@@ -52,8 +52,15 @@ export const CART_FIELDS = `fragment CartFields on Cart {
 export const CART = `query Cart($id: ID!) @inContext(country: CH, language: DE) {
   cart(id: $id) { ...CartFields }
 } ${CART_FIELDS}`;
-export const CREATE_CART = `mutation CreateCart($lines: [CartLineInput!]) @inContext(country: CH, language: DE) {
-  cartCreate(input: { lines: $lines, buyerIdentity: { countryCode: CH } }) {
+export const CREATE_CART = `mutation CreateCart($lines: [CartLineInput!], $note: String) @inContext(country: CH, language: DE) {
+  cartCreate(input: { lines: $lines, note: $note, buyerIdentity: { countryCode: CH } }) {
+    cart { ...CartFields }
+    userErrors { field message code }
+    warnings { code message target }
+  }
+} ${CART_FIELDS}`;
+export const CART_NOTE_UPDATE = `mutation UpdateCartNote($cartId: ID!, $note: String!) @inContext(country: CH, language: DE) {
+  cartNoteUpdate(cartId: $cartId, note: $note) {
     cart { ...CartFields }
     userErrors { field message code }
     warnings { code message target }
