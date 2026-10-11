@@ -24,6 +24,9 @@ test('homepage rotates matching gift and cooking photos without changing the her
  assert.equal((page.match(/data-offer-image/g)||[]).length,5);
  assert.match(page,/src="\/assets\/lucia-hero-banner\.webp"/);
  assert.match(page,/src="\/assets\/hero\.jpg"/);
+ assert.match(page,/class="hero-image bundled-hero hero-offer-image product-offer-banner is-active" data-offer-image src="\/assets\/suessmost-3-liter\.webp"/);
+ assert.ok(page.indexOf('/assets/hero.jpg')>page.indexOf('/assets/essig-original.webp'));
+ assert.doesNotMatch(page,/src="\/assets\/saison-aepfel\.webp"/);
  assert.match(page,/<h1 id="HeroHeading">Geschenke aus<br>dem Thurgau<\/h1>/);
  assert.match(page,/Geschenkkörbe entdecken/);
  assert.match(page,/Lucia kocht<br>für dich/);
