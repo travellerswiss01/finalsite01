@@ -190,6 +190,11 @@
 .cooking-course-photo{overflow:hidden}
 .cooking-course-photo img{display:block!important;width:100%!important;height:100%!important;max-width:100%;max-height:100%;object-fit:contain!important}
 
-/* Anchor each complete photo to its fixed frame so portrait images cannot spill. */
-.cooking-course-photo{position:relative;overflow:hidden}
-.cooking-course-photo img{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:contain!important;object-position:center!important}
+
+/* Fill each menu frame edge to edge with a deliberate crop around the dish. */
+.cooking-course-photo{position:relative;overflow:hidden;background:#f9f6ef}
+.cooking-course-photo img{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover!important;object-position:center 52%!important}
+.cooking-course-grid .cooking-course:nth-child(1) .cooking-course-photo img{object-position:center 52%!important}
+.cooking-course-grid .cooking-course:nth-child(2) .cooking-course-photo img{object-position:center 54%!important}
+.cooking-course-grid .cooking-course:nth-child(3) .cooking-course-photo img{object-position:center 62%!important}
+.cooking-course-grid .cooking-course:nth-child(4) .cooking-course-photo img{object-position:center 50%!important}
