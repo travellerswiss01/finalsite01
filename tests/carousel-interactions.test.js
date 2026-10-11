@@ -34,10 +34,11 @@ test('a tap starts a staggered domino wave and pauses rotation until all bottles
  env.bottles[2].handlers.pointerenter({pointerType:'touch'});assert.equal(env.timeouts.size,0);
  env.bottles[2].handlers.click();assert.equal(env.running(),false);
  assert.ok(env.figures.every(figure=>figure.classList.contains('is-domino')));
- assert.deepEqual(env.figures.map(figure=>figure.style.values['--domino-delay']),['220ms','110ms','0ms','110ms','220ms','330ms','440ms']);
- assert.equal(env.figures[0].style.values['--domino-angle'],'-65deg');
- assert.equal(env.figures[6].style.values['--domino-angle'],'65deg');
- assert.equal([...env.timeouts.values()][0].ms,2340);
+ assert.deepEqual(env.figures.map(figure=>figure.style.values['--domino-delay']),['440ms','220ms','0ms','220ms','440ms','660ms','880ms']);
+ assert.ok(env.figures.every(figure=>figure.style.values['--domino-duration']==='2400ms'));
+ assert.equal(env.figures[0].style.values['--domino-angle'],'-76deg');
+ assert.equal(env.figures[6].style.values['--domino-angle'],'76deg');
+ assert.equal([...env.timeouts.values()][0].ms,3280);
  env.bottles[4].handlers.click();assert.equal(env.timeouts.size,1);
  env.carousel.handlers.mouseleave();assert.equal(env.running(),false);
  env.finish();assert.ok(env.figures.every(figure=>!figure.classList.contains('is-domino')));assert.equal(env.running(),true);

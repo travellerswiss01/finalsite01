@@ -181,14 +181,16 @@ if(offerCarousel){
  const playDomino=origin=>{
   if(dominoRunning||!bottles[origin]?.closest('[data-offer-image]').classList.contains('is-active'))return;
   if(motion.matches){openVinegar();return;}
+  const fallDelay=220,duration=2400;
   dominoRunning=true;stop();
   bottles.forEach((button,index)=>{
    const bottle=button.closest('.vinegar-lineup-item');
-   bottle.style.setProperty('--domino-delay',Math.abs(index-origin)*110+'ms');
-   bottle.style.setProperty('--domino-angle',index<origin?'-65deg':'65deg');
+   bottle.style.setProperty('--domino-delay',Math.abs(index-origin)*fallDelay+'ms');
+   bottle.style.setProperty('--domino-duration',duration+'ms');
+   bottle.style.setProperty('--domino-angle',index<origin?'-76deg':'76deg');
    bottle.classList.add('is-domino');
   });
-  dominoTimer=window.setTimeout(()=>{resetDomino();start();},1900+Math.max(origin,bottles.length-1-origin)*110);
+  dominoTimer=window.setTimeout(()=>{resetDomino();start();},duration+Math.max(origin,bottles.length-1-origin)*fallDelay);
  };
  bottles.forEach((button,index)=>{
   button.addEventListener('click',()=>playDomino(index));
