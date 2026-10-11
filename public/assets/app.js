@@ -29,6 +29,51 @@ function openCart(trigger){
 }
 drawer?.addEventListener('close',()=>{document.body.style.overflow=oldOverflow;opener?.focus();});
 drawer?.addEventListener('click',e=>{if(e.target===drawer){const r=drawer.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)drawer.close();}});
+const giftForm=document.getElementById('GiftConfigurator');
+if(giftForm){
+ const giftItems=[...giftForm.querySelectorAll('[data-gift-item]')];
+ const giftSearch=document.querySelector('[data-gift-search-input]');
+ const giftCount=giftForm.querySelector('[data-gift-count]');
+ const giftTotal=giftForm.querySelector('[data-gift-total]');
+ const giftSubmit=giftForm.querySelector('[data-gift-submit]');
+ const giftError=giftForm.querySelector('[data-gift-error]');
+ const selectedVariant=item=>{const control=item.querySelector('[data-gift-variant]');return control.tagName==='SELECT'?control.selectedOptions[0]:control;};
+ const updateGiftBuilder=()=>{
+  const query=(giftSearch?.value||'').trim().toLocaleLowerCase('de');
+  let chosen=0,total=0;
+  for(const item of giftItems){
+   item.hidden=Boolean(query&&!item.dataset.giftSearch.includes(query));
+   const checkbox=item.querySelector('[data-gift-select]');
+   const control=item.querySelector('[data-gift-variant]');
+   const quantity=item.querySelector('[data-gift-quantity]');
+   const isSelected=checkbox.checked;
+   control.disabled=!isSelected;quantity.disabled=!isSelected;
+   if(isSelected){
+    chosen++;
+    const variant=selectedVariant(item);
+    if(control.tagName==='INPUT'){control.dataset.price=variant.dataset.price;control.dataset.currency=variant.dataset.currency;}
+    item.querySelector('[data-gift-price]').textContent=money({amount:variant.dataset.price,currencyCode:variant.dataset.currency});
+    total+=Number(variant.dataset.price)*Number(quantity.value||1);
+   }
+  }
+  giftCount.textContent=`${chosen} ${chosen===1?'Produkt':'Produkte'} ausgewählt`;
+  giftTotal.textContent=money({amount:total,currencyCode:'CHF'});
+  giftSubmit.disabled=chosen===0||busy;
+ };
+ giftForm.addEventListener('change',e=>{if(e.target.matches('[data-gift-select],[data-gift-variant],[data-gift-quantity]'))updateGiftBuilder();});
+ giftForm.addEventListener('input',e=>{if(e.target.matches('[data-gift-quantity]'))updateGiftBuilder();});
+ giftSearch?.addEventListener('input',updateGiftBuilder);
+ giftForm.addEventListener('submit',async e=>{
+  e.preventDefault();if(busy)return;
+  const lines=giftItems.filter(item=>item.querySelector('[data-gift-select]').checked).map(item=>({merchandiseId:selectedVariant(item).value,quantity:Number(item.querySelector('[data-gift-quantity]').value)}));
+  if(!lines.length)return;
+  giftError.textContent='';clearErrors();setBusy(true);giftForm.setAttribute('aria-busy','true');giftSubmit.disabled=true;giftSubmit.textContent='Wird hinzugefügt …';
+  try{const result=await api('/api/cart/add',{lines});renderCart(result.cart,result.warnings);openCart(giftSubmit);}
+  catch(err){await syncCart().catch(()=>{});giftError.textContent=err.message;}
+  finally{setBusy(false);giftForm.removeAttribute('aria-busy');giftSubmit.textContent='Auswahl in den Warenkorb';updateGiftBuilder();}
+ });
+ updateGiftBuilder();
+}
 async function changeLine(lineId,quantity,remove=false){
  if(busy)return;clearErrors();setBusy(true);
  try{const result=await api(remove?'/api/cart/remove':'/api/cart/update',remove?{lineId}:{lineId,quantity});renderCart(result.cart,result.warnings);const focusRoot=drawer?.open?drawer:document;const input=[...focusRoot.querySelectorAll('[data-line]')].find(el=>el.dataset.line===lineId)?.querySelector('[data-cart-quantity]');(input||focusRoot.querySelector('[data-checkout]')||drawer?.querySelector('[data-cart-close]'))?.focus();}

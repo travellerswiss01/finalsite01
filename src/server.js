@@ -23,6 +23,13 @@ async function readJson(req){
  return parsed;
 }
 const validQuantity=q=>Number.isInteger(q)&&q>=1&&q<=250;
+const validVariantId=id=>typeof id==='string'&&/^gid:\/\/shopify\/ProductVariant\/\d+$/.test(id);
+export function normalizeCartAddLines(body){
+ const lines=Array.isArray(body.lines)?body.lines:(body.variantId!==undefined?[{merchandiseId:body.variantId,quantity:body.quantity}]:null);
+ if(!lines||lines.length<1||lines.length>50)throw new StorefrontError('Bitte wähle 1 bis 50 Produkte für dein Geschenk.',400);
+ for(const line of lines){if(!line||!validVariantId(line.merchandiseId)||!validQuantity(line.quantity))throw new StorefrontError('Bitte prüfe Produktauswahl und Mengen.',400);}
+ return lines.map(line=>({merchandiseId:line.merchandiseId,quantity:line.quantity}));
+}
 export function createApp({store=createStorefront(),origin=process.env.PUBLIC_ORIGIN}={}) {
  return httpServer(async(req,res)=>{
   res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');res.setHeader('X-Frame-Options','DENY');
@@ -60,9 +67,9 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
     }
     let result;
     if(pathname==='/api/cart/add'){
-      if(!validQuantity(body.quantity)||typeof body.variantId!=='string'||!/^gid:\/\/shopify\/ProductVariant\/\d+$/.test(body.variantId))throw new StorefrontError('Bitte wähle eine gültige Variante und Menge.',400);
+      const lines=normalizeCartAddLines(body);
       if(cartId&&!(await store.cart(cartId)))cartId=null;
-      result=await store.mutateCart(cartId?'add':'create',cartId,{lines:[{merchandiseId:body.variantId,quantity:body.quantity}]});
+      result=await store.mutateCart(cartId?'add':'create',cartId,{lines});
     }else{
       if(!cartId)throw new StorefrontError('Dein Warenkorb ist nicht mehr verfügbar. Bitte lade ihn erneut.',409);
       if(typeof body.lineId!=='string'||!body.lineId.startsWith('gid://shopify/CartLine/')||body.lineId.length>1000)throw new StorefrontError('Ungültige Warenkorbposition.',400);
@@ -75,11 +82,12 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
    if(pathname==='/health'){sendJson(res,200,{status:'ok'});return;}
    if(pathname==='/robots.txt'){res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8'});res.end(`User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /warenkorb\nDisallow: /suche\nSitemap: ${requestOrigin}/sitemap.xml\n`);return;}
    if(pathname==='/sitemap.xml'){
-    const products=await store.catalog();const routes=['/','/sortiment','/geschenkkoerbe','/ueber-uns','/kontakt',...products.map(view.productUrl)];
+    const products=await store.catalog();const routes=['/','/sortiment','/geschenkkoerbe','/geschenk-konfigurator','/ueber-uns','/kontakt',...products.map(view.productUrl)];
     res.writeHead(200,{'Content-Type':'application/xml; charset=utf-8'});res.end(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${routes.map(route=>`<url><loc>${view.escape(requestOrigin+route)}</loc></url>`).join('')}</urlset>`);return;
    }
    const shop=await store.shop();let content,title,description,product,status=200;
    if(pathname==='/'){content=view.home(await store.catalog());title='Geschenke aus dem Thurgau';}
+   else if(pathname==='/geschenk-konfigurator'){content=view.giftConfigurator(await store.catalog());title='Geschenk zusammenstellen';description='Wähle Thurgauer Spezialitäten und stelle dein persönliches Geschenk zusammen.';}
    else if(['/sortiment','/geschenkkoerbe','/suche'].includes(pathname)){
     const q=(url.searchParams.get('q')||'').slice(0,200);const category=(url.searchParams.get('kategorie')||'').slice(0,100);
     content=view.listing(await store.catalog(),{q,category,gifts:pathname==='/geschenkkoerbe',search:pathname==='/suche'});title=pathname==='/geschenkkoerbe'?'Geschenkkörbe aus dem Thurgau':pathname==='/suche'?'Produkte suchen':'Sortiment';
