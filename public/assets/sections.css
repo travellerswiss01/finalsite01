@@ -39,3 +39,7 @@
 
 .hero-image.product-offer-banner{object-fit:contain;object-position:right center;background:#f8f4ed}
 @media(max-width:599px){.hero-image.product-offer-banner{object-position:right bottom}}
+
+/* Every offer uses exactly the same image area at each breakpoint. */
+.offer-carousel .hero-offer-image{width:70%;left:30%;height:100%}
+@media(max-width:599px){.offer-carousel .hero-offer-image{width:100%;left:0}}

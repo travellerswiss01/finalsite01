@@ -32,6 +32,7 @@ test('homepage rotates matching gift and cooking photos without changing the her
  assert.match(page,/aria-hidden="true" inert/);
  for(const path of ["/kontakt","/geschenk-konfigurator","/saisonales"])assert.ok(page.includes(`href="${path}"`));
  assert.match(page,/Firmengeschenke anfragen/);
+ assert.match(page,/src="\/assets\/troepfli-heimat\.webp"/);
  assert.match(page,/Saisonales entdecken/);
 });
 
