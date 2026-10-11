@@ -133,12 +133,13 @@ if(offerCarousel){
  const slides=[...offerCarousel.querySelectorAll('[data-offer-slide]')];
  const images=[...offerCarousel.querySelectorAll('[data-offer-image]')];
  const toggle=offerCarousel.querySelector('[data-offer-toggle]');
+ const vinegarDialog=document.querySelector('[data-vinegar-dialog]');
  const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
  let current=0,timer=null,paused=motion.matches,hovered=false;
  const stop=()=>{if(timer!==null){window.clearInterval(timer);timer=null;}};
  const start=()=>{
   stop();
-  if(slides.length>1&&!paused&&!motion.matches&&!hovered&&!document.hidden&&!offerCarousel.contains(document.activeElement)){
+  if(slides.length>1&&!paused&&!motion.matches&&!hovered&&!document.hidden&&!vinegarDialog?.open&&!offerCarousel.contains(document.activeElement)){
    timer=window.setInterval(()=>show(current+1),6000);
   }
  };
@@ -151,6 +152,7 @@ if(offerCarousel){
    slide.inert=!active;
    images[i]?.classList.toggle('is-active',active);
    images[i]?.setAttribute('aria-hidden',String(!active));
+   if(images[i])images[i].inert=!active;
   });
  };
  const updateToggle=()=>{
@@ -167,6 +169,9 @@ if(offerCarousel){
  offerCarousel.addEventListener('focusout',event=>{if(!offerCarousel.contains(event.relatedTarget))window.setTimeout(start,0);});
  document.addEventListener('visibilitychange',start);
  motion.addEventListener('change',event=>{if(event.matches){paused=true;updateToggle();}start();});
+ offerCarousel.querySelector('[data-vinegar-open]')?.addEventListener('click',()=>{if(vinegarDialog){stop();vinegarDialog.showModal();}});
+ vinegarDialog?.querySelector('[data-vinegar-close]')?.addEventListener('click',()=>vinegarDialog.close());
+ vinegarDialog?.addEventListener('close',start);
  offerCarousel.querySelector('[data-offer-controls]').hidden=false;
  show(0);updateToggle();start();
 }

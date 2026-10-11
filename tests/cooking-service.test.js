@@ -36,7 +36,11 @@ test('homepage rotates matching gift and cooking photos without changing the her
  for(const path of ["/kontakt","/geschenk-konfigurator","/saisonales"])assert.ok(page.includes(`href="${path}"`));
  assert.match(page,/Firmengeschenke anfragen/);
  assert.match(page,/src="\/assets\/essig-original\.webp"/);
- assert.match(page,/class="original-vinegar-bottle"/);
+ assert.match(page,/class="vinegar-lineup"/);
+ assert.equal((page.match(/class="vinegar-lineup-item"/g)||[]).length,7);
+ assert.match(page,/data-vinegar-dialog/);
+ assert.match(page,/data-vinegar-open/);
+ for(const name of ["essig-birnen","essig-balsamico","essig-himbeer","essig-holunder","essig-kirschen-birnen","essig-kirsch"])assert.ok(page.includes(`/assets/${name}.webp`));
  assert.doesNotMatch(page,/src="\/assets\/essig-liegend\.webp"/);
  assert.match(page,/Saisonales entdecken/);
 });
