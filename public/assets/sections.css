@@ -118,3 +118,6 @@
  .announcement-marquee-copy{min-width:0;width:100%;padding:0;white-space:normal}
  .announcement-marquee-copy+.announcement-marquee-copy{display:none}
 }
+
+/* Give each announcement statement more breathing room. */
+.announcement-marquee-message{display:inline-flex;align-items:center;gap:clamp(28px,4vw,64px)}
