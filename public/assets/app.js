@@ -37,8 +37,8 @@ if(giftForm){
  const giftTotal=giftForm.querySelector('[data-gift-total]');
  const giftSubmit=giftForm.querySelector('[data-gift-submit]');
  const giftError=giftForm.querySelector('[data-gift-error]');
- const giftMessage=giftForm.querySelector('[data-gift-message]');
- const giftMessageCount=giftForm.querySelector('[data-gift-message-count]');
+ const giftMessage=document.querySelector('[data-gift-message]');
+ const giftMessageCount=document.querySelector('[data-gift-message-count]');
  const selectedVariant=item=>{const control=item.querySelector('[data-gift-variant]');return control.tagName==='SELECT'?control.selectedOptions[0]:control;};
  const updateGiftBuilder=()=>{
   const query=(giftSearch?.value||'').trim().toLocaleLowerCase('de');
@@ -66,6 +66,14 @@ if(giftForm){
  giftForm.addEventListener('input',e=>{if(e.target.matches('[data-gift-quantity]'))updateGiftBuilder();});
  giftSearch?.addEventListener('input',updateGiftBuilder);
  giftMessage?.addEventListener('input',()=>{giftMessageCount.textContent=`${giftMessage.value.length} / 500`;});
+ document.querySelectorAll('[data-greeting-preset]').forEach(button=>button.addEventListener('click',()=>{
+  const addition=button.dataset.greetingPreset;
+  const prefix=giftMessage.value.trim()?`${giftMessage.value.trim()}\n\n`:'';
+  giftMessage.value=`${prefix}${addition}`.slice(0,500);
+  giftMessage.dispatchEvent(new Event('input',{bubbles:true}));
+  giftMessage.focus();
+ }));
+ document.querySelector('[data-gift-message-jump]')?.addEventListener('click',()=>setTimeout(()=>giftMessage?.focus({preventScroll:true}),0));
  giftForm.addEventListener('submit',async e=>{
   e.preventDefault();if(busy)return;
   const lines=giftItems.filter(item=>item.querySelector('[data-gift-select]').checked).map(item=>({merchandiseId:selectedVariant(item).value,quantity:Number(item.querySelector('[data-gift-quantity]').value)}));

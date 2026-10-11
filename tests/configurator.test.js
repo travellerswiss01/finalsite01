@@ -17,6 +17,8 @@ test('configurator renders live catalog product, variant, accessible selection a
  assert.match(html,/data-gift-total/);
  assert.match(html,/id="GiftMessage"[^>]+maxlength="500"/);
  assert.match(html,/Grusstext/);
+ assert.match(html,/data-greeting-preset/);
+ assert.match(html,/data-gift-message-jump/);
  assert.match(html,/aria-live="polite"/);
 });
 
