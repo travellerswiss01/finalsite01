@@ -1,0 +1,37 @@
+{
+  "layouts": [
+    {
+      "width": 1440,
+      "scrollWidth": 1440,
+      "cards": 4,
+      "loaded": true
+    },
+    {
+      "width": 768,
+      "scrollWidth": 768,
+      "cards": 4,
+      "loaded": true
+    },
+    {
+      "width": 375,
+      "scrollWidth": 375,
+      "cards": 4,
+      "loaded": true
+    }
+  ],
+  "products": 19,
+  "verified": [
+    "All catalog cards rendered",
+    "10 Liter Süssmost selection and correct price",
+    "Live Shopify add to cart",
+    "Quantity change with live total",
+    "Cart survives reload",
+    "Remove returns empty cart",
+    "Search filters product catalog",
+    "Product-page add",
+    "Checkout button navigates to Shopify checkout; navigation intercepted before checkout loaded"
+  ],
+  "checkoutSeen": true,
+  "ordersPlaced": 0,
+  "errors": []
+}
