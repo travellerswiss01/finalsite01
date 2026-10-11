@@ -42,7 +42,7 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
   res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https://cdn.shopify.com; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' mailto:");
   let url;try{url=new URL(req.url,'http://localhost');}catch{sendJson(res,400,{error:'Ungültige Adresse.'});return;}
   const pathname=url.pathname;
-  const requestOrigin=origin||`${process.env.VERCEL?'https':'http'}://${req.headers.host}`;
+  const requestOrigin=origin||`${req.headers['x-forwarded-proto']?.split(',')[0]?.trim()==='https'||process.env.VERCEL?'https':'http'}://${req.headers.host}`;
   const secure=requestOrigin.startsWith('https://');
   try {
    if(pathname.startsWith('/assets/')){
