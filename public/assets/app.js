@@ -131,6 +131,7 @@ syncCart().catch(err=>{if(document.querySelector('[data-cart-page-content]')){do
 const offerCarousel=document.querySelector('[data-offer-carousel]');
 if(offerCarousel){
  const slides=[...offerCarousel.querySelectorAll('[data-offer-slide]')];
+ const images=[...offerCarousel.querySelectorAll('[data-offer-image]')];
  const toggle=offerCarousel.querySelector('[data-offer-toggle]');
  const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
  let current=0,timer=null,paused=motion.matches,hovered=false;
@@ -148,6 +149,8 @@ if(offerCarousel){
    slide.classList.toggle('is-active',active);
    slide.setAttribute('aria-hidden',String(!active));
    slide.inert=!active;
+   images[i]?.classList.toggle('is-active',active);
+   images[i]?.setAttribute('aria-hidden',String(!active));
   });
  };
  const updateToggle=()=>{
