@@ -1,5 +1,5 @@
 export const PRODUCT_FIELDS = `
-  id handle title description productType availableForSale
+  id handle title description productType tags availableForSale
   featuredImage { url altText width height }
   images(first: 20) { nodes { url altText width height } }
   variants(first: 100) {
