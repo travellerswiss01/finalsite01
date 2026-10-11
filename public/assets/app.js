@@ -127,3 +127,43 @@ document.addEventListener('change',async e=>{
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.nav-dropdown[open],.mobile-nav[open]').forEach(el=>el.open=false);});
 syncCart().catch(err=>{if(document.querySelector('[data-cart-page-content]')){document.querySelector('[data-cart-page-content]').textContent='Warenkorb konnte nicht geladen werden.';error(err.message);}});
+
+const offerCarousel=document.querySelector('[data-offer-carousel]');
+if(offerCarousel){
+ const slides=[...offerCarousel.querySelectorAll('[data-offer-slide]')];
+ const toggle=offerCarousel.querySelector('[data-offer-toggle]');
+ const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
+ let current=0,timer=null,paused=motion.matches,hovered=false;
+ const stop=()=>{if(timer!==null){window.clearInterval(timer);timer=null;}};
+ const start=()=>{
+  stop();
+  if(slides.length>1&&!paused&&!motion.matches&&!hovered&&!document.hidden&&!offerCarousel.contains(document.activeElement)){
+   timer=window.setInterval(()=>show(current+1),8000);
+  }
+ };
+ const show=index=>{
+  current=(index+slides.length)%slides.length;
+  slides.forEach((slide,i)=>{
+   const active=i===current;
+   slide.classList.toggle('is-active',active);
+   slide.setAttribute('aria-hidden',String(!active));
+   slide.inert=!active;
+  });
+ };
+ const updateToggle=()=>{
+  toggle.textContent=paused?'Abspielen':'Pause';
+  toggle.setAttribute('aria-label',paused?'Automatischen Wechsel abspielen':'Automatischen Wechsel pausieren');
+  toggle.setAttribute('aria-pressed',String(paused));
+ };
+ offerCarousel.querySelector('[data-offer-prev]').addEventListener('click',()=>{show(current-1);start();});
+ offerCarousel.querySelector('[data-offer-next]').addEventListener('click',()=>{show(current+1);start();});
+ toggle.addEventListener('click',()=>{paused=!paused;updateToggle();start();});
+ offerCarousel.addEventListener('mouseenter',()=>{hovered=true;stop();});
+ offerCarousel.addEventListener('mouseleave',()=>{hovered=false;start();});
+ offerCarousel.addEventListener('focusin',stop);
+ offerCarousel.addEventListener('focusout',event=>{if(!offerCarousel.contains(event.relatedTarget))window.setTimeout(start,0);});
+ document.addEventListener('visibilitychange',start);
+ motion.addEventListener('change',event=>{if(event.matches){paused=true;updateToggle();}start();});
+ offerCarousel.querySelector('[data-offer-controls]').hidden=false;
+ show(0);updateToggle();start();
+}
