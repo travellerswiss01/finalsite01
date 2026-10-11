@@ -11,6 +11,7 @@ test('Lucia has a dedicated service page with the agreed offer and a prepared in
  assert.match(page,/Abwasch und räumt die Küche auf/);
  assert.match(page,/name="guests" type="number" min="1" max="20"/);
  assert.match(page,/data-subject="Kochservice-Anfrage für Lucia"/);
+ assert.match(page,/src="\/assets\/lucia-kocht\.jpg"/);
 });
 
 test('Kochservice is linked and marked current in the site navigation',()=>{
