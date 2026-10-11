@@ -135,15 +135,22 @@ if(offerCarousel){
  const toggle=offerCarousel.querySelector('[data-offer-toggle]');
  const vinegarDialog=document.querySelector('[data-vinegar-dialog]');
  const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
- let current=0,timer=null,paused=motion.matches,hovered=false;
+ const bottles=[...offerCarousel.querySelectorAll('[data-vinegar-domino]')];
+ let current=0,timer=null,dominoTimer=null,dominoRunning=false,paused=motion.matches,hovered=false;
  const stop=()=>{if(timer!==null){window.clearInterval(timer);timer=null;}};
  const start=()=>{
   stop();
-  if(slides.length>1&&!paused&&!motion.matches&&!hovered&&!document.hidden&&!vinegarDialog?.open&&!offerCarousel.contains(document.activeElement)){
+  if(slides.length>1&&!paused&&!motion.matches&&!hovered&&!document.hidden&&!vinegarDialog?.open&&!dominoRunning&&!offerCarousel.contains(document.activeElement)){
    timer=window.setInterval(()=>show(current+1),6000);
   }
  };
+ const resetDomino=()=>{
+  if(dominoTimer!==null){window.clearTimeout(dominoTimer);dominoTimer=null;}
+  dominoRunning=false;
+  bottles.forEach(button=>button.closest('.vinegar-lineup-item').classList.remove('is-domino'));
+ };
  const show=index=>{
+  resetDomino();
   current=(index+slides.length)%slides.length;
   slides.forEach((slide,i)=>{
    const active=i===current;
@@ -167,9 +174,27 @@ if(offerCarousel){
  offerCarousel.addEventListener('mouseleave',()=>{hovered=false;start();});
  offerCarousel.addEventListener('focusin',stop);
  offerCarousel.addEventListener('focusout',event=>{if(!offerCarousel.contains(event.relatedTarget))window.setTimeout(start,0);});
- document.addEventListener('visibilitychange',start);
- motion.addEventListener('change',event=>{if(event.matches){paused=true;updateToggle();}start();});
- offerCarousel.querySelector('[data-vinegar-open]')?.addEventListener('click',()=>{if(vinegarDialog){stop();vinegarDialog.showModal();}});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)resetDomino();start();});
+ motion.addEventListener('change',event=>{if(event.matches){resetDomino();paused=true;updateToggle();}start();});
+
+ const openVinegar=()=>{if(vinegarDialog){resetDomino();stop();vinegarDialog.showModal();}};
+ const playDomino=origin=>{
+  if(dominoRunning||!bottles[origin]?.closest('[data-offer-image]').classList.contains('is-active'))return;
+  if(motion.matches){openVinegar();return;}
+  dominoRunning=true;stop();
+  bottles.forEach((button,index)=>{
+   const bottle=button.closest('.vinegar-lineup-item');
+   bottle.style.setProperty('--domino-delay',Math.abs(index-origin)*110+'ms');
+   bottle.style.setProperty('--domino-angle',index<origin?'-65deg':'65deg');
+   bottle.classList.add('is-domino');
+  });
+  dominoTimer=window.setTimeout(()=>{resetDomino();start();},1900+Math.max(origin,bottles.length-1-origin)*110);
+ };
+ bottles.forEach((button,index)=>{
+  button.addEventListener('click',()=>playDomino(index));
+  button.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!motion.matches)playDomino(index);});
+ });
+ offerCarousel.querySelector('[data-vinegar-open]')?.addEventListener('click',openVinegar);
  vinegarDialog?.querySelector('[data-vinegar-close]')?.addEventListener('click',()=>vinegarDialog.close());
  vinegarDialog?.addEventListener('close',start);
  offerCarousel.querySelector('[data-offer-controls]').hidden=false;

@@ -53,8 +53,8 @@
 .offer-carousel{--vinegar-backdrop:#fcf8f1}
 .offer-carousel:has(.vinegar-lineup-frame.is-active):before{background:var(--vinegar-backdrop)}
 .vinegar-lineup-frame{z-index:0;background:var(--vinegar-backdrop)}
-.vinegar-lineup{position:absolute;inset:5px 12px 8px 20%;display:flex;gap:4px;align-items:end}
-.vinegar-lineup-item{position:relative;container-type:size;flex:1;height:100%;min-width:0;margin:0;overflow:hidden;isolation:isolate;background:var(--vinegar-backdrop)}
+.vinegar-lineup{position:absolute;inset:5px 12px 8px 20%;display:flex;gap:4px;align-items:end;isolation:isolate;background:var(--vinegar-backdrop)}
+.vinegar-lineup-item{position:relative;container-type:size;flex:1;height:100%;min-width:0;margin:0;overflow:visible;background:transparent}
 .vinegar-lineup-item img{position:absolute;left:50%;top:45%;height:min(78cqh,150cqw);width:auto;max-width:none;transform:translate(-50%,-50%);filter:brightness(1.003937);mix-blend-mode:multiply}
 .vinegar-lineup-item figcaption{position:absolute;bottom:4px;left:2px;right:2px;text-align:center;color:#173d2b;font-size:11px;line-height:1.2}
 .vinegar-zoom{position:absolute;right:12px;top:8px;display:flex;align-items:center;gap:5px;min-height:44px;padding:6px 10px;border:1px solid #173d2b26;border-radius:24px;background:#fffefaee;color:#173d2b;font-size:13px}
@@ -70,3 +70,21 @@
 .vinegar-detail-grid img{width:100%;height:auto}
 .vinegar-detail-grid figcaption{padding:8px;font-size:16px;font-weight:700}
 @media(max-width:599px){.vinegar-lineup{inset:auto 8px 56px;height:72px;gap:1px}.vinegar-lineup-item img{top:50%;height:min(95cqh,150cqw)}.vinegar-lineup-item figcaption{display:none}.vinegar-zoom{top:auto;bottom:8px;right:auto;left:8px;font-size:12px;padding:6px 8px}}
+
+/* Animate the original bottle photos around their base without changing hero dimensions. */
+.vinegar-domino-trigger{position:absolute;inset:0;width:100%;padding:0;border:0;border-radius:8px;background:transparent;cursor:pointer;touch-action:manipulation}
+.vinegar-domino-trigger:focus-visible{outline:2px solid #205532;outline-offset:2px}
+.vinegar-lineup-item img{pointer-events:none;transform-origin:50% 85%}
+.vinegar-lineup-item.is-domino img{animation:vinegar-domino 1900ms cubic-bezier(.22,1,.36,1) var(--domino-delay,0ms) both}
+@keyframes vinegar-domino{
+ 0%{transform:translate(-50%,-50%) rotate(0deg)}
+ 12%{transform:translate(-50%,-50%) rotate(-4deg)}
+ 34%,58%{transform:translate(-50%,-50%) rotate(var(--domino-angle,65deg))}
+ 83%{transform:translate(-50%,-50%) rotate(-3deg)}
+ 100%{transform:translate(-50%,-50%) rotate(0deg)}
+}
+.offer-carousel:has(.vinegar-lineup-frame.is-active) .hero-content,
+.offer-carousel:has(.vinegar-lineup-frame.is-active) .hero-offer.is-active{pointer-events:none}
+.offer-carousel:has(.vinegar-lineup-frame.is-active) .hero-offer.is-active a{pointer-events:auto}
+@media(max-width:599px){.vinegar-domino-trigger{inset:0}}
+@media(prefers-reduced-motion:reduce){.vinegar-lineup-item.is-domino img{animation:none}}
