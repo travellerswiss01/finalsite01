@@ -127,29 +127,3 @@ document.addEventListener('change',async e=>{
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.nav-dropdown[open],.mobile-nav[open]').forEach(el=>el.open=false);});
 syncCart().catch(err=>{if(document.querySelector('[data-cart-page-content]')){document.querySelector('[data-cart-page-content]').textContent='Warenkorb konnte nicht geladen werden.';error(err.message);}});
-
-const carousel=document.querySelector('[data-carousel]');
-if(carousel){
- const slides=[...carousel.querySelectorAll('[data-carousel-slide]')];
- const count=carousel.querySelector('[data-carousel-count]');
- const toggle=carousel.querySelector('[data-carousel-toggle]');
- const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
- let current=0,timer=null,paused=reducedMotion.matches;
- const showSlide=index=>{
-  current=(index+slides.length)%slides.length;
-  slides.forEach((slide,i)=>{const active=i===current;slide.classList.toggle('is-active',active);slide.setAttribute('aria-hidden',String(!active));slide.inert=!active;});
-  if(count)count.textContent=`${current+1} / ${slides.length}`;
- };
- const stop=()=>{if(timer){window.clearInterval(timer);timer=null;}};
- const start=()=>{stop();if(!paused&&!reducedMotion.matches)timer=window.setInterval(()=>showSlide(current+1),8000);};
- const updateToggle=()=>{if(!toggle)return;toggle.textContent=paused?'Abspielen':'Pause';toggle.setAttribute('aria-label',paused?'Animation abspielen':'Animation pausieren');toggle.setAttribute('aria-pressed',String(paused));};
- carousel.querySelector('[data-carousel-prev]')?.addEventListener('click',()=>{showSlide(current-1);start();});
- carousel.querySelector('[data-carousel-next]')?.addEventListener('click',()=>{showSlide(current+1);start();});
- toggle?.addEventListener('click',()=>{paused=!paused;updateToggle();start();});
- carousel.addEventListener('mouseenter',stop);
- carousel.addEventListener('mouseleave',()=>{if(!carousel.contains(document.activeElement))start();});
- carousel.addEventListener('focusin',stop);
- carousel.addEventListener('focusout',event=>{if(!carousel.contains(event.relatedTarget))start();});
- reducedMotion.addEventListener?.('change',event=>{if(event.matches){paused=true;updateToggle();}start();});
- showSlide(0);updateToggle();start();
-}

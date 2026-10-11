@@ -19,14 +19,12 @@ test('Lucia has a dedicated service page with the agreed offer and a prepared in
  for(let i=1;i<=7;i++)assert.match(page,new RegExp(`/assets/lucia-menu-${i}\\.webp`));
 });
 
-test('homepage rotates between Thurgau gift baskets and Lucia cooking service',()=>{
+test('homepage keeps the original static gift hero without carousel controls',()=>{
  const page=home([]);
- assert.match(page,/data-carousel aria-label="Angebote von Biottos Lädeli"/);
+ assert.match(page,/<section class="hero" aria-labelledby="HeroHeading">/);
+ assert.match(page,/<h1 id="HeroHeading">Geschenke aus<br>dem Thurgau<\/h1>/);
  assert.match(page,/Geschenkkörbe entdecken/);
- assert.match(page,/href="\/kochservice">Kochservice entdecken/);
- assert.match(page,/data-carousel-prev/);
- assert.match(page,/data-carousel-next/);
- assert.match(page,/data-carousel-toggle/);
+ assert.doesNotMatch(page,/data-carousel|carousel-slide|Kochservice entdecken/);
 });
 
 test('Kochservice is linked and marked current in the site navigation',()=>{
