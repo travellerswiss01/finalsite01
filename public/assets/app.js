@@ -199,7 +199,7 @@ if(offerCarousel){
   mostiSprite.alt='Mosti, unser Apfelmaskottchen';mostiSprite.width=420;mostiSprite.height=432;
   mostiSprite.addEventListener('load',()=>{mostiFrame.classList.add('has-mosti');mostiButton.hidden=false;});
   mostiSprite.addEventListener('error',()=>{mostiFrame.classList.remove('has-mosti');mostiButton.hidden=true;});
-  mostiSprite.src='/assets/mosti-domino.svg';
+  mostiSprite.src='/assets/mosti-domino.webp';
   mostiButton.append(mostiSprite);mostiFrame.append(mostiButton);
  }
  const resetMosti=()=>{
