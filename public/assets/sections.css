@@ -178,3 +178,9 @@
  .cooking-gallery .cooking-menu-card:nth-child(5):last-child{grid-column:2/span 2}
 }
 @media(prefers-reduced-motion:reduce){.cooking-course{transition:none}}
+
+/* Keep each course photograph and its ivory caption visibly separate. */
+.cooking-course-photo{position:relative;flex:0 0 270px;isolation:isolate;background:#f9f6ef}
+.cooking-course-copy{position:relative;z-index:1;background:#f9f6ef}
+@media(max-width:1099px){.cooking-course-photo{flex-basis:300px}}
+@media(max-width:599px){.cooking-course-photo{flex:auto}}
