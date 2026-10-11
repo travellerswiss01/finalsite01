@@ -120,4 +120,4 @@
 }
 
 /* Give each announcement statement more breathing room. */
-.announcement-marquee-message{display:inline-flex;align-items:center;gap:clamp(56px,8vw,128px)}
+.announcement-marquee-message{display:inline-flex;align-items:center;gap:clamp(120px,16vw,240px)}
