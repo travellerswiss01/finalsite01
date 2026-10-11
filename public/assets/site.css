@@ -9,7 +9,12 @@
 }
 
 
-/* Premium custom-gift card */
+/* Goldene Geschenkkarte mit dezentem Lichtschimmer */
+.inquiry-card {
+  border-color: #bd9135;
+  background: #fff9e8;
+  box-shadow: 0 8px 22px #80601f30, inset 0 0 0 1px #ead69d;
+}
 .gift-image-premium {
   position: relative;
   aspect-ratio: 1.33;
@@ -21,33 +26,46 @@
   justify-content: center;
   gap: 10px;
   padding: 20px 12px;
-  color: #17432b;
-  background: radial-gradient(ellipse at 50% 43%, #fff 0%, #fffaf1 43%, #f4e8d2 100%);
+  color: #29472b;
+  background: linear-gradient(132deg, #d5ae55 0%, #fff0b8 23%, #dfbd69 45%, #f9e7a7 69%, #caa044 100%);
 }
 .gift-image-premium::before {
   position: absolute;
-  z-index: -1;
-  inset: 15% 18%;
-  border: 1px solid #b8975a55;
-  border-radius: 50%;
+  z-index: 0;
+  top: -20%;
+  bottom: -20%;
+  left: -65%;
+  width: 44%;
+  background: linear-gradient(90deg, transparent, #ffffffa8 48%, transparent);
   content: "";
+  pointer-events: none;
+  transform: skewX(-18deg);
+  animation: premium-gift-shine 7s ease-in-out infinite;
 }
 .gift-image-premium::after {
   position: absolute;
-  z-index: -1;
-  inset: 19% 21%;
-  border: 1px solid #b8975a33;
-  border-radius: 50%;
-  content: "";
+  z-index: 1;
+  top: 15%;
+  right: 13%;
+  color: #fffbed;
+  content: "✦";
+  font-size: 22px;
+  line-height: 1;
+  text-shadow: -176px 128px 0 #fff8dd, -26px 158px 0 #fff5d2;
+  pointer-events: none;
+}
+.gift-image-premium > * {
+  position: relative;
+  z-index: 2;
 }
 .gift-image-premium .icon {
-  width: clamp(112px, 9vw, 136px);
-  height: clamp(112px, 9vw, 136px);
-  filter: drop-shadow(0 8px 8px #60451c24);
+  width: clamp(116px, 9.3vw, 140px);
+  height: clamp(116px, 9.3vw, 140px);
+  filter: drop-shadow(0 7px 5px #75561835);
   stroke-width: 1.35;
 }
 .gift-kicker {
-  color: #84672f;
+  color: #72551c;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: .16em;
@@ -55,17 +73,18 @@
 }
 .gift-caption {
   padding: 6px 13px;
-  border: 1px solid #b8975a66;
+  border: 1px solid #ad822e99;
   border-radius: 999px;
-  background: #fffdf7d9;
-  color: #46604a;
+  background: #fff9e8cc;
+  color: #465b37;
   font-size: 12px;
   letter-spacing: .04em;
 }
 .inquiry-card .card-body {
   align-items: center;
-  text-align: center;
   padding-inline: 14px;
+  background: linear-gradient(155deg, #fffdf6, #f7edcf);
+  text-align: center;
 }
 .inquiry-card .card-body h2 {
   margin: 2px 0 10px;
@@ -80,4 +99,12 @@
 }
 .inquiry-card .card-body > .button {
   align-self: stretch;
+}
+@keyframes premium-gift-shine {
+  0%, 66%, 100% { transform: translateX(0) skewX(-18deg); opacity: 0; }
+  71% { opacity: .85; }
+  88% { transform: translateX(390%) skewX(-18deg); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gift-image-premium::before { animation: none; }
 }
