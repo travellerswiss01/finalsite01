@@ -38,6 +38,11 @@ test('homepage rotates matching gift and cooking photos without changing the her
  assert.match(page,/src="\/assets\/essig-original\.webp"/);
  assert.match(page,/class="vinegar-lineup"/);
  assert.equal((page.match(/class="vinegar-lineup-item"/g)||[]).length,7);
+ const colorOrder=['essig-birnen','essig-holunder','essig-balsamico','essig-original','essig-kirsch','essig-himbeer','essig-kirschen-birnen'];
+ for(const className of ['vinegar-lineup','vinegar-detail-grid']){
+  const images=page.match(new RegExp(`<div class="${className}"[^>]*>([\\s\\S]*?)</div>`))[1];
+  assert.deepEqual([...images.matchAll(/<img src="\/assets\/([^"]+)\.webp"/g)].map(match=>match[1]),colorOrder);
+ }
  assert.match(page,/data-vinegar-dialog/);
  assert.match(page,/data-vinegar-open/);
  for(const name of ["essig-birnen","essig-balsamico","essig-himbeer","essig-holunder","essig-kirschen-birnen","essig-kirsch"])assert.ok(page.includes(`/assets/${name}.webp`));
