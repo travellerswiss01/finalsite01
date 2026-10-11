@@ -29,3 +29,7 @@
 .hero-offer-image{opacity:0;transition:opacity 1300ms cubic-bezier(.22,1,.36,1)}
 .hero-offer-image.is-active{opacity:1}
 @media(prefers-reduced-motion:reduce){.hero-offer-image{transition:none}}
+
+/* Display the complete cooking banner instead of cropping it with cover. */
+.hero-image.lucia-offer-banner{object-fit:contain;object-position:right center;background:#f8f4ed}
+@media(max-width:599px){.hero-image.lucia-offer-banner{object-position:right bottom}}

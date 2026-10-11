@@ -22,7 +22,7 @@ test('Lucia has a dedicated service page with the agreed offer and a prepared in
 test('homepage rotates matching gift and cooking photos without changing the hero structure',()=>{
  const page=home([]);
  assert.equal((page.match(/data-offer-image/g)||[]).length,2);
- assert.match(page,/src="\/assets\/lucia-menu-3\.webp"/);
+ assert.match(page,/src="\/assets\/lucia-hero-banner\.webp"/);
  assert.match(page,/src="\/assets\/hero\.jpg"/);
  assert.match(page,/<h1 id="HeroHeading">Geschenke aus<br>dem Thurgau<\/h1>/);
  assert.match(page,/Geschenkkörbe entdecken/);
