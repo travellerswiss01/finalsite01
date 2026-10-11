@@ -14,3 +14,12 @@
 .imagefilm-error a,.imagefilm-nojs a{text-decoration:underline}
 @media(max-width:799px){.imagefilm{grid-template-columns:1fr;gap:24px;margin-top:40px;margin-bottom:40px;padding:24px}.imagefilm-copy h2{font-size:32px}.imagefilm-copy>p:not(.imagefilm-eyebrow){max-width:55ch}.imagefilm-eyebrow{font-size:11px;letter-spacing:1.5px}.imagefilm-play-circle{width:58px;height:58px}}
 @media(prefers-reduced-motion:reduce){.imagefilm-play-circle{transition:none}}
+
+.imagefilm-shop{margin-top:24px;padding-top:22px;border-top:1px solid #dfd5c3}
+.imagefilm-shop h3{font-size:22px;margin:0 0 8px;color:#205532}
+.imagefilm-price{font-size:20px;font-weight:600;margin:0 0 12px}
+.imagefilm-shop .product-form{max-width:360px;display:grid;gap:10px}
+.imagefilm-shop .variant-label{font-size:13px;margin:0;color:#526057}
+.imagefilm-shop select{width:100%;min-height:44px;background:white}
+.imagefilm-shop .button{width:100%;font-size:17px}
+.imagefilm-details{display:inline-block;margin-top:12px;font-size:13px;text-decoration:underline;text-underline-offset:3px;color:#526057}
