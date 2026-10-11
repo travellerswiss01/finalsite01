@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {cookingService, shell} from '../src/render.js';
+import {readFileSync} from 'node:fs';
+import {cookingService, home, shell} from '../src/render.js';
 
 test('Lucia has a dedicated service page with the agreed offer and a prepared inquiry',()=>{
  const page=cookingService();
@@ -12,6 +13,20 @@ test('Lucia has a dedicated service page with the agreed offer and a prepared in
  assert.match(page,/name="guests" type="number" min="1" max="20"/);
  assert.match(page,/data-subject="Kochservice-Anfrage für Lucia"/);
  assert.match(page,/src="\/assets\/lucia-kocht\.jpg"/);
+ assert.match(page,/class="cooking-inspiration"/);
+ assert.match(readFileSync(new URL('../public/assets/sections.css',import.meta.url),'utf8'),/url\('\/assets\/lucia-salate\.webp'\)/);
+ assert.equal((page.match(/class="cooking-menu-image"/g)||[]).length,7);
+ for(let i=1;i<=7;i++)assert.match(page,new RegExp(`/assets/lucia-menu-${i}\\.webp`));
+});
+
+test('homepage rotates between Thurgau gift baskets and Lucia cooking service',()=>{
+ const page=home([]);
+ assert.match(page,/data-carousel aria-label="Angebote von Biottos Lädeli"/);
+ assert.match(page,/Geschenkkörbe entdecken/);
+ assert.match(page,/href="\/kochservice">Kochservice entdecken/);
+ assert.match(page,/data-carousel-prev/);
+ assert.match(page,/data-carousel-next/);
+ assert.match(page,/data-carousel-toggle/);
 });
 
 test('Kochservice is linked and marked current in the site navigation',()=>{
