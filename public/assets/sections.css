@@ -124,3 +124,57 @@
 .announcement-marquee-message>span:not(.announcement-marquee-separator){flex:0 0 max(300px,50vw);width:max(300px,50vw);text-align:center}
 .announcement-marquee-message>.announcement-marquee-separator{flex:0 0 96px;width:96px;text-align:center}
 @media(prefers-reduced-motion:reduce){.announcement-marquee-message{flex-wrap:wrap;justify-content:center;gap:16px 32px}.announcement-marquee-message>span:not(.announcement-marquee-separator),.announcement-marquee-message>.announcement-marquee-separator{flex:0 0 auto;width:auto}}
+
+/* Lucia's four-course Christmas menu */
+.cooking-christmas{padding:clamp(56px,7vw,92px) 0;background:#153e2c;color:#f8f4e9}
+.cooking-christmas-inner{max-width:1280px}
+.cooking-christmas-heading{max-width:760px;margin:0 auto 42px;text-align:center}
+.cooking-christmas-heading .cooking-eyebrow{margin-bottom:14px;color:#d5b776;font-size:11px;letter-spacing:.2em}
+.cooking-christmas-heading h2{margin:0 0 14px;color:#fffaf0;font:500 clamp(36px,5vw,54px)/1.08 Georgia,"Times New Roman",serif;letter-spacing:-.025em}
+.cooking-christmas-heading>p:last-child{max-width:58ch;margin:0 auto;color:#e5e0d4;font-size:17px;line-height:1.65}
+.cooking-course-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:0;padding:0;list-style:none}
+.cooking-course{display:flex;min-width:0;flex-direction:column;overflow:hidden;background:#f9f6ef;color:#173b2b;border:1px solid #c6ad75;border-radius:5px;box-shadow:0 12px 30px #081b1130}
+.cooking-course-photo{display:grid;place-items:center;height:270px;margin:0;background:#ece8df;border-bottom:1px solid #d8cfbd}
+.cooking-course-photo img{display:block;width:100%;height:100%;object-fit:contain}
+.cooking-course-copy{display:flex;flex:1;flex-direction:column;padding:20px 20px 24px}
+.cooking-course-label{display:flex;align-items:center;gap:9px;margin:0 0 14px;color:#79623c;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.cooking-course-label span{display:inline-grid;width:25px;height:25px;place-items:center;border:1px solid #b79a60;border-radius:50%;font-size:10px;letter-spacing:0}
+.cooking-course h3{margin:0 0 8px;color:#173b2b;font:500 22px/1.18 Georgia,"Times New Roman",serif;letter-spacing:-.015em}
+.cooking-course-copy>p:last-child{margin:0;color:#536057;font-size:14px;line-height:1.6}
+.cooking-course-main{border-color:#dfc98f;box-shadow:0 14px 34px #07190f45}
+.cooking-vegetarian{display:grid;grid-template-columns:112px 1fr;align-items:center;gap:22px;max-width:760px;margin:28px auto 0;padding:16px 22px;background:#1d4936;border:1px solid #a9915e;border-radius:5px}
+.cooking-vegetarian figure{display:grid;place-items:center;width:112px;height:112px;margin:0;background:#ece8df;border-radius:3px;overflow:hidden}
+.cooking-vegetarian img{width:100%;height:100%;object-fit:contain}
+.cooking-vegetarian-label{margin:0 0 6px;color:#d5b776;font-size:10px;font-weight:700;letter-spacing:.15em}
+.cooking-vegetarian h3{margin:0 0 4px;color:#fffaf0;font:500 23px/1.2 Georgia,"Times New Roman",serif}
+.cooking-vegetarian div>p:last-child{margin:0;color:#e5e0d4;font-size:14px;line-height:1.5}
+.cooking-christmas-cta{display:flex;width:max-content;max-width:100%;min-height:52px;align-items:center;justify-content:center;gap:10px;margin:28px auto 0;padding:13px 22px;background:#d0ae69;color:#173b2b;font-size:15px;font-weight:700;letter-spacing:.015em}
+.cooking-christmas-cta:hover{background:#e0c487;color:#102d20}
+.cooking-christmas-cta .icon{width:18px;height:18px}
+.cooking-gallery .cooking-menu-grid{grid-template-columns:repeat(6,minmax(0,1fr))}
+.cooking-gallery .cooking-menu-card{grid-column:span 2}
+.cooking-gallery .cooking-menu-card:nth-child(4):nth-last-child(2){grid-column:2/span 2}
+.cooking-gallery .cooking-menu-card:nth-child(5):last-child{grid-column:4/span 2}
+@media(max-width:1099px){.cooking-course-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cooking-course-photo{height:300px}}
+@media(max-width:599px){
+ .cooking-christmas{padding:48px 0 54px}
+ .cooking-christmas-heading{margin-bottom:28px;text-align:left}
+ .cooking-christmas-heading h2{font-size:38px}
+ .cooking-christmas-heading>p:last-child{font-size:16px}
+ .cooking-course-grid{grid-template-columns:1fr;gap:14px}
+ .cooking-course{display:grid;grid-template-columns:42% 1fr;align-items:stretch}
+ .cooking-course-photo{height:100%;min-height:230px;border-right:1px solid #d8cfbd;border-bottom:0}
+ .cooking-course-copy{justify-content:center;padding:17px 14px}
+ .cooking-course-label{gap:7px;margin-bottom:11px;font-size:9px;letter-spacing:.08em}
+ .cooking-course-label span{width:22px;height:22px}
+ .cooking-course h3{font-size:20px}
+ .cooking-course-copy>p:last-child{font-size:13px}
+ .cooking-vegetarian{grid-template-columns:82px 1fr;gap:14px;padding:13px}
+ .cooking-vegetarian figure{width:82px;height:95px}
+ .cooking-vegetarian h3{font-size:20px}
+ .cooking-christmas-cta{width:100%;font-size:14px}
+ .cooking-gallery .cooking-menu-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .cooking-gallery .cooking-menu-card:nth-child(4):nth-last-child(2){grid-column:1/span 2}
+ .cooking-gallery .cooking-menu-card:nth-child(5):last-child{grid-column:2/span 2}
+}
+@media(prefers-reduced-motion:reduce){.cooking-course{transition:none}}
