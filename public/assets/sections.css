@@ -189,3 +189,7 @@
 /* Fit every full dish photo inside a fixed frame, including portrait originals. */
 .cooking-course-photo{overflow:hidden}
 .cooking-course-photo img{display:block!important;width:100%!important;height:100%!important;max-width:100%;max-height:100%;object-fit:contain!important}
+
+/* Anchor each complete photo to its fixed frame so portrait images cannot spill. */
+.cooking-course-photo{position:relative;overflow:hidden}
+.cooking-course-photo img{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:contain!important;object-position:center!important}
