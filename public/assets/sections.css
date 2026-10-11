@@ -104,3 +104,23 @@
 .vinegar-detail-grid.is-single{grid-template-columns:minmax(0,480px);justify-content:center}
 .vinegar-detail-grid figure[hidden]{display:none}
 @media(max-width:599px){.vinegar-tools .vinegar-zoom{width:44px;justify-content:center}.vinegar-tools .vinegar-zoom span{display:none}}
+
+/* Only the top announcement bar: restrained continuous motion and original height. */
+.announcement.announcement-ticker{padding:0;gap:0}
+.announcement-ticker .announcement-window{width:100%;overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 28px,#000 calc(100% - 28px),transparent)}
+.announcement-ticker .announcement-track{display:flex;width:max-content;animation:announcement-flow 70s linear infinite}
+.announcement-ticker .announcement-sequence{display:flex;flex:0 0 auto;align-items:center;justify-content:space-around;min-width:100vw;gap:64px;padding-inline:32px}
+.announcement-ticker .announcement-message{display:inline-flex;align-items:center;gap:11px;white-space:nowrap;font-weight:400;letter-spacing:.025em;line-height:1.4;color:#f7f5ed}
+.announcement-ticker .announcement-message .icon{width:19px;height:19px;flex:none;color:#d8dfce}
+.announcement-ticker:hover .announcement-track{animation-play-state:paused}
+@keyframes announcement-flow{to{transform:translateX(-50%)}}
+@media(max-width:599px){.announcement-ticker .announcement-track{animation-duration:48s}.announcement-ticker .announcement-sequence{gap:42px;padding-inline:21px}.announcement-ticker .announcement-message{font-size:14px}.announcement-ticker .announcement-message .icon{width:17px;height:17px}}
+@media(min-width:1600px){.announcement-ticker .announcement-track{animation-duration:90s}}
+@media(prefers-reduced-motion:reduce){
+ .announcement-ticker .announcement-track{animation:none;width:100%}
+ .announcement-ticker .announcement-window{mask-image:none}
+ .announcement-ticker .announcement-sequence{min-width:0;width:100%;padding-inline:12px;gap:2px 20px;flex-wrap:wrap}
+ .announcement-ticker .announcement-sequence+.announcement-sequence,.announcement-ticker .announcement-message:nth-child(2){display:none}
+ .announcement-ticker .announcement-message{font-size:12px}
+ .announcement-ticker .announcement-message .icon{width:15px;height:15px}
+}
