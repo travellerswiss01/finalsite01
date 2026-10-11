@@ -22,3 +22,34 @@
 .garden-photo-kicker{font-size:12px;font-weight:700;letter-spacing:.12em}
 @media(min-width:600px){.garden-hero-inner{padding-block:70px 45px}.garden-services{padding-block:68px 60px}.garden-grid{gap:18px}.garden-grid article{padding:24px}}
 @media(min-width:1000px){.garden-hero-inner{padding-block:90px 50px;grid-template-columns:minmax(0,1.3fr) minmax(340px,.7fr);gap:56px}.garden-services{padding-block:82px 70px}.garden-grid{gap:16px}.garden-grid article{padding:24px 20px}}
+
+/* A calm, editorial introduction to Otto's garden work. */
+.garden-impressions{padding:68px 0 76px;background:#f6f4ed;border-block:1px solid #e8e3d6}
+.garden-impressions-inner{display:grid;grid-template-columns:1fr;gap:32px}
+.garden-impressions-heading{max-width:none;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(250px,.65fr);column-gap:48px;align-items:end;margin:0}
+.garden-impressions-heading .garden-eyebrow{grid-column:1/-1;margin-bottom:14px;color:#79613b}
+.garden-impressions-heading h2{max-width:720px;margin:0;font-size:clamp(32px,5vw,48px);font-weight:600;letter-spacing:-.035em;line-height:1.08}
+.garden-impressions-heading>p:not(.garden-eyebrow){max-width:38ch;margin:0 0 3px;color:#536457;font-size:16px;line-height:1.7}
+.garden-photo-grid{gap:18px}
+.garden-photo-card{background:#fffefa;border:1px solid #e7e1d4;border-radius:8px;box-shadow:0 8px 24px #243b2810;transition:transform .25s ease,box-shadow .25s ease}
+.garden-photo-card:hover{transform:translateY(-3px);box-shadow:0 14px 30px #243b2817}
+.garden-photo-card>img{height:268px;object-fit:cover}
+.garden-photo-card figcaption{padding:22px 23px 24px;background:#fffefa}
+.garden-photo-apples,.garden-photo-seedlings,.garden-photo-salads{background:#fffefa}
+.garden-photo-kicker{margin-bottom:13px;color:#79613b;font-size:11px;font-weight:700;letter-spacing:.13em}
+.garden-photo-card h3{margin-bottom:10px;font-size:23px;font-weight:600;letter-spacing:-.02em;line-height:1.15}
+.garden-photo-card p{margin-bottom:20px;color:#536457;font-size:15px;line-height:1.65}
+.garden-photo-card a{font-size:14px;font-weight:600;text-decoration:none;border-bottom:1px solid #a6b4a6;padding-bottom:3px;width:max-content}
+.garden-photo-card a:hover{border-color:#153e2c}
+@media(max-width:799px){
+ .garden-impressions{padding:42px 0 48px}
+ .garden-impressions-inner{gap:24px}
+ .garden-impressions-heading{grid-template-columns:1fr;gap:12px}
+ .garden-impressions-heading .garden-eyebrow{margin-bottom:0}
+ .garden-impressions-heading h2{font-size:clamp(32px,8vw,42px)}
+ .garden-impressions-heading>p:not(.garden-eyebrow){max-width:46ch;margin:0}
+ .garden-photo-grid{gap:16px}
+ .garden-photo-card>img{height:auto;max-height:360px}
+ .garden-photo-card figcaption{padding:21px}
+}
+@media(prefers-reduced-motion:reduce){.garden-photo-card{transition:none}.garden-photo-card:hover{transform:none}}
