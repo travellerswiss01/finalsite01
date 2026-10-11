@@ -1,6 +1,6 @@
-.most-gallery{min-width:0;align-self:start;padding:24px;background:#faf7f0;border:1px solid #e7ddcb;border-radius:18px}
+.most-gallery{display:block;min-width:0;align-self:start;padding:24px;background:#faf7f0;border:1px solid #e7ddcb;border-radius:18px}
 .most-gallery-stage{position:relative;display:grid;place-items:center;height:clamp(300px,40vw,510px);border-radius:12px;overflow:hidden;touch-action:pan-y}
-.most-gallery .detail-main-image{display:block;width:100%;height:100%;max-height:100%;object-fit:contain;padding:20px 64px;mix-blend-mode:multiply;border:0;background:none}
+.most-gallery .detail-main-image{position:absolute;inset:0;display:block;width:100%;height:100%;min-width:0;min-height:0;max-height:none;object-fit:contain;object-position:center;padding:28px 64px;mix-blend-mode:multiply;border:0;background:none}
 .most-arrow{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;display:grid;place-items:center;border:1px solid #d1d7cc;border-radius:50%;background:#fffdf9;color:#153e2c;box-shadow:0 3px 12px #153e2c0a;transition:background .2s,border-color .2s}
 .most-arrow:hover{background:#153e2c;border-color:#153e2c;color:white}
 .most-arrow-prev{left:0}.most-arrow-next{right:0}.most-arrow .icon{width:21px;height:21px}.most-arrow-prev .icon{transform:rotate(90deg)}.most-arrow-next .icon{transform:rotate(-90deg)}
