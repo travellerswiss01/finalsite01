@@ -7,7 +7,7 @@ if(!/^[a-f0-9]{40}$/.test(assetRef))throw new Error('Pass the full GitHub commit
 const assetBase='https://raw.githubusercontent.com/travellerswiss01/finalsite01/'+assetRef+'/public/assets/';
 const css=['base.css','sections.css','site.css'].map(name=>readFileSync(new URL('../public/assets/'+name,import.meta.url),'utf8')).join('\n');
 const app=readFileSync(new URL('../public/assets/app.js',import.meta.url),'utf8');
-const carousel='const offerCarousel='+app.split('const offerCarousel=')[1];
+const carousel='const announcementTicker='+app.split('const announcementTicker=')[1];
 if(!carousel.includes('data-vinegar-sound'))throw new Error('The current carousel was not found.');
 const content=home([]).split('<section class="featured container"')[0]+'<aside id="PreviewNote" class="container preview-note"><p><strong>Designvorschau des Karussells</strong></p><p>Aktueller Stand mit Originalfotos, Etikettenansicht und optionalem Glasklang. Weitere Seiten, Warenkorb und Bestellungen benötigen den vollständigen Shop.</p></aside>';
 let html=shell(content,{title:'Karussell – Designvorschau',origin:'https://travellerswiss01.github.io/finalsite01'});

@@ -128,6 +128,18 @@ document.addEventListener('change',async e=>{
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.nav-dropdown[open],.mobile-nav[open]').forEach(el=>el.open=false);});
 syncCart().catch(err=>{if(document.querySelector('[data-cart-page-content]')){document.querySelector('[data-cart-page-content]').textContent='Warenkorb konnte nicht geladen werden.';error(err.message);}});
 
+const announcementTicker=document.querySelector('[data-announcement-ticker]');
+if(announcementTicker){
+ const sequence=announcementTicker.querySelector('.announcement-sequence');
+ const setTickerSpeed=()=>{
+  const width=sequence?.getBoundingClientRect().width;
+  if(width)announcementTicker.style.setProperty('--announcement-duration',width/20+'s');
+ };
+ setTickerSpeed();
+ if(window.ResizeObserver)new window.ResizeObserver(setTickerSpeed).observe(sequence);
+ else window.addEventListener('resize',setTickerSpeed);
+}
+
 const offerCarousel=document.querySelector('[data-offer-carousel]');
 if(offerCarousel){
  const slides=[...offerCarousel.querySelectorAll('[data-offer-slide]')];

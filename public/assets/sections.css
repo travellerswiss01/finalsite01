@@ -104,3 +104,22 @@
 .vinegar-detail-grid.is-single{grid-template-columns:minmax(0,480px);justify-content:center}
 .vinegar-detail-grid figure[hidden]{display:none}
 @media(max-width:599px){.vinegar-tools .vinegar-zoom{width:44px;justify-content:center}.vinegar-tools .vinegar-zoom span{display:none}}
+
+/* A continuous, quiet regional announcement; the original bar height is retained. */
+.announcement-ticker{padding-inline:0;gap:0}
+.announcement-window{width:100%;overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 32px,#000 calc(100% - 32px),transparent)}
+.announcement-track{display:flex;width:max-content;animation:announcement-flow var(--announcement-duration,70s) linear infinite}
+.announcement-sequence{display:flex;flex:0 0 auto;align-items:center;justify-content:space-around;min-width:100vw;gap:64px;padding-inline:32px}
+.announcement-message{display:inline-flex;align-items:center;gap:11px;white-space:nowrap;font-weight:400;letter-spacing:.025em;line-height:1.4;color:#f7f5ed}
+.announcement-message .icon{width:19px;height:19px;flex:none;color:#d8dfce}
+.announcement-ticker:hover .announcement-track{animation-play-state:paused}
+@keyframes announcement-flow{to{transform:translateX(-50%)}}
+@media(max-width:599px){.announcement-message{font-size:14px}.announcement-sequence{gap:42px;padding-inline:21px}.announcement-message .icon{width:17px;height:17px}}
+@media(prefers-reduced-motion:reduce){
+ .announcement-track{animation:none;width:100%}
+ .announcement-window{mask-image:none}
+ .announcement-sequence{min-width:0;width:100%;padding-inline:12px;gap:2px 20px;flex-wrap:wrap}
+ .announcement-sequence+.announcement-sequence,.announcement-message:nth-child(2){display:none}
+ .announcement-message{font-size:12px}
+ .announcement-message .icon{width:15px;height:15px}
+}
