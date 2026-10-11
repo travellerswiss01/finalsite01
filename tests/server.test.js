@@ -38,7 +38,7 @@ test('accepts same-origin HTTPS cart requests behind Render proxy',async()=>{
   const body=JSON.stringify({variantId:'gid://shopify/ProductVariant/1',quantity:1});
   const accepted=await fetch(base+'/api/cart/add',{method:'POST',headers,body});
   assert.equal(accepted.status,200);
-  assert.match(accepted.headers.get('set-cookie')||'','; Secure(?:;|$)');
+  assert.match(accepted.headers.get('set-cookie')||'',/; Secure(?:;|$)/);
   const rejected=await fetch(base+'/api/cart/add',{method:'POST',headers:{...headers,Origin:'https://attacker.example'},body});
   assert.equal(rejected.status,403);
   const crossSite=await fetch(base+'/api/cart/add',{method:'POST',headers:{...headers,'Sec-Fetch-Site':'cross-site'},body});
