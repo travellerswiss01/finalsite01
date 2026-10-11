@@ -63,6 +63,10 @@ npm run test:live
 
 ## Validierung und verbleibende Grenzen
 
-Stand der Prüfung: 19 veröffentlichte Produkte, 22 Varianten; 13 automatisierte Tests bestanden. Live-Warenkorb und alle 25 Seitenrouten geprüft. Desktop 1440 px, Tablet 768 px und Mobile 375 px werden zusätzlich im Browser geprüft.
+Stand der aktuellen Prüfung (11. Oktober 2026): Die GitHub-Actions-Prüfung auf PR-Commit `394034e` war erfolgreich; `npm run check` und `npm test` liefen durch, 39/39 Tests bestanden. Im Browser wurden 35 unterschiedliche Seitenrouten geprüft. Der Warenkorb-POST schlägt auf den beiden Live-Domains weiterhin mit der Origin-Schutzmeldung fehl.
 
-Das Mockup liefert keine exakte Schriftdatei oder Hover-Spezifikation: Georgia/Arial und dunklerer roter Hover sind Annahmen. Der Footer ergänzt funktionale Navigation und vorhandene Shopify-Rechtstexte. Checkout und Zahlungsabwicklung bleiben im Shopify-Checkout; dessen Abschluss wurde bewusst nicht mit einer echten Bestellung getestet. Domain, Hosting und Mailversand werden durch das Repository allein noch nicht veröffentlicht.
+Der Shopify-Checkout wurde nur in einer Render-Vorschau auf dem Basisbranch `codex/mockup-homepage` (Commit `192aee34`) geöffnet. Diese Vorschau enthält nicht den PR-Fix und beweist daher nicht, dass der Fix live funktioniert. Es wurde keine Bestellung ausgelöst.
+
+Mobile Ansichten wurden in dieser Prüfung nicht vollständig verifiziert. 375-px- und 768-px-Darstellung sind offen. Auch Lighthouse/Core Web Vitals sind nicht abschliessend gemessen.
+
+Das Mockup liefert keine exakte Schriftdatei oder Hover-Spezifikation: Georgia/Arial und dunklerer roter Hover sind Annahmen. Der Footer ergänzt funktionale Navigation und vorhandene Shopify-Rechtstexte. Domain, Hosting und Mailversand werden durch das Repository allein noch nicht veröffentlicht.
