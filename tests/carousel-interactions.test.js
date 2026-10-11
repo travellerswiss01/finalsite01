@@ -4,7 +4,7 @@ import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 
 const carouselScript='const offerCarousel='+readFileSync(new URL('../public/assets/app.js',import.meta.url),'utf8').split('const offerCarousel=')[1];
-function setup(reduced=false){
+function setup(reduced=false,audioSupported=true){
  const element=()=>({
   handlers:{},attrs:{},inert:false,hidden:true,
   style:{values:{},setProperty(name,value){this.values[name]=value;}},
@@ -15,6 +15,7 @@ function setup(reduced=false){
  const figures=Array.from({length:7},element),bottles=figures.map(figure=>{const button=element();button.closest=selector=>selector==='[data-offer-image]'?images[3]:figure;return button;});
  const controls=Object.fromEntries(['prev','next','toggle','controls'].map(name=>['[data-offer-'+name+']',element()]));
  controls['[data-vinegar-open]']=element();
+ controls['[data-vinegar-sound]']=element();
  const dialog=element(),close=element();dialog.open=false;dialog.querySelector=()=>close;dialog.showModal=()=>{dialog.open=true;};dialog.close=()=>{dialog.open=false;dialog.handlers.close();};
  const carousel=element();carousel.contains=el=>bottles.includes(el)||Object.values(controls).includes(el);
  carousel.querySelectorAll=selector=>selector==='[data-offer-image]'?images:selector==='[data-vinegar-bottle]'?bottles:slides;
@@ -23,8 +24,15 @@ function setup(reduced=false){
  const motion=element();motion.matches=reduced;
  let interval=null,id=0;const timeouts=new Map();
  const window={matchMedia:()=>motion,setInterval(fn){interval=fn;return 1;},clearInterval(){interval=null;},setTimeout(fn,ms){timeouts.set(++id,{fn,ms});return id;},clearTimeout(key){timeouts.delete(key);}};
+ const audio={contexts:0,notes:0};
+ class FakeAudioContext{
+  constructor(){audio.contexts++;this.state='running';this.currentTime=0;this.destination={};}
+  createOscillator(){return {frequency:{setValueAtTime(){}},connect(){},disconnect(){},start(){audio.notes++;},stop(){this.onended?.();}};}
+  createGain(){return {gain:{setValueAtTime(){},linearRampToValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){},disconnect(){}};}
+ }
+ if(audioSupported)window.AudioContext=FakeAudioContext;
  vm.runInNewContext(carouselScript,{document,window});
- return {bottles,figures,images,controls,carousel,dialog,document,motion,timeouts,
+ return {bottles,figures,images,controls,carousel,dialog,document,motion,timeouts,audio,
   next(){controls['[data-offer-next]'].handlers.click();},running:()=>interval!==null,
   finish(){const [key,timeout]=timeouts.entries().next().value;timeouts.delete(key);timeout.fn();}
  };
@@ -66,4 +74,23 @@ test('reduced motion keeps bottles still while allowing direct access to origina
  const normal=setup();for(let i=0;i<3;i++)normal.next();normal.bottles[0].handlers.pointerenter({pointerType:'mouse'});
  normal.motion.matches=true;normal.motion.handlers.change({matches:true});
  assert.equal(normal.timeouts.size,0);assert.equal(normal.running(),false);
+});
+
+test('glass sound is silent by default and plays only on a bottle click after opting in',async()=>{
+ const env=setup();for(let i=0;i<3;i++)env.next();
+ const sound=env.controls['[data-vinegar-sound]'];
+ assert.equal(sound.hidden,false);assert.equal(env.audio.contexts,0);
+ env.bottles[0].handlers.click();assert.equal(env.audio.notes,0);env.dialog.close();
+ await sound.handlers.click();
+ assert.equal(sound.attrs['aria-pressed'],'true');assert.equal(env.audio.contexts,1);assert.equal(env.audio.notes,0);
+ env.bottles[0].handlers.pointerenter({pointerType:'mouse'});env.bottles[0].handlers.focus();
+ assert.equal(env.audio.notes,0);
+ env.bottles[0].handlers.click();assert.equal(env.audio.notes,3);assert.equal(env.dialog.open,true);
+ await sound.handlers.click();assert.equal(sound.attrs['aria-pressed'],'false');env.dialog.close();
+ env.bottles[0].handlers.click();assert.equal(env.audio.notes,3);
+});
+test('devices without Web Audio keep the sound button hidden and label viewing functional',()=>{
+ const env=setup(false,false);for(let i=0;i<3;i++)env.next();
+ assert.equal(env.controls['[data-vinegar-sound]'].hidden,true);
+ env.bottles[0].handlers.click();assert.equal(env.dialog.open,true);assert.equal(env.audio.contexts,0);
 });

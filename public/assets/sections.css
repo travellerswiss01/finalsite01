@@ -86,3 +86,12 @@
 .offer-carousel:has(.vinegar-lineup-frame.is-active) .hero-offer.is-active a{pointer-events:auto}
 @media(max-width:599px){.vinegar-bottle-trigger{inset:0}}
 @media(prefers-reduced-motion:reduce){.vinegar-lineup-item.is-vinegar-sway img{animation:none}}
+
+.vinegar-tools{position:absolute;right:12px;top:8px;display:flex;align-items:center;gap:6px;z-index:2}
+.vinegar-tools .vinegar-zoom{position:static}
+.vinegar-sound{display:grid;place-items:center;width:44px;height:44px;padding:8px;border:1px solid #173d2b26;border-radius:50%;background:#fffefaee;color:#173d2b}
+.vinegar-sound[hidden]{display:none}
+.vinegar-sound[aria-pressed="true"]{background:#e8eee3;border-color:#20553266}
+.vinegar-sound .icon{width:20px;height:20px}
+@media(max-width:599px){.vinegar-tools{top:auto;right:auto;bottom:8px;left:8px}}
+@media(max-width:399px){.vinegar-tools .vinegar-zoom{width:44px;justify-content:center}.vinegar-tools .vinegar-zoom span{display:none}}

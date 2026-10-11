@@ -134,6 +134,52 @@ if(offerCarousel){
  const images=[...offerCarousel.querySelectorAll('[data-offer-image]')];
  const toggle=offerCarousel.querySelector('[data-offer-toggle]');
  const vinegarDialog=document.querySelector('[data-vinegar-dialog]');
+ const soundToggle=offerCarousel.querySelector('[data-vinegar-sound]');
+ const AudioContext=window.AudioContext||window.webkitAudioContext;
+ let soundEnabled=false,audioContext=null,lastChime=-Infinity;
+ const updateSound=()=>{
+  if(!soundToggle)return;
+  soundToggle.setAttribute('aria-pressed',String(soundEnabled));
+  const label=soundEnabled?'Glasklang ausschalten':'Glasklang einschalten';
+  soundToggle.setAttribute('aria-label',label);soundToggle.setAttribute('title',label);
+  soundToggle.innerHTML='<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" focusable="false"><path d="M11 5 6 9H3v6h3l5 4V5Z"/>'+ (soundEnabled?'<path d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/>':'<path d="m16 9 5 6m0-6-5 6"/>')+'</svg>';
+ };
+ if(soundToggle&&AudioContext){
+  soundToggle.hidden=false;
+  soundToggle.addEventListener('click',async()=>{
+   if(soundEnabled){soundEnabled=false;updateSound();return;}
+   try{
+    audioContext??=new AudioContext();
+    if(audioContext.state==='suspended')await audioContext.resume();
+    soundEnabled=audioContext.state==='running';
+   }catch{soundEnabled=false;}
+   updateSound();
+  });
+ }
+ const playGlass=()=>{
+  if(!soundEnabled||!audioContext||document.hidden)return;
+  const ring=()=>{
+   if(!soundEnabled||document.hidden||audioContext.state!=='running')return;
+   const now=audioContext.currentTime;
+   if(now-lastChime<.35)return;
+   lastChime=now;
+   // Quiet inharmonic sine partials create one short, soft glass chime.
+   for(const [frequency,level,decay] of [[1568,.025,.38],[2437,.009,.25],[3521,.004,.16]]){
+    const oscillator=audioContext.createOscillator(),gain=audioContext.createGain();
+    oscillator.type='sine';oscillator.frequency.setValueAtTime(frequency,now);
+    gain.gain.setValueAtTime(0,now);
+    gain.gain.linearRampToValueAtTime(level,now+.004);
+    gain.gain.exponentialRampToValueAtTime(.00001,now+decay);
+    oscillator.connect(gain);gain.connect(audioContext.destination);
+    oscillator.onended=()=>{oscillator.disconnect();gain.disconnect();};
+    oscillator.start(now);oscillator.stop(now+decay+.02);
+   }
+  };
+  try{
+   if(audioContext.state==='suspended')audioContext.resume().then(ring).catch(()=>{});
+   else ring();
+  }catch{soundEnabled=false;updateSound();}
+ };
  const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
  const bottles=[...offerCarousel.querySelectorAll('[data-vinegar-bottle]')];
  let current=0,timer=null,swayTimer=null,swayRunning=false,paused=motion.matches,hovered=false;
@@ -194,7 +240,7 @@ if(offerCarousel){
   swayTimer=window.setTimeout(()=>{resetSway();start();},duration+Math.max(origin,bottles.length-1-origin)*rippleDelay);
  };
  bottles.forEach((button,index)=>{
-  button.addEventListener('click',openVinegar);
+  button.addEventListener('click',()=>{playGlass();openVinegar();});
   button.addEventListener('focus',()=>{if(!motion.matches)playSway(index);});
   button.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!motion.matches)playSway(index);});
  });
