@@ -116,12 +116,13 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
    if(pathname==='/health'){sendJson(res,200,{status:'ok'});return;}
    if(pathname==='/robots.txt'){res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8'});res.end(`User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /warenkorb\nDisallow: /suche\nSitemap: ${requestOrigin}/sitemap.xml\n`);return;}
    if(pathname==='/sitemap.xml'){
-    const products=await store.catalog();const routes=['/','/sortiment','/saisonales','/geschenkkoerbe','/geschenk-konfigurator','/kochservice','/ueber-uns','/kontakt',...products.map(view.productUrl)];
+    const products=await store.catalog();const routes=['/','/sortiment','/saisonales','/geschenkkoerbe','/geschenk-konfigurator','/kochservice','/garten','/ueber-uns','/kontakt',...products.map(view.productUrl)];
     res.writeHead(200,{'Content-Type':'application/xml; charset=utf-8'});res.end(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${routes.map(route=>`<url><loc>${view.escape(requestOrigin+route)}</loc></url>`).join('')}</urlset>`);return;
    }
    const shop=await store.shop();let content,title,description,product,status=200;
    if(pathname==='/'){content=view.home(await store.catalog());title='Geschenke aus dem Thurgau';}
    else if(pathname==='/geschenk-konfigurator'){content=view.giftConfigurator(await store.catalog());title='Geschenk zusammenstellen';description='Wähle Thurgauer Spezialitäten und stelle dein persönliches Geschenk zusammen.';}
+   else if(pathname==='/garten'){content=view.gardenService();title='Garten & Obstbäume mit Otto';description='Otto, gelernter Baumschulist mit 40 Jahren Erfahrung: Obstbaumschnitt, Sortenberatung und Veredelung. Direkt anrufen: 079 935 00 64.';}
    else if(pathname==='/kochservice'){content=view.cookingService();title='Kochen mit Lucia im Thurgau';description='Kochservice bei dir zu Hause für private Anlässe, Geburtstage und Familienfeiern bis 20 Personen im Kanton Thurgau.';}
    else if(['/sortiment','/saisonales','/geschenkkoerbe','/suche'].includes(pathname)){
     const q=(url.searchParams.get('q')||'').slice(0,200);const category=(url.searchParams.get('kategorie')||'').slice(0,100);
