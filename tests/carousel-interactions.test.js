@@ -6,7 +6,7 @@ import {readFileSync} from 'node:fs';
 const carouselScript='const offerCarousel='+readFileSync(new URL('../public/assets/app.js',import.meta.url),'utf8').split('const offerCarousel=')[1];
 function setup(reduced=false,audioSupported=true){
  const element=()=>({
-  handlers:{},attrs:{},inert:false,hidden:true,
+  handlers:{},attrs:{},inert:false,hidden:true,textContent:'',
   style:{values:{},setProperty(name,value){this.values[name]=value;}},
   classList:{values:new Set(),add(name){this.values.add(name);},remove(name){this.values.delete(name);},contains(name){return this.values.has(name);},toggle(name,value){if(value)this.add(name);else this.remove(name);}},
   addEventListener(type,fn){this.handlers[type]=fn;},setAttribute(name,value){this.attrs[name]=value;}
@@ -16,7 +16,11 @@ function setup(reduced=false,audioSupported=true){
  const controls=Object.fromEntries(['prev','next','toggle','controls'].map(name=>['[data-offer-'+name+']',element()]));
  controls['[data-vinegar-open]']=element();
  controls['[data-vinegar-sound]']=element();
- const dialog=element(),close=element();dialog.open=false;dialog.querySelector=()=>close;dialog.showModal=()=>{dialog.open=true;};dialog.close=()=>{dialog.open=false;dialog.handlers.close();};
+ controls['[data-vinegar-motion]']=element();
+ const dialog=element(),close=element(),detailGrid=element(),detailHeading=element();
+ const detailPhotos=Array.from({length:7},(_,i)=>{const photo=element();photo.hidden=false;photo.querySelector=()=>({textContent:'Sorte '+i});return photo;});
+ detailGrid.querySelectorAll=()=>detailPhotos;detailHeading.textContent='Alle Originaletiketten';
+ dialog.open=false;dialog.querySelector=selector=>selector==='.vinegar-detail-grid'?detailGrid:selector==='#VinegarDialogHeading'?detailHeading:close;dialog.showModal=()=>{dialog.open=true;};dialog.close=()=>{dialog.open=false;dialog.handlers.close();};
  const carousel=element();carousel.contains=el=>bottles.includes(el)||Object.values(controls).includes(el);
  carousel.querySelectorAll=selector=>selector==='[data-offer-image]'?images:selector==='[data-vinegar-bottle]'?bottles:slides;
  carousel.querySelector=selector=>controls[selector];
@@ -32,35 +36,36 @@ function setup(reduced=false,audioSupported=true){
  }
  if(audioSupported)window.AudioContext=FakeAudioContext;
  vm.runInNewContext(carouselScript,{document,window});
- return {bottles,figures,images,controls,carousel,dialog,document,motion,timeouts,audio,
+ return {bottles,figures,images,controls,carousel,dialog,detailGrid,detailHeading,detailPhotos,document,motion,timeouts,audio,
   next(){controls['[data-offer-next]'].handlers.click();},running:()=>interval!==null,
   finish(){const [key,timeout]=timeouts.entries().next().value;timeouts.delete(key);timeout.fn();}
  };
 }
-test('hover gives a subtle fading ripple and pauses rotation until every bottle rests',()=>{
+test('bottles fall fully horizontal in a staggered wave and pause rotation until upright',()=>{
  const env=setup();for(let i=0;i<3;i++)env.next();
  env.bottles[2].handlers.pointerenter({pointerType:'touch'});assert.equal(env.timeouts.size,0);
  env.bottles[2].handlers.pointerenter({pointerType:'mouse'});assert.equal(env.running(),false);
  assert.ok(env.figures.every(figure=>figure.classList.contains('is-vinegar-sway')));
- assert.deepEqual(env.figures.map(figure=>figure.style.values['--bottle-delay']),['140ms','70ms','0ms','70ms','140ms','210ms','280ms']);
- assert.ok(env.figures.every(figure=>figure.style.values['--bottle-duration']==='1500ms'));
- assert.equal(env.figures[2].style.values['--bottle-angle'],'3.5deg');
- assert.equal(env.figures[1].style.values['--bottle-angle'],'-1.75deg');
- assert.equal(env.figures[6].style.values['--bottle-angle'],'0.7deg');
- assert.equal([...env.timeouts.values()][0].ms,1780);
+ assert.deepEqual(env.figures.map(figure=>figure.style.values['--bottle-delay']),['440ms','220ms','0ms','220ms','440ms','660ms','880ms']);
+ assert.ok(env.figures.every(figure=>figure.style.values['--bottle-duration']==='2400ms'));
+ assert.equal(env.figures[2].style.values['--bottle-angle'],'90deg');
+ assert.equal(env.figures[1].style.values['--bottle-angle'],'-90deg');
+ assert.equal(env.figures[6].style.values['--bottle-angle'],'-90deg');
+ assert.equal([...env.timeouts.values()][0].ms,3280);
  env.bottles[4].handlers.pointerenter({pointerType:'mouse'});assert.equal(env.timeouts.size,1);
  env.carousel.handlers.mouseleave();assert.equal(env.running(),false);
  env.finish();assert.ok(env.figures.every(figure=>!figure.classList.contains('is-vinegar-sway')));assert.equal(env.running(),true);
 });
-test('hover and keyboard focus trigger a ripple only on the active bottle slide',()=>{
+test('hover and the motion control trigger a full fall on the active bottle slide',()=>{
  const env=setup();env.bottles[0].handlers.pointerenter({pointerType:'mouse'});assert.equal(env.timeouts.size,0);
  for(let i=0;i<3;i++)env.next();
- env.bottles[0].handlers.focus();assert.equal(env.timeouts.size,1);
+ env.controls['[data-vinegar-motion]'].handlers.click();assert.equal(env.timeouts.size,1);
  env.next();assert.equal(env.timeouts.size,0);assert.ok(env.figures.every(figure=>!figure.classList.contains('is-vinegar-sway')));
 });
-test('clicking a bottle opens original labels and cancels motion; hiding the page also resets it',()=>{
+test('the motion control starts the fall; opening labels or hiding the page resets it',()=>{
  const env=setup();for(let i=0;i<3;i++)env.next();
- env.bottles[0].handlers.pointerenter({pointerType:'mouse'});env.bottles[0].handlers.click();
+ env.controls['[data-vinegar-motion]'].handlers.click();assert.equal(env.timeouts.size,1);
+ env.controls['[data-vinegar-open]'].handlers.click();
  assert.equal(env.timeouts.size,0);assert.equal(env.dialog.open,true);assert.equal(env.running(),false);
  env.dialog.close();assert.equal(env.running(),true);
  env.bottles[0].handlers.pointerenter({pointerType:'mouse'});env.document.hidden=true;env.document.handlers.visibilitychange();
@@ -68,7 +73,7 @@ test('clicking a bottle opens original labels and cancels motion; hiding the pag
 });
 test('reduced motion keeps bottles still while allowing direct access to original labels',()=>{
  const env=setup(true);for(let i=0;i<3;i++)env.next();
- env.bottles[0].handlers.pointerenter({pointerType:'mouse'});env.bottles[0].handlers.focus();
+ env.bottles[0].handlers.pointerenter({pointerType:'mouse'});
  assert.equal(env.timeouts.size,0);assert.equal(env.dialog.open,false);
  env.bottles[0].handlers.click();assert.equal(env.dialog.open,true);assert.equal(env.timeouts.size,0);
  const normal=setup();for(let i=0;i<3;i++)normal.next();normal.bottles[0].handlers.pointerenter({pointerType:'mouse'});
@@ -83,7 +88,7 @@ test('glass sound is silent by default and plays only on a bottle click after op
  env.bottles[0].handlers.click();assert.equal(env.audio.notes,0);env.dialog.close();
  await sound.handlers.click();
  assert.equal(sound.attrs['aria-pressed'],'true');assert.equal(env.audio.contexts,1);assert.equal(env.audio.notes,0);
- env.bottles[0].handlers.pointerenter({pointerType:'mouse'});env.bottles[0].handlers.focus();
+ env.bottles[0].handlers.pointerenter({pointerType:'mouse'});
  assert.equal(env.audio.notes,0);
  env.bottles[0].handlers.click();assert.equal(env.audio.notes,3);assert.equal(env.dialog.open,true);
  await sound.handlers.click();assert.equal(sound.attrs['aria-pressed'],'false');env.dialog.close();
@@ -92,5 +97,17 @@ test('glass sound is silent by default and plays only on a bottle click after op
 test('devices without Web Audio keep the sound button hidden and label viewing functional',()=>{
  const env=setup(false,false);for(let i=0;i<3;i++)env.next();
  assert.equal(env.controls['[data-vinegar-sound]'].hidden,true);
- env.bottles[0].handlers.click();assert.equal(env.dialog.open,true);assert.equal(env.audio.contexts,0);
+ env.controls['[data-vinegar-motion]'].handlers.click();assert.equal(env.timeouts.size,1);
+ env.controls['[data-vinegar-open]'].handlers.click();assert.equal(env.dialog.open,true);assert.equal(env.audio.contexts,0);
+});
+
+test('each bottle opens its own original photo, and the label overview restores every photo',()=>{
+ const env=setup();for(let i=0;i<3;i++)env.next();
+ env.bottles[4].handlers.click();
+ assert.equal(env.dialog.open,true);assert.equal(env.detailHeading.textContent,'Sorte 4 – Originaletikett');
+ assert.deepEqual(env.detailPhotos.map(photo=>photo.hidden),[true,true,true,true,false,true,true]);
+ assert.equal(env.detailGrid.classList.contains('is-single'),true);
+ env.dialog.close();env.controls['[data-vinegar-open]'].handlers.click();
+ assert.ok(env.detailPhotos.every(photo=>!photo.hidden));assert.equal(env.detailHeading.textContent,'Alle Originaletiketten');
+ assert.equal(env.detailGrid.classList.contains('is-single'),false);
 });

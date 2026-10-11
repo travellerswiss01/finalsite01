@@ -134,6 +134,11 @@ if(offerCarousel){
  const images=[...offerCarousel.querySelectorAll('[data-offer-image]')];
  const toggle=offerCarousel.querySelector('[data-offer-toggle]');
  const vinegarDialog=document.querySelector('[data-vinegar-dialog]');
+ const detailGrid=vinegarDialog?.querySelector('.vinegar-detail-grid');
+ const detailPhotos=[...detailGrid?.querySelectorAll('figure')||[]];
+ const detailHeading=vinegarDialog?.querySelector('#VinegarDialogHeading');
+ const detailTitle=detailHeading?.textContent;
+ const motionToggle=offerCarousel.querySelector('[data-vinegar-motion]');
  const soundToggle=offerCarousel.querySelector('[data-vinegar-sound]');
  const AudioContext=window.AudioContext||window.webkitAudioContext;
  let soundEnabled=false,audioContext=null,lastChime=-Infinity;
@@ -221,29 +226,39 @@ if(offerCarousel){
  offerCarousel.addEventListener('focusin',stop);
  offerCarousel.addEventListener('focusout',event=>{if(!offerCarousel.contains(event.relatedTarget))window.setTimeout(start,0);});
  document.addEventListener('visibilitychange',()=>{if(document.hidden)resetSway();start();});
- motion.addEventListener('change',event=>{if(event.matches){resetSway();paused=true;updateToggle();}start();});
+ motion.addEventListener('change',event=>{if(motionToggle)motionToggle.disabled=event.matches;if(event.matches){resetSway();paused=true;updateToggle();}start();});
 
- const openVinegar=()=>{if(vinegarDialog){resetSway();stop();vinegarDialog.showModal();}};
+ const openVinegar=selection=>{
+  if(!vinegarDialog)return;
+  const selected=Number.isInteger(selection)&&selection>=0&&selection<detailPhotos.length?selection:null;
+  detailPhotos.forEach((photo,index)=>{photo.hidden=selected!==null&&index!==selected;});
+  detailGrid?.classList.toggle('is-single',selected!==null);
+  if(detailHeading)detailHeading.textContent=selected===null?detailTitle:detailPhotos[selected].querySelector('figcaption').textContent+' – Originaletikett';
+  resetSway();stop();vinegarDialog.showModal();
+ };
  const playSway=origin=>{
   if(swayRunning||!bottles[origin]?.closest('[data-offer-image]').classList.contains('is-active'))return;
   if(motion.matches){openVinegar();return;}
-  const rippleDelay=70,duration=1500;
+  const rippleDelay=220,duration=2400;
   swayRunning=true;stop();
   bottles.forEach((button,index)=>{
    const bottle=button.closest('.vinegar-lineup-item');
    bottle.style.setProperty('--bottle-delay',Math.abs(index-origin)*rippleDelay+'ms');
    bottle.style.setProperty('--bottle-duration',duration+'ms');
-   const distance=Math.abs(index-origin),angle=3.5/(1+distance);
-   bottle.style.setProperty('--bottle-angle',(index<origin?-angle:angle)+'deg');
+   const angle=index===0?90:index===bottles.length-1?-90:index<origin?-90:90;
+   bottle.style.setProperty('--bottle-angle',angle+'deg');
    bottle.classList.add('is-vinegar-sway');
   });
   swayTimer=window.setTimeout(()=>{resetSway();start();},duration+Math.max(origin,bottles.length-1-origin)*rippleDelay);
  };
  bottles.forEach((button,index)=>{
-  button.addEventListener('click',()=>{playGlass();openVinegar();});
-  button.addEventListener('focus',()=>{if(!motion.matches)playSway(index);});
+  button.addEventListener('click',()=>{playGlass();openVinegar(index);});
   button.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!motion.matches)playSway(index);});
  });
+ if(motionToggle){
+  motionToggle.hidden=false;motionToggle.disabled=motion.matches;
+  motionToggle.addEventListener('click',()=>{if(!motion.matches)playSway(Math.floor(bottles.length/2));});
+ }
  offerCarousel.querySelector('[data-vinegar-open]')?.addEventListener('click',openVinegar);
  vinegarDialog?.querySelector('[data-vinegar-close]')?.addEventListener('click',()=>vinegarDialog.close());
  vinegarDialog?.addEventListener('close',start);
