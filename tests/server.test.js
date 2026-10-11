@@ -50,10 +50,12 @@ test('accepts same-origin HTTPS cart requests behind Render proxy',async()=>{
 test('uses the request host for cart checks while keeping the configured canonical origin',async()=>{
  const store={catalog:async()=>[],shop:async()=>null,cart:async()=>null,mutateCart:async()=>({cart:cartFixture(),warnings:[]})};
  const app=createApp({store,origin:'https://canonical.example'});
- await new Promise(resolve=>app.listen(0,'127.0.0.1',resolve));
- const base='http://127.0.0.1:'+app.address().port;
+ const handler=app.listeners('request')[0];
+ const server=createServer((req,res)=>{req.headers.host='alias.example';handler(req,res);});
+ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+ const base='http://127.0.0.1:'+server.address().port;
  try{
-  const headers={'Content-Type':'application/json','X-Forwarded-Proto':'https',Host:'alias.example',Origin:'https://alias.example'};
+  const headers={'Content-Type':'application/json','X-Forwarded-Proto':'https',Origin:'https://alias.example'};
   const body=JSON.stringify({variantId:'gid://shopify/ProductVariant/1',quantity:1});
   const accepted=await fetch(base+'/api/cart/add',{method:'POST',headers,body});
   assert.equal(accepted.status,200);
@@ -62,8 +64,8 @@ test('uses the request host for cart checks while keeping the configured canonic
   assert.equal(rejected.status,403);
   const crossSite=await fetch(base+'/api/cart/add',{method:'POST',headers:{...headers,'Sec-Fetch-Site':'cross-site'},body});
   assert.equal(crossSite.status,403);
-  const page=await fetch(base+'/',{headers:{'X-Forwarded-Proto':'https',Host:'alias.example'}});
+  const page=await fetch(base+'/',{headers:{'X-Forwarded-Proto':'https'}});
   assert.equal(page.status,200);
   assert.match(await page.text(),/rel="canonical" href="https:\/\/canonical\.example\//);
- }finally{app.closeAllConnections();await new Promise(resolve=>app.close(resolve));}
+ }finally{server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
 });
