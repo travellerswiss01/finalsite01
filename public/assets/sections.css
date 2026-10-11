@@ -120,4 +120,7 @@
 }
 
 /* Give each announcement statement more breathing room. */
-.announcement-marquee-message{display:inline-flex;align-items:center;gap:clamp(120px,16vw,240px)}
+.announcement-marquee-message{display:inline-flex;flex:none;align-items:center;gap:0}
+.announcement-marquee-message>span:not(.announcement-marquee-separator){flex:0 0 calc(100vw - 96px);width:calc(100vw - 96px);text-align:center}
+.announcement-marquee-message>.announcement-marquee-separator{flex:0 0 96px;width:96px;text-align:center}
+@media(prefers-reduced-motion:reduce){.announcement-marquee-message{flex-wrap:wrap;justify-content:center;gap:16px 32px}.announcement-marquee-message>span:not(.announcement-marquee-separator),.announcement-marquee-message>.announcement-marquee-separator{flex:0 0 auto;width:auto}}
