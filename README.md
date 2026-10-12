@@ -30,11 +30,11 @@ Webseite: http://localhost:3000. Für den Produktionsbetrieb `npm start` verwend
 
 ## Bereitstellen
 
-### Vercel
+### Render
 
-Dieses Repository als Projekt importieren. Framework-Preset **Other**, Build-Befehl leer lassen, Node.js **24.x** wählen. `api/index.js` und `vercel.json` liefern die dynamischen Seiten und die Warenkorb-API; Bilder, CSS und JavaScript liegen in `public/assets`.
+Als Node.js-Web-Service mit Branch `main` bereitstellen. Node.js **24.x**, Build-Befehl `npm install --omit=dev`, Start-Befehl `npm start`. Bilder, CSS und JavaScript liegen in `public/assets`.
 
-Umgebungsvariablen: `SHOPIFY_STORE_DOMAIN=biottoslaedeli.myshopify.com` und `SHOPIFY_API_VERSION=2026-10`. `PUBLIC_ORIGIN` auf die endgültige HTTPS-Adresse setzen, sobald die Domain feststeht. Ohne diese Variable verwendet Vercel die jeweils angefragte HTTPS-Domain, damit Preview-Deployments funktionieren. Eine localhost-Adresse darf nicht im veröffentlichten Projekt stehen.
+Umgebungsvariablen: `SHOPIFY_STORE_DOMAIN=biottoslaedeli.myshopify.com` und `SHOPIFY_API_VERSION=2026-10`. `PUBLIC_ORIGIN=https://biottoslaedeli.ch` legt die kanonische Produktionsadresse für Seiten und Sitemap fest. Das Anfrageprotokoll wird über `X-Forwarded-Proto` ermittelt, andernfalls über den TLS-Status der Verbindung. Eine localhost-Adresse darf nicht im veröffentlichten Projekt stehen.
 
 ### Node.js / Docker
 
