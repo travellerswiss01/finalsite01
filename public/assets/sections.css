@@ -233,3 +233,7 @@
 
 /* Mobile: Logo und Navigation bleiben auch bei 320px in einer Zeile bedienbar. */
 @media(max-width:399px){.header{gap:.125rem;padding:1rem}.brand img.bundled-logo{width:clamp(9rem,45vw,10.3125rem)}.header-actions{gap:.5rem}}
+
+/* Only the first offer: all three juice sizes on a transparent background. */
+.offer-carousel .hero-image.most-trio-banner{object-fit:contain;object-position:right center;background:transparent;padding:12px 30px 18px 20%;}
+@media(max-width:599px){.offer-carousel .hero-image.most-trio-banner{padding:0 12px 49px;object-position:right bottom;}}
