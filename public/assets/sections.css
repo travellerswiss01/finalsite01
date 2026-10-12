@@ -54,7 +54,7 @@
 .offer-carousel:has(.vinegar-lineup-frame.is-active):before{background:var(--vinegar-backdrop)}
 .vinegar-lineup-frame{z-index:0;background:var(--vinegar-backdrop)}
 .vinegar-lineup{position:absolute;inset:5px 12px 8px 20%;display:flex;gap:4px;align-items:end;isolation:isolate;background:var(--vinegar-backdrop)}
-.vinegar-lineup-item{position:relative;container-type:size;flex:1;height:100%;min-width:0;margin:0;overflow:visible;background:transparent;mix-blend-mode:multiply}
+.vinegar-lineup-item{position:relative;container-type:size;flex:1;height:100%;min-width:0;margin:0;overflow:visible;background:var(--vinegar-backdrop);isolation:isolate}
 .vinegar-lineup-item img{position:absolute;left:50%;top:45%;height:min(78cqh,150cqw);width:auto;max-width:none;transform:translate(-50%,-50%);filter:brightness(1.003937)}
 .vinegar-lineup-item figcaption{position:absolute;bottom:4px;left:2px;right:2px;text-align:center;color:#173d2b;font-size:11px;line-height:1.2}
 .vinegar-zoom{position:absolute;right:12px;top:8px;display:flex;align-items:center;gap:5px;min-height:44px;padding:6px 10px;border:1px solid #173d2b26;border-radius:24px;background:#fffefaee;color:#173d2b;font-size:13px}
