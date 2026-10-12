@@ -134,6 +134,12 @@ if(offerCarousel){
  const images=[...offerCarousel.querySelectorAll('[data-offer-image]')];
  const toggle=offerCarousel.querySelector('[data-offer-toggle]');
  const vinegarDialog=document.querySelector('[data-vinegar-dialog]');
+ const mostDialog=document.createElement('dialog');
+ mostDialog.className='most-size-dialog';
+ mostDialog.setAttribute('aria-labelledby','MostSizeHeading');
+ mostDialog.innerHTML='<div class="most-size-dialog-inner"><div class="most-size-dialog-image"><img data-most-product-image alt="" width="960" height="960"></div><div class="most-size-dialog-copy"><div class="most-size-dialog-header"><div><p class="most-size-kicker">Direkt aus dem Thurgau</p><h2 id="MostSizeHeading">Süssmost</h2></div><button class="most-size-dialog-close" type="button" data-most-close aria-label="Ansicht schliessen">×</button></div><p class="most-size-description" data-most-description></p><div class="most-size-options" role="group" aria-label="Gebindegrösse"></div><p class="most-size-price" data-most-price></p><div class="most-size-purchase-row"><input class="most-size-quantity" type="number" min="1" max="250" step="1" value="1" aria-label="Anzahl"><button class="most-size-add" type="button" data-most-add>In den Warenkorb</button></div><p class="most-size-error" data-most-error role="status" aria-live="polite"></p></div></div>';
+ document.body.append(mostDialog);
+ let mostCatalog=null,mostVariant=null,mostOpener=null;
  const detailGrid=vinegarDialog?.querySelector('.vinegar-detail-grid');
  const detailPhotos=[...detailGrid?.querySelectorAll('figure')||[]];
  const detailHeading=vinegarDialog?.querySelector('#VinegarDialogHeading');
@@ -211,10 +217,78 @@ if(offerCarousel){
  const stop=()=>{if(timer!==null){window.clearInterval(timer);timer=null;}};
  const start=()=>{
   stop();
-  if(slides.length>1&&!paused&&!hovered&&!document.hidden&&!vinegarDialog?.open&&!swayRunning&&!document.activeElement?.matches?.(':focus-visible')){
+  if(slides.length>1&&!paused&&!hovered&&!document.hidden&&!vinegarDialog?.open&&!mostDialog.open&&!swayRunning&&!document.activeElement?.matches?.(':focus-visible')){
    timer=window.setInterval(()=>show(current+1),6000);
   }
  };
+ const formatMostPrice=value=>money(value);
+ const paintMostVariant=variant=>{
+  mostVariant=variant;
+  const image=variant.image||mostCatalog.featuredImage;
+  const picture=mostDialog.querySelector('[data-most-product-image]');
+  picture.src=image?.url||'';picture.alt=image?.altText||`Süssmost ${variant.title}`;
+  mostDialog.querySelector('#MostSizeHeading').textContent=`Süssmost · ${variant.title}`;
+  mostDialog.querySelector('[data-most-price]').textContent=formatMostPrice(variant.price);
+  const add=mostDialog.querySelector('[data-most-add]');
+  add.disabled=!variant.availableForSale;
+  add.textContent=variant.availableForSale?'In den Warenkorb':'Derzeit nicht verfügbar';
+  mostDialog.querySelector('[data-most-error]').textContent='';
+  mostDialog.querySelectorAll('[data-most-option]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.mostOption===variant.title)));
+ };
+ const showMostProduct=async size=>{
+  stop();
+  mostOpener=offerCarousel.querySelector(`[data-most-size="${CSS.escape(size)}"]`);
+  mostDialog.showModal();
+  mostDialog.querySelector('#MostSizeHeading').textContent='Süssmost';
+  mostDialog.querySelector('[data-most-description]').textContent='Gebinde und Preis werden geladen …';
+  mostDialog.querySelector('[data-most-price]').textContent='';
+  try{
+   if(!mostCatalog){
+    const result=await api('/api/catalog');
+    mostCatalog=result.products.find(product=>product.handle==='sussmost');
+    if(!mostCatalog)throw new Error('Süssmost ist momentan nicht verfügbar.');
+    const options=mostDialog.querySelector('.most-size-options');
+    options.innerHTML=mostCatalog.variants.map(variant=>`<button class="most-size-option" type="button" data-most-option="${escape(variant.title)}" aria-pressed="false" ${variant.availableForSale?'':'disabled'}>${escape(variant.title)}</button>`).join('');
+    options.addEventListener('click',event=>{
+     const button=event.target.closest('[data-most-option]');
+     if(button){const variant=mostCatalog.variants.find(item=>item.title===button.dataset.mostOption);if(variant)paintMostVariant(variant);}
+    });
+    mostDialog.querySelector('[data-most-description]').textContent=mostCatalog.description;
+   }
+   const variant=mostCatalog.variants.find(item=>item.title===size)||mostCatalog.variants[0];
+   paintMostVariant(variant);
+  }catch(error){
+   mostDialog.querySelector('#MostSizeHeading').textContent='Süssmost';
+   mostDialog.querySelector('[data-most-description]').textContent='';
+   mostDialog.querySelector('[data-most-error]').textContent=error.message||'Produktdaten konnten nicht geladen werden.';
+  }
+ };
+ offerCarousel.querySelectorAll('[data-most-size]').forEach(button=>button.addEventListener('click',()=>showMostProduct(button.dataset.mostSize)));
+ mostDialog.querySelector('[data-most-close]').addEventListener('click',()=>mostDialog.close());
+ mostDialog.addEventListener('click',event=>{if(event.target===mostDialog)mostDialog.close();});
+ mostDialog.addEventListener('close',()=>{start();mostOpener?.focus({preventScroll:true});});
+ mostDialog.querySelector('[data-most-add]').addEventListener('click',async event=>{
+  if(busy||!mostVariant?.availableForSale)return;
+  const quantity=Number(mostDialog.querySelector('.most-size-quantity').value);
+  const quantityInput=mostDialog.querySelector('.most-size-quantity');
+  const errorNode=mostDialog.querySelector('[data-most-error]');
+  if(!Number.isInteger(quantity)||quantity<1||quantity>250){quantityInput.reportValidity();return;}
+  clearErrors();errorNode.textContent='';setBusy(true);
+  event.currentTarget.disabled=true;event.currentTarget.textContent='Wird hinzugefügt …';
+  try{
+   const result=await api('/api/cart/add',{variantId:mostVariant.id,quantity});
+   renderCart(result.cart,result.warnings);
+   mostDialog.close();
+   openCart(event.currentTarget);
+  }catch(error){
+   await syncCart().catch(()=>{});
+   errorNode.textContent=error.message;
+  }finally{
+   setBusy(false);
+   const add=mostDialog.querySelector('[data-most-add]');
+   if(mostDialog.open){add.disabled=!mostVariant?.availableForSale;add.textContent=mostVariant?.availableForSale?'In den Warenkorb':'Derzeit nicht verfügbar';}
+  }
+ });
  const resetSway=()=>{
   resetMosti();
   if(swayTimer!==null){window.clearTimeout(swayTimer);swayTimer=null;}
