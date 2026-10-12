@@ -1,0 +1,15 @@
+{
+  "products": 19,
+  "variants": 22,
+  "availableVariants": 22,
+  "cart": [
+    "create",
+    "read",
+    "update",
+    "remove",
+    "checkout URL"
+  ],
+  "pageRoutes": 25,
+  "sitemap": "all products present",
+  "ordersPlaced": 0
+}

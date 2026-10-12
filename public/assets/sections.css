@@ -1,0 +1,416 @@
+.announcement{min-height:49px;display:flex;align-items:center;justify-content:center;gap:14px;background:#205532;color:#fff;padding:10px 16px;text-align:center;font-size:14px}.announcement .icon{width:22px;height:22px}.header{display:flex;align-items:center;gap:12px;padding:16px;min-height:85px;position:relative;z-index:10;background:white}.brand{font-size:26px;font-weight:800;color:var(--green);margin-right:auto}.brand img{width:210px}.header-actions{display:flex;gap:5px}.header-actions .icon{width:30px;height:30px}.cart-link{position:relative}.cart-count{position:absolute;top:-3px;right:-2px;border-radius:100%;min-width:23px;height:23px;background:#a46500;color:white;font-size:13px;display:grid;place-items:center}.desktop-nav{display:none}.mobile-nav>summary{list-style:none;font-size:26px;min-width:44px;min-height:44px;display:grid;place-items:center}.mobile-nav>summary::-webkit-details-marker{display:none}.mobile-nav>.nav-list{position:absolute;left:0;right:0;top:100%;background:white;padding:20px;box-shadow:0 8px 16px #0002}.nav-list{list-style:none;padding:0;margin:0}.nav-list a{display:block;padding:10px 0}.nav-list summary{display:flex;align-items:center;gap:6px;padding:10px 0;list-style:none}.nav-list summary .icon{width:17px;height:17px}.dropdown{list-style:none;padding:8px 20px;background:#fff;border-radius:5px}.dropdown a{font-size:16px}.nav-list [aria-current=page]{position:relative}.nav-list [aria-current=page]:after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:#cf8b1d}.hero{position:relative;isolation:isolate;min-height:330px;background:#f8f4ed;overflow:hidden}.hero-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}.hero:before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#fcf8f1 0%,#fcf8f1ed 35%,#fcf8f155 75%,transparent);z-index:-1}.hero-content{padding:35px 24px;max-width:680px}.hero h1{font-size:38px;font-weight:700;letter-spacing:-1.4px;margin-bottom:18px}.hero .button{font-size:18px}.featured{padding-top:32px;padding-bottom:20px;scroll-margin-top:20px}.product-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:20px}.product-card{display:flex;flex-direction:column;border:2px solid var(--red);border-radius:10px;overflow:hidden;min-width:0;background:#fff}.product-image{display:block;aspect-ratio:1.57;overflow:hidden}.product-image img{width:100%;height:100%;object-fit:cover}.card-body{display:flex;flex-direction:column;flex:1;padding:12px 20px 19px}.card-body h2{font-size:24px;margin:0 0 5px;letter-spacing:-.5px}.card-body p{font-size:18px;line-height:1.35;margin:0}.card-body .price{margin-bottom:6px}.card-body .product-form,.card-body>.button{margin-top:auto;padding-top:0}.card-body .button{width:100%}.gift-image{aspect-ratio:1.57;background:#fbf8f2;display:grid;place-items:center;color:var(--green)}.gift-image .icon{width:86px;height:86px}.inquiry-card .card-body h2{margin-bottom:28px;max-width:230px}.product-detail{display:grid;gap:35px}.product-gallery{display:grid;gap:20px}.product-gallery img{width:100%;object-fit:contain;max-height:680px}.product-detail .product-form{display:grid;gap:10px}.cart-drawer{position:fixed;inset:0 0 0 auto;height:100dvh;max-height:100dvh;width:min(480px,100%);max-width:100%;margin:0;border:0;padding:24px;overflow:auto;color:#10201c}.cart-drawer::backdrop{background:#001d1680}.drawer-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #ddd;margin-bottom:24px}.drawer-header h2{margin:0}.cart-item{display:grid;grid-template-columns:90px minmax(0,1fr);gap:16px;margin-bottom:25px}.cart-item img{width:90px;height:90px;object-fit:contain}.cart-item input{width:90px;margin-right:20px}.cart-item [data-cart-remove]{text-decoration:underline;font-size:15px}.cart-total{padding-top:20px;border-top:1px solid #ddd}.cart-buttons{display:grid;gap:12px;margin-top:20px}.cart-form[aria-busy=true]{opacity:.65}.cart-form[aria-busy=true] input{pointer-events:none}@media(min-width:600px){.announcement{font-size:18px}.header{padding:20px 32px}.hero-content{padding:35px 55px}.hero h1{font-size:48px}.product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(min-width:900px){.product-detail{grid-template-columns:1fr 1fr}.hero:before{background:linear-gradient(90deg,#fcf8f1 0%,#fcf8f1f5 32%,#fcf8f133 52%,transparent 68%)}}@media(min-width:1200px){.announcement{font-size:18px;height:49px}.header{height:105px;padding:20px 35px;gap:32px}.brand img{width:370px}.brand{font-size:40px}.mobile-nav{display:none}.desktop-nav{display:block;margin-left:auto;margin-right:auto}.nav-list{display:flex;align-items:center;gap:28px;font-size:18px}.nav-dropdown{position:relative}.dropdown{position:absolute;top:100%;left:-15px;min-width:280px;box-shadow:0 2px 10px #0002;border:1px solid #eee}.dropdown a{padding:6px 0;white-space:normal}.header-actions{gap:30px}.header-actions .icon{width:36px;height:36px}.hero{min-height:225px}.hero-content{padding:32px 0 0 82px}.hero h1{font-size:68px;line-height:.9;letter-spacing:-2px;margin-bottom:20px}.hero .button{font-size:21px;padding:12px 25px}.featured{padding-top:54px}.product-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:21px}.product-card{min-height:356px}.card-body h2{font-size:24px}.card-body .button{font-size:18px;padding:10px 12px}.hero-content{max-width:650px}.cart-count{width:29px;height:29px;font-size:16px;top:-8px;right:-9px}}@media(min-width:1600px){.header{gap:40px}.brand img{width:425px}.nav-list{gap:36px;font-size:20px}.hero{min-height:262px}.hero-content{padding:39px 0 0 95px;max-width:750px}.hero h1{font-size:79px}.hero .button{font-size:24px}.featured{padding-top:63px}.product-grid{gap:24px}.product-card{min-height:414px}.card-body{padding:13px 24px 22px}.card-body h2{font-size:28px}.card-body p,.card-body .button{font-size:21px}.announcement{height:56px;font-size:21px}.header{height:122px}.container{width:calc(100% - 128px)}}@media(max-width:399px){.brand img{width:165px}.brand{font-size:22px}.header{gap:2px}.header-actions{gap:0}.hero h1{font-size:38px}.announcement{font-size:12px}}
+
+.brand img.bundled-logo{object-fit:cover;object-position:50% 49%;height:40px;width:210px}@media(min-width:1200px){.brand img.bundled-logo{width:370px;height:68px}}@media(min-width:1600px){.brand img.bundled-logo{width:425px;height:78px}}@media(max-width:399px){.brand img.bundled-logo{width:165px;height:32px}}
+
+.hero-image.bundled-hero{width:70%;left:30%;height:100%;object-fit:cover;object-position:center 18%}@media(max-width:599px){.hero-image.bundled-hero{width:100%;left:0;object-position:center 18%}}
+@media(min-width:1200px) and (max-width:1599px){.product-card .card-body h2{letter-spacing:-1px;font-size:23px}}
+
+.cooking-inspiration{position:relative;isolation:isolate;display:flex;min-height:300px;align-items:center;overflow:hidden;background:#173d2b;color:#fff}.cooking-inspiration:before{position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#102c22f2 0%,#183c2ce8 38%,#183c2c35 100%),url('/assets/lucia-hero-banner.webp') right center/auto 100% no-repeat;content:''}.cooking-inspiration-inner{padding-block:44px}.cooking-inspiration .cooking-eyebrow{color:#f2d294}.cooking-inspiration h2{max-width:680px;color:#fff;font-size:clamp(32px,5vw,54px)}.cooking-inspiration-inner>p:not(.cooking-eyebrow){max-width:600px;margin-bottom:20px;color:#fff;font-size:18px;line-height:1.55}.cooking-inspiration-cta{background:#c4871e}.cooking-inspiration-cta:hover{background:#a46500}.cooking-gallery{padding-block:52px 58px}.cooking-gallery-heading{max-width:760px;margin-bottom:24px}.cooking-gallery-heading h2{font-size:clamp(30px,5vw,46px)}.cooking-gallery-heading>p:last-child{color:#47564e;line-height:1.6}.cooking-menu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.cooking-menu-card{margin:0;overflow:hidden;border-radius:12px;background:#f3f0e9;box-shadow:0 4px 16px #1c2b1912}.cooking-menu-image{width:100%;height:100%;min-height:180px;max-height:310px;aspect-ratio:4/5;object-fit:cover;transition:transform .35s ease}.cooking-menu-card:hover .cooking-menu-image{transform:scale(1.035)}
+@media(min-width:600px){.cooking-inspiration{min-height:360px}.cooking-inspiration-inner{padding-block:60px}.cooking-menu-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.cooking-menu-card:last-child{grid-column:auto}}
+@media(min-width:900px){.cooking-menu-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}.cooking-menu-image{aspect-ratio:4/3;max-height:290px}}
+@media(prefers-reduced-motion:reduce){.cooking-menu-image{transition:none}}
+
+/* Original hero sizes and image bounds stay intact during offer transitions. */
+.hero-offers{position:relative}
+.hero-offer{opacity:0;transform:translateX(24px);transition:opacity 1100ms cubic-bezier(.22,1,.36,1),transform 1100ms cubic-bezier(.22,1,.36,1);pointer-events:none}
+.hero-offer:not(:first-child){position:absolute;inset:0}
+.hero-offer.is-active{opacity:1;transform:translateX(0);pointer-events:auto}
+.hero .hero-offer-heading{font-size:38px;font-weight:700;letter-spacing:-1.4px;margin-bottom:18px}
+.hero-offer-controls{position:absolute;right:12px;bottom:8px;display:flex;align-items:center;gap:2px;background:#fffefae8;border:1px solid #173d2b26;border-radius:24px;box-shadow:0 2px 10px #0000000d}
+.hero-offer-controls[hidden]{display:none}
+.hero-offer-controls button{min-width:44px;min-height:44px;border:0;border-radius:24px;background:transparent;color:#173d2b;font-size:14px;padding:6px 10px}
+.hero-offer-controls button:hover{background:#eee8dc}
+.hero-offer-controls [data-offer-prev],.hero-offer-controls [data-offer-next]{font-size:25px}
+@media(min-width:600px){.hero .hero-offer-heading{font-size:48px}}
+@media(min-width:1200px){.hero .hero-offer-heading{font-size:68px;line-height:.9;letter-spacing:-2px;margin-bottom:20px}}
+@media(min-width:1600px){.hero .hero-offer-heading{font-size:79px}}
+@media(prefers-reduced-motion:reduce){.hero-offer{transition:none;transform:none}}
+
+.hero-offer-image{opacity:0;transition:opacity 1300ms cubic-bezier(.22,1,.36,1)}
+.hero-offer-image.is-active{opacity:1}
+@media(prefers-reduced-motion:reduce){.hero-offer-image{transition:none}}
+
+/* Display the complete cooking banner instead of cropping it with cover. */
+.hero-image.lucia-offer-banner{object-fit:contain;object-position:right center;background:#f8f4ed}
+@media(max-width:599px){.hero-image.lucia-offer-banner{object-position:right bottom}}
+
+.hero-offer-controls [data-offer-toggle]{display:grid;place-items:center}
+.offer-playback-icon{display:block;width:16px;height:16px}
+
+.hero-image.product-offer-banner{object-fit:contain;object-position:right center;background:#f8f4ed}
+@media(max-width:599px){.hero-image.product-offer-banner{object-position:right bottom}}
+
+/* Every offer uses exactly the same image area at each breakpoint. */
+.offer-carousel .hero-offer-image{width:70%;left:30%;height:100%}
+@media(max-width:599px){.offer-carousel .hero-offer-image{width:100%;left:0}}
+
+/* Turn the authentic photo; preserve every original label pixel. */
+.original-vinegar-frame{container-type:size;overflow:hidden;background:#fff}
+.original-vinegar-frame .original-vinegar-bottle{position:absolute;left:50%;top:50%;width:min(90cqw,190cqh);height:auto;max-width:none;transform:translate(-50%,-50%) rotate(90deg)}
+
+.offer-carousel .hero-content{position:relative;z-index:1}
+.hero-offer-controls{z-index:3}
+.offer-carousel{--vinegar-backdrop:#fcf8f1}
+.offer-carousel:has(.vinegar-lineup-frame.is-active):before{background:var(--vinegar-backdrop)}
+.vinegar-lineup-frame{z-index:0;background:var(--vinegar-backdrop)}
+.vinegar-lineup{position:absolute;inset:5px 12px 8px 20%;display:flex;gap:4px;align-items:end;isolation:isolate;background:var(--vinegar-backdrop)}
+.vinegar-lineup-item{position:relative;container-type:size;flex:1;height:100%;min-width:0;margin:0;overflow:visible;background:var(--vinegar-backdrop)}
+.vinegar-lineup-item img{position:absolute;left:50%;top:45%;height:min(78cqh,150cqw);width:auto;max-width:none;transform:translate(-50%,-50%);filter:brightness(1.003937)}
+.vinegar-lineup-item figcaption{position:absolute;bottom:4px;left:2px;right:2px;text-align:center;color:#173d2b;font-size:11px;line-height:1.2}
+.vinegar-zoom{position:absolute;right:12px;top:8px;display:flex;align-items:center;gap:5px;min-height:44px;padding:6px 10px;border:1px solid #173d2b26;border-radius:24px;background:#fffefaee;color:#173d2b;font-size:13px}
+.vinegar-zoom .icon{width:18px;height:18px}
+.vinegar-dialog{width:min(1100px,calc(100% - 24px));max-height:90dvh;padding:20px;border:0;border-radius:14px;color:#173d2b;background:#fff;overflow:auto}
+.vinegar-dialog::backdrop{background:#001d1680}
+.vinegar-dialog-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.vinegar-dialog-header h2{font-size:25px;margin:0}
+.vinegar-dialog-header button{display:grid;place-items:center;min-width:44px;min-height:44px;border:0;border-radius:50%;background:#f3f0e9;color:#173d2b}
+.vinegar-dialog>p{margin-block:16px;font-size:15px}
+.vinegar-detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:20px}
+.vinegar-detail-grid figure{margin:0;text-align:center}
+.vinegar-detail-grid img{width:100%;height:auto}
+.vinegar-detail-grid figcaption{padding:8px;font-size:16px;font-weight:700}
+@media(max-width:599px){.offer-carousel{min-height:410px}.offer-carousel:has(.vinegar-lineup-frame.is-active){min-height:630px}.vinegar-lineup{inset:auto 8px 56px;height:330px;gap:8px;overflow-x:auto;overflow-y:hidden;padding:4px 8px;scroll-snap-type:x proximity;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}.vinegar-lineup::-webkit-scrollbar{display:none}.vinegar-lineup-item{flex:0 0 clamp(160px,44vw,174px);scroll-snap-align:center}.vinegar-lineup-item img{top:42%;height:min(72cqh,230px)}.vinegar-lineup-item figcaption{display:-webkit-box;bottom:2px;left:1px;right:1px;min-height:38px;overflow:hidden;overflow-wrap:anywhere;padding:0 2px;text-align:center;font-size:16px;line-height:1.2;-webkit-box-orient:vertical;-webkit-line-clamp:2}.vinegar-zoom{top:auto;bottom:8px;right:auto;left:8px;font-size:12px;padding:6px 8px}.vinegar-motion,.vinegar-sound{display:none!important}.vinegar-lineup.is-mosti-sequence{inset:auto 8px 100px;height:440px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:4px;padding:0;overflow:visible;scroll-snap-type:none}.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item{width:auto;min-width:0;min-height:0;height:100%;flex:none;scroll-snap-align:none}.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item img{top:43%;height:min(70cqh,200px)}.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item figcaption{font-size:clamp(10px,2.8vw,13px);min-height:30px;line-height:1.08;bottom:0}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:8px}.vinegar-lineup-frame.has-mosti .mosti-domino{bottom:18px;right:8px}}
+
+/* Let original bottle photos fall horizontally around their base, then rise gently. */
+.vinegar-bottle-trigger{position:absolute;inset:0;width:100%;padding:0;border:0;border-radius:8px;background:transparent;cursor:pointer;touch-action:manipulation}
+.vinegar-bottle-trigger:focus-visible{outline:2px solid #205532;outline-offset:2px}
+.vinegar-lineup-item img{pointer-events:none;transform-origin:50% 94%;mix-blend-mode:multiply}
+.vinegar-lineup-item.is-vinegar-sway img{animation:vinegar-sway var(--bottle-duration,900ms) cubic-bezier(.2,.7,.25,1) var(--bottle-delay,0ms) both}
+@keyframes vinegar-sway{
+ 0%{transform:translate(-50%,-50%) rotate(0deg);animation-timing-function:cubic-bezier(.55,.04,.86,.48)}
+ 28%{transform:translate(-50%,-50%) rotate(var(--bottle-angle,72deg));animation-timing-function:cubic-bezier(.2,.7,.25,1)}
+ 38%{transform:translate(-50%,-50%) rotate(calc(var(--bottle-angle,72deg) * .94));animation-timing-function:ease-out}
+ 48%,100%{transform:translate(-50%,-50%) rotate(var(--bottle-angle,72deg))}
+}
+.offer-carousel:has(.vinegar-lineup-frame.is-active) .hero-content,
+.offer-carousel:has(.vinegar-lineup-frame.is-active) .hero-offer.is-active{pointer-events:none}
+.offer-carousel:has(.vinegar-lineup-frame.is-active) .hero-offer.is-active a{pointer-events:auto}
+@media(max-width:599px){.vinegar-bottle-trigger{inset:0}}
+@media(prefers-reduced-motion:reduce){.vinegar-lineup-item.is-vinegar-sway img{animation:none}}
+
+.vinegar-tools{position:absolute;right:12px;top:8px;display:flex;align-items:center;gap:6px;z-index:2}
+.vinegar-tools .vinegar-zoom{position:static}
+.vinegar-sound{display:grid;place-items:center;width:44px;height:44px;padding:8px;border:1px solid #173d2b26;border-radius:50%;background:#fffefaee;color:#173d2b}
+.vinegar-sound[hidden]{display:none}
+.vinegar-sound[aria-pressed="true"]{background:#e8eee3;border-color:#20553266}
+.vinegar-sound .icon{width:20px;height:20px}
+@media(max-width:599px){.vinegar-tools{top:auto;right:auto;bottom:8px;left:8px}}
+@media(max-width:399px){.vinegar-tools .vinegar-zoom{width:44px;justify-content:center}.vinegar-tools .vinegar-zoom span{display:none}}
+
+.vinegar-motion{display:grid;place-items:center;width:44px;height:44px;padding:8px;border:1px solid #173d2b26;border-radius:50%;background:#fffefaee;color:#173d2b}
+.vinegar-motion[hidden]{display:none}
+.vinegar-motion .icon{width:20px;height:20px}
+.vinegar-detail-grid.is-single{grid-template-columns:minmax(0,480px);justify-content:center}
+.vinegar-detail-grid figure[hidden]{display:none}
+@media(max-width:599px){.vinegar-tools .vinegar-zoom{width:44px;justify-content:center}.vinegar-tools .vinegar-zoom span{display:none}}
+
+/* Animate only the existing announcement; retain its text, colour, type and height. */
+.announcement-marquee{width:100%;overflow:hidden}
+.announcement-marquee-track{display:flex;width:max-content;animation:announcement-marquee-scroll 60s linear infinite}
+.announcement-marquee-copy{display:flex;flex:0 0 auto;align-items:center;justify-content:center;gap:14px;white-space:nowrap;min-width:calc(100vw - 32px);padding-inline:32px}
+.announcement:hover .announcement-marquee-track{animation-play-state:paused}
+@keyframes announcement-marquee-scroll{to{transform:translateX(-50%)}}
+@media(max-width:599px){.announcement-marquee-track{animation-duration:24s}}
+@media(min-width:1600px){.announcement-marquee-track{animation-duration:75s}}
+@media(prefers-reduced-motion:reduce){
+ .announcement-marquee-track{animation:none;width:100%}
+ .announcement-marquee-copy{min-width:0;width:100%;padding:0;white-space:normal}
+ .announcement-marquee-copy+.announcement-marquee-copy{display:none}
+}
+
+/* Give each announcement statement more breathing room. */
+.announcement-marquee-message{display:inline-flex;flex:none;align-items:center;gap:0}
+.announcement-marquee-message>span:not(.announcement-marquee-separator){flex:0 0 max(300px,50vw);width:max(300px,50vw);text-align:center}
+.announcement-marquee-message>.announcement-marquee-separator{flex:0 0 96px;width:96px;text-align:center}
+@media(prefers-reduced-motion:reduce){.announcement-marquee-message{flex-wrap:wrap;justify-content:center;gap:16px 32px}.announcement-marquee-message>span:not(.announcement-marquee-separator),.announcement-marquee-message>.announcement-marquee-separator{flex:0 0 auto;width:auto}}
+
+/* Lucia's four-course Christmas menu */
+.cooking-christmas{padding:clamp(56px,7vw,92px) 0;background:#153e2c;color:#f8f4e9}
+.cooking-christmas-inner{max-width:1280px}
+.cooking-christmas-heading{max-width:760px;margin:0 auto 42px;text-align:center}
+.cooking-christmas-heading .cooking-eyebrow{margin-bottom:14px;color:#d5b776;font-size:11px;letter-spacing:.2em}
+.cooking-christmas-heading h2{margin:0 0 14px;color:#fffaf0;font:500 clamp(36px,5vw,54px)/1.08 Georgia,"Times New Roman",serif;letter-spacing:-.025em}
+.cooking-christmas-heading>p:last-child{max-width:58ch;margin:0 auto;color:#e5e0d4;font-size:17px;line-height:1.65}
+.cooking-course-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:0;padding:0;list-style:none}
+.cooking-course{display:flex;min-width:0;flex-direction:column;overflow:hidden;background:#f9f6ef;color:#173b2b;border:1px solid #c6ad75;border-radius:5px;box-shadow:0 12px 30px #081b1130}
+.cooking-course-photo{display:grid;place-items:center;height:270px;margin:0;background:#ece8df;border-bottom:1px solid #d8cfbd}
+.cooking-course-photo img{display:block;width:100%;height:100%;object-fit:contain}
+.cooking-course-copy{display:flex;flex:1;flex-direction:column;padding:20px 20px 24px}
+.cooking-course-label{display:flex;align-items:center;gap:9px;margin:0 0 14px;color:#79623c;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.cooking-course-label span{display:inline-grid;width:25px;height:25px;place-items:center;border:1px solid #b79a60;border-radius:50%;font-size:10px;letter-spacing:0}
+.cooking-course h3{margin:0 0 8px;color:#173b2b;font:500 22px/1.18 Georgia,"Times New Roman",serif;letter-spacing:-.015em}
+.cooking-course-copy>p:last-child{margin:0;color:#536057;font-size:14px;line-height:1.6}
+.cooking-course-main{border-color:#dfc98f;box-shadow:0 14px 34px #07190f45}
+.cooking-vegetarian{display:grid;grid-template-columns:112px 1fr;align-items:center;gap:22px;max-width:760px;margin:28px auto 0;padding:16px 22px;background:#1d4936;border:1px solid #a9915e;border-radius:5px}
+.cooking-vegetarian figure{display:grid;place-items:center;width:112px;height:112px;margin:0;background:#ece8df;border-radius:3px;overflow:hidden}
+.cooking-vegetarian img{width:100%;height:100%;object-fit:contain}
+.cooking-vegetarian-label{margin:0 0 6px;color:#d5b776;font-size:10px;font-weight:700;letter-spacing:.15em}
+.cooking-vegetarian h3{margin:0 0 4px;color:#fffaf0;font:500 23px/1.2 Georgia,"Times New Roman",serif}
+.cooking-vegetarian div>p:last-child{margin:0;color:#e5e0d4;font-size:14px;line-height:1.5}
+.cooking-christmas-cta{display:flex;width:max-content;max-width:100%;min-height:52px;align-items:center;justify-content:center;gap:10px;margin:28px auto 0;padding:13px 22px;background:#d0ae69;color:#173b2b;font-size:15px;font-weight:700;letter-spacing:.015em}
+.cooking-christmas-cta:hover{background:#e0c487;color:#102d20}
+.cooking-christmas-cta .icon{width:18px;height:18px}
+.cooking-gallery .cooking-menu-grid{grid-template-columns:repeat(6,minmax(0,1fr))}
+.cooking-gallery .cooking-menu-card{grid-column:span 2}
+.cooking-gallery .cooking-menu-card:nth-child(4):nth-last-child(2){grid-column:2/span 2}
+.cooking-gallery .cooking-menu-card:nth-child(5):last-child{grid-column:4/span 2}
+@media(max-width:1099px){.cooking-course-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cooking-course-photo{height:300px}}
+@media(max-width:599px){
+ .cooking-christmas{padding:48px 0 54px}
+ .cooking-christmas-heading{margin-bottom:28px;text-align:left}
+ .cooking-christmas-heading h2{font-size:38px}
+ .cooking-christmas-heading>p:last-child{font-size:16px}
+ .cooking-course-grid{grid-template-columns:1fr;gap:14px}
+ .cooking-course{display:grid;grid-template-columns:42% 1fr;align-items:stretch}
+ .cooking-course-photo{height:100%;min-height:230px;border-right:1px solid #d8cfbd;border-bottom:0}
+ .cooking-course-copy{justify-content:center;padding:17px 14px}
+ .cooking-course-label{gap:7px;margin-bottom:11px;font-size:9px;letter-spacing:.08em}
+ .cooking-course-label span{width:22px;height:22px}
+ .cooking-course h3{font-size:20px}
+ .cooking-course-copy>p:last-child{font-size:13px}
+ .cooking-vegetarian{grid-template-columns:82px 1fr;gap:14px;padding:13px}
+ .cooking-vegetarian figure{width:82px;height:95px}
+ .cooking-vegetarian h3{font-size:20px}
+ .cooking-christmas-cta{width:100%;font-size:14px}
+ .cooking-gallery .cooking-menu-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .cooking-gallery .cooking-menu-card:nth-child(4):nth-last-child(2){grid-column:1/span 2}
+ .cooking-gallery .cooking-menu-card:nth-child(5):last-child{grid-column:2/span 2}
+}
+@media(prefers-reduced-motion:reduce){.cooking-course{transition:none}}
+
+/* Keep each course photograph and its ivory caption visibly separate. */
+.cooking-course-photo{position:relative;flex:0 0 270px;isolation:isolate;background:#f9f6ef}
+.cooking-course-copy{position:relative;z-index:1;background:#f9f6ef}
+@media(max-width:1099px){.cooking-course-photo{flex-basis:300px}}
+@media(max-width:599px){.cooking-course-photo{flex:auto}}
+
+
+/* Fit every full dish photo inside a fixed frame, including portrait originals. */
+.cooking-course-photo{overflow:hidden}
+.cooking-course-photo img{display:block!important;width:100%!important;height:100%!important;max-width:100%;max-height:100%;object-fit:contain!important}
+
+
+/* Fill each menu frame edge to edge with a deliberate crop around the dish. */
+.cooking-course-photo{position:relative;overflow:hidden;background:#f9f6ef}
+.cooking-course-photo img{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover!important;object-position:center 52%!important}
+.cooking-course-grid .cooking-course:nth-child(1) .cooking-course-photo img{object-position:center 52%!important}
+.cooking-course-grid .cooking-course:nth-child(2) .cooking-course-photo img{object-position:center 54%!important}
+.cooking-course-grid .cooking-course:nth-child(3) .cooking-course-photo img{object-position:center 62%!important}
+.cooking-course-grid .cooking-course:nth-child(4) .cooking-course-photo img{object-position:center 50%!important}
+
+/* Gentle per-course zoom keeps each dish prominent without losing its context. */
+.cooking-course-grid .cooking-course:nth-child(1) .cooking-course-photo img{transform:scale(1.12)!important}
+.cooking-course-grid .cooking-course:nth-child(2) .cooking-course-photo img{transform:scale(1.06)!important}
+.cooking-course-grid .cooking-course:nth-child(3) .cooking-course-photo img{transform:scale(1.08)!important}
+.cooking-course-grid .cooking-course:nth-child(4) .cooking-course-photo img{transform:scale(1.42)!important;transform-origin:50% 36%!important}
+
+/* Keep the dessert garnish inside frame while preserving a close presentation. */
+.cooking-course-grid .cooking-course:nth-child(4) .cooking-course-photo img{transform:scale(1.25)!important;transform-origin:50% 26%!important}
+
+/* Slightly closer framing for the plated main course and dessert. */
+.cooking-course-grid .cooking-course:nth-child(3) .cooking-course-photo img{transform:scale(1.18)!important}
+.cooking-course-grid .cooking-course:nth-child(4) .cooking-course-photo img{transform:scale(1.38)!important;transform-origin:50% 15%!important}
+
+/* Center the plated dessert itself within its close crop. */
+.cooking-course-grid .cooking-course:nth-child(4) .cooking-course-photo img{transform:translateX(-14%) scale(1.38)!important;transform-origin:50% 15%!important}
+
+@media(max-width:599px){.cooking-inspiration:before{background-position:0 0,44% center}}
+
+
+/* Mosti lives only inside the existing vinegar slide; hero heights stay unchanged. */
+.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:132px}
+.mosti-domino{position:absolute;right:5px;bottom:38px;z-index:4;width:128px;height:142px;display:block;border:0;padding:0;background:transparent;cursor:pointer;touch-action:manipulation;transform-origin:50% 93%;-webkit-tap-highlight-color:transparent}
+.mosti-domino[hidden]{display:none}
+.mosti-domino img{display:block;width:100%;height:100%;object-fit:contain;transform:scaleX(-1);filter:drop-shadow(0 4px 3px #173d2b18);pointer-events:none}
+@keyframes mosti-walk-bounce{from{transform:scaleX(-1) translateY(1px) rotate(1deg)}to{transform:scaleX(-1) translateY(-6px) rotate(-1deg)}}
+@keyframes mosti-walk-back-bounce{from{transform:scaleX(1) translateY(1px) rotate(-1deg)}to{transform:scaleX(1) translateY(-6px) rotate(1deg)}}
+.mosti-domino.is-walking img{animation:mosti-walk-bounce .22s ease-in-out infinite alternate}
+.mosti-domino.is-walking-back img{animation-name:mosti-walk-back-bounce}
+.mosti-domino:focus-visible{outline:2px solid #9c792b;outline-offset:3px;border-radius:18px}
+.is-mosti-playing .mosti-domino{pointer-events:none}
+@media(min-width:1600px){.mosti-domino{width:150px;height:162px}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:155px}}
+@media(max-width:899px) and (min-width:600px){.mosti-domino{width:94px;height:108px;bottom:53px}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:98px}}
+@media(max-width:599px){.mosti-domino{width:84px;height:92px;top:auto;bottom:150px;right:8px}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:8px}}
+.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item.is-vinegar-waiting,
+.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item.is-vinegar-ready,
+.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item.is-vinegar-entering{visibility:visible;opacity:1;transform:none}
+.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item.is-vinegar-carried,
+.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item.is-vinegar-drunk{visibility:hidden;opacity:0;pointer-events:none}
+.vinegar-lineup-item.is-vinegar-hugging,
+.vinegar-lineup-item.is-vinegar-dragging,
+.vinegar-lineup-item.is-vinegar-sipping{z-index:3}
+.vinegar-lineup-item.is-vinegar-hugging img,.vinegar-lineup-item.is-vinegar-dragging img,.vinegar-lineup-item.is-vinegar-sipping img{transform-origin:50% 50%}
+.mosti-domino.is-sipping img{animation:mosti-gulp .34s ease-in-out 2 alternate}
+@keyframes mosti-gulp{from{transform:scaleX(-1) rotate(0deg) translateY(0)}to{transform:scaleX(-1) rotate(-5deg) translateY(-3px)}}
+
+@media(prefers-reduced-motion:reduce) and (min-width:600px){.mosti-domino{cursor:default}.mosti-domino.is-walking img{animation:none}}
+
+
+/* Mobile: Logo und Navigation bleiben auch bei 320px in einer Zeile bedienbar. */
+@media(max-width:399px){.header{gap:.125rem;padding:1rem}.brand img.bundled-logo{width:clamp(9rem,45vw,10.3125rem)}.header-actions{gap:.5rem}}
+
+/* Only the first offer: all three juice sizes on a transparent background. */
+.offer-carousel .hero-image.most-trio-banner{left:43%;width:55%;object-fit:contain;object-position:center;background:transparent;padding:18px 24px 40px;}
+@media(min-width:600px) and (max-width:1199px){.offer-carousel .hero-image.most-trio-banner{left:52%;width:46%;padding:18px 16px 40px;}}
+@media(max-width:599px){.offer-carousel .hero-image.most-trio-banner{left:0;top:auto;bottom:44px;width:100%;height:105px;padding:0 18px;object-position:center;}}
+
+/* Tap a juice pack in the existing hero to inspect its Shopify variant and buy. */
+.offer-carousel .most-trio-banner{z-index:2;overflow:visible;background:transparent;}
+.offer-carousel .most-trio-art{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;z-index:-1;pointer-events:none;}
+.offer-carousel .most-size-hotspot{position:absolute;top:18%;height:72%;padding:0;border:0;border-radius:12px;background:transparent;cursor:pointer;z-index:2;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+.offer-carousel .most-size-hotspot:hover,.offer-carousel .most-size-hotspot:focus-visible{background:#ffffff18;outline:2px solid #7b5d29;outline-offset:2px;}
+.offer-carousel .most-size-3{left:4%;width:20%}
+.offer-carousel .most-size-5{left:40%;width:20%}
+.offer-carousel .most-size-10{left:76%;width:23%}
+.offer-carousel .most-trio-hint{position:absolute;left:50%;top:8px;transform:translateX(-50%);z-index:2;padding:5px 10px;border:1px solid #d6c8af;border-radius:999px;background:#fffdf9ed;color:#38533e;font-size:12px;line-height:1.2;white-space:nowrap;pointer-events:none}
+.most-size-dialog{width:min(850px,calc(100% - 32px));max-width:850px;max-height:min(88dvh,820px);overflow:auto;border:1px solid #e8dfd2;border-radius:22px;padding:0;background:#fffdf9;color:#173c2b;box-shadow:0 24px 80px #10271d40}
+.most-size-dialog::backdrop{background:#10231eb3;backdrop-filter:blur(3px)}
+.most-size-dialog-inner{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.9fr);gap:clamp(20px,4vw,42px);align-items:center;padding:clamp(18px,4vw,36px)}
+.most-size-dialog-image{height:min(54vh,470px);min-height:240px;display:grid;place-items:center;background:#f8f4ed;border-radius:16px;overflow:hidden}
+.most-size-dialog-image img{width:100%;height:100%;object-fit:contain}
+.most-size-dialog-copy{min-width:0}
+.most-size-dialog-header{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.most-size-dialog h2{font-family:inherit;font-size:clamp(28px,4vw,42px);margin:0 0 6px;line-height:1.05;color:#17452f}
+.most-size-dialog-close{width:44px;height:44px;flex:0 0 44px;border:1px solid #ded7ca;border-radius:50%;background:white;color:#173c2b;font-size:28px;cursor:pointer}
+.most-size-kicker{margin:0 0 8px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#886b36}
+.most-size-description{line-height:1.55;color:#4d5b52}
+.most-size-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:20px 0 14px}
+.most-size-option{min-height:54px;border:1px solid #d9d2c6;border-radius:12px;background:#fff;color:#173c2b;font:inherit;cursor:pointer}
+.most-size-option[aria-pressed=true]{border-color:#235936;background:#edf4ed;box-shadow:inset 0 0 0 1px #235936;font-weight:700}
+.most-size-purchase-row{display:grid;grid-template-columns:100px 1fr;gap:10px;align-items:stretch}
+.most-size-quantity{min-height:54px;padding:0 12px;border:1px solid #d9d2c6;border-radius:12px;background:white;font:inherit;color:#173c2b}
+.most-size-add{min-height:54px;width:100%;border:0;border-radius:12px;background:#cf061d;color:#fff;font:inherit;font-weight:700;cursor:pointer}
+.most-size-add:disabled{opacity:.6;cursor:wait}
+.most-size-price{font-size:26px;font-weight:700;margin:16px 0}
+.most-size-error{min-height:24px;margin:10px 0 0;color:#a32020}
+@media(max-width:599px){
+ .offer-carousel .most-trio-hint{display:none}
+ .offer-carousel .most-size-hotspot{top:5%;height:80%}
+ .offer-carousel .most-size-3{left:35%;width:11%}
+ .offer-carousel .most-size-5{left:49%;width:12%}
+ .offer-carousel .most-size-10{left:63%;width:15%}
+ .most-size-dialog{width:calc(100% - 20px);max-height:calc(100dvh - 20px);border-radius:18px}
+ .most-size-dialog-inner{grid-template-columns:1fr;gap:16px;padding:14px}
+ .most-size-dialog-image{height:clamp(185px,32dvh,280px);min-height:185px}
+ .most-size-dialog h2{font-size:28px}
+ .most-size-dialog-copy{padding:0 2px 4px}
+ .most-size-description{font-size:14px;margin:8px 0}
+ .most-size-options{margin:12px 0 8px}
+ .most-size-option{min-height:48px}
+ .most-size-price{font-size:22px;margin:10px 0}
+ .most-size-purchase-row{grid-template-columns:78px 1fr;gap:8px}
+ .most-size-add,.most-size-quantity{min-height:50px}
+}
+
+/* Preserve clear access to the 10L box and carousel controls. */
+@media(min-width:1200px){.offer-carousel:has(.most-trio-banner.is-active) .hero-offer-controls{left:34%;right:auto}}
+@media(max-width:599px){
+ .offer-carousel .hero-image.most-trio-banner{bottom:68px}
+ .offer-carousel:has(.most-trio-banner.is-active) .hero-offer-controls{left:auto;right:10px;bottom:10px}
+}
+
+
+/* Seasonal carousel offer: three live Shopify products with compact direct purchase. */
+.offer-carousel .hero-offer-image.seasonal-offer-products{
+ left:50%;width:50%;z-index:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:clamp(6px,1vw,12px);padding:12px;background:#f8f4ed;box-sizing:border-box
+}
+.seasonal-offer-card{
+ min-width:0;height:100%;display:flex;flex-direction:column;overflow:hidden;
+ border:1px solid #173d2b26;border-radius:10px;background:#fffefa;
+ box-shadow:0 5px 18px #173d2b12
+}
+.seasonal-offer-image{
+ min-height:0;flex:1 1 auto;display:grid;place-items:center;padding:7px 8px 0;
+ overflow:hidden
+}
+.seasonal-offer-image img{width:100%;height:100%;max-height:125px;object-fit:contain}
+.seasonal-offer-details{display:grid;gap:3px;padding:6px 9px 9px}
+.seasonal-offer-details h3{min-width:0;margin:0;color:#173d2b;font-size:clamp(13px,1.25vw,17px);line-height:1.15}
+.seasonal-offer-details h3 a{color:inherit;text-decoration:none}
+.seasonal-offer-details h3 a:hover{text-decoration:underline}
+.seasonal-offer-price{margin:0;color:#173d2b;font-size:14px;font-weight:700}
+.seasonal-offer-card .product-form{display:block;margin:1px 0 0}
+.seasonal-offer-card .product-form .button{
+ display:flex;align-items:center;justify-content:center;gap:5px;width:100%;min-height:36px;
+ padding:5px 8px;font-size:14px;line-height:1.1;white-space:nowrap
+}
+.seasonal-offer-card .product-form .button .icon{width:15px;height:15px;flex:0 0 auto}
+.offer-carousel:has(.seasonal-offer-products.is-active) .hero-content{
+ box-sizing:border-box;width:50%;max-width:50%;padding-left:clamp(24px,6.8vw,82px)
+}
+.offer-carousel:has(.seasonal-offer-products.is-active) .hero-offer.is-active a{pointer-events:auto}
+.offer-carousel:has(.seasonal-offer-products.is-active) .hero-offer.is-active{pointer-events:none}
+@media(max-width:899px){
+ .offer-carousel .hero-offer-image.seasonal-offer-products{
+  left:0;width:100%;padding:146px 9px 10px;gap:6px;grid-template-columns:repeat(3,minmax(0,1fr))
+ }
+ .offer-carousel:has(.seasonal-offer-products.is-active) .hero-content{
+  width:100%;max-width:100%;padding:22px 18px 0
+ }
+ .offer-carousel:has(.seasonal-offer-products.is-active) .hero h1{
+  max-width:100%;margin-bottom:11px;font-size:clamp(30px,4vw,38px);line-height:1;letter-spacing:-.7px
+ }
+ .offer-carousel:has(.seasonal-offer-products.is-active) .hero .button{
+  min-height:40px;padding:8px 14px;font-size:15px
+ }
+ .offer-carousel:has(.seasonal-offer-products.is-active) .hero-offer.is-active>a{display:none}
+ .seasonal-offer-card{border-radius:8px}
+ .seasonal-offer-image{padding:5px 5px 0}
+ .seasonal-offer-image img{max-height:70px}
+ .seasonal-offer-details{gap:2px;padding:4px 5px 6px}
+ .seasonal-offer-details h3{font-size:clamp(11px,3.1vw,13px);line-height:1.12;min-height:2.24em}
+ .seasonal-offer-price{font-size:12px}
+ .seasonal-offer-card .product-form .button{
+  min-height:32px;padding:4px 3px;font-size:11px
+ }
+ .seasonal-offer-card .product-form .button .icon{display:none}
+}
+
+/* Keep carousel controls clear of all three seasonal purchase buttons. */
+
+.offer-carousel:has(.seasonal-offer-products.is-active) .hero-offer-controls{
+ left:calc(50% - 140px);right:auto;bottom:8px
+}
+@media(max-width:899px){
+ .offer-carousel:has(.seasonal-offer-products.is-active) .hero-offer-controls{
+  top:8px;right:8px;bottom:auto;left:auto
+ }
+ .offer-carousel:has(.seasonal-offer-products.is-active) .hero-content{
+  width:68%;max-width:68%;padding:22px 0 0 18px
+ }
+ .offer-carousel:has(.seasonal-offer-products.is-active) .hero h1{
+  font-size:clamp(24px,7vw,34px);line-height:1;letter-spacing:-.5px
+ }
+}
+@media(max-width:359px){
+ .offer-carousel:has(.seasonal-offer-products.is-active) .hero-offer-controls{right:4px}
+ .offer-carousel:has(.seasonal-offer-products.is-active) .hero-content{width:60%;max-width:60%}
+ .offer-carousel:has(.seasonal-offer-products.is-active) .hero h1{font-size:22px}
+}
+
+/* Contact, impact and recovery cues make each shove read as a single physical action. */
+@keyframes mosti-brace-pulse{0%{transform:scaleX(-1) translateX(0) rotate(0)}48%{transform:scaleX(-1) translateX(-2px) rotate(-2deg)}100%{transform:scaleX(-1) translateX(1px) rotate(1deg)}}
+.mosti-domino.is-bracing img{animation:mosti-brace-pulse .13s ease-in-out infinite alternate}
+@keyframes vinegar-glass-impact{0%{rotate:0deg}18%{rotate:5deg}43%{rotate:-4deg}70%{rotate:2deg}100%{rotate:0deg}}
+.vinegar-lineup-item.is-vinegar-impact img{animation:vinegar-glass-impact .42s cubic-bezier(.2,.7,.25,1) both}
+.vinegar-lineup-item.is-vinegar-impact:after{content:"";position:absolute;right:8%;top:37%;z-index:3;width:22px;height:22px;background:#c79a36;clip-path:polygon(50% 0,62% 36%,100% 50%,62% 63%,50% 100%,38% 63%,0 50%,38% 37%);filter:drop-shadow(0 1px 2px #6f511744);pointer-events:none;animation:vinegar-contact-flash .34s cubic-bezier(.2,.8,.2,1) both}
+@keyframes vinegar-contact-flash{0%{opacity:0;transform:scale(.25) rotate(-20deg)}32%{opacity:.9;transform:scale(1.08) rotate(8deg)}100%{opacity:0;transform:scale(.72) rotate(24deg)}}
+@media(prefers-reduced-motion:reduce) and (min-width:600px){.mosti-domino.is-bracing img,.vinegar-lineup-item.is-vinegar-impact img,.vinegar-lineup-item.is-vinegar-impact:after{animation:none}}
+
+/* Mosti hugs each bottle, carries it out of the lineup, then takes a sip from the last one. */
+.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item.is-vinegar-carried,
+.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item.is-vinegar-drunk{visibility:hidden;opacity:0}
+.mosti-domino.is-hugging img{animation:mosti-hold-bottle .32s ease-in-out infinite alternate}
+@keyframes mosti-hold-bottle{
+ 0%{transform:scaleX(-1) translateY(0) rotate(0deg)}
+ 100%{transform:scaleX(-1) translateY(-2px) rotate(-3deg)}
+}
+.mosti-domino.is-sipping img{animation:mosti-sip-bob .24s ease-in-out infinite alternate}
+@keyframes mosti-sip-bob{
+ 0%{transform:scaleX(-1) translateY(0) rotate(0deg)}
+ 100%{transform:scaleX(-1) translateY(-3px) rotate(-5deg)}
+}
+@media(prefers-reduced-motion:reduce) and (min-width:600px){
+ .mosti-domino.is-hugging img,.mosti-domino.is-sipping img{animation:none}
+}

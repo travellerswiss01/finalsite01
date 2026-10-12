@@ -1,0 +1,15 @@
+.most-gallery{display:block;min-width:0;align-self:start;padding:24px;background:#faf7f0;border:1px solid #e7ddcb;border-radius:18px}
+.most-gallery-stage{position:relative;display:grid;place-items:center;height:clamp(300px,40vw,510px);border-radius:12px;overflow:hidden;touch-action:pan-y}
+.most-gallery .detail-main-image{position:absolute;inset:0;display:block;width:100%;height:100%;min-width:0;min-height:0;max-height:none;object-fit:contain;object-position:center;padding:28px 64px;mix-blend-mode:multiply;border:0;background:none}
+.most-arrow{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;display:grid;place-items:center;border:1px solid #d1d7cc;border-radius:50%;background:#fffdf9;color:#153e2c;box-shadow:0 3px 12px #153e2c0a;transition:background .2s,border-color .2s}
+.most-arrow:hover{background:#153e2c;border-color:#153e2c;color:white}
+.most-arrow-prev{left:0}.most-arrow-next{right:0}.most-arrow .icon{width:21px;height:21px}.most-arrow-prev .icon{transform:rotate(90deg)}.most-arrow-next .icon{transform:rotate(-90deg)}
+.most-gallery-caption{text-align:center;margin-top:14px}.most-gallery-kicker{font-size:10px;letter-spacing:1.8px;color:#766342;font-weight:600}.most-gallery-caption p{font:28px/1.2 Georgia,serif;color:#153e2c;margin:8px 0}.most-gallery-hint{font-size:12px;color:#536457}
+.most-size-controls{display:flex;justify-content:center;gap:10px;margin:20px 0 4px;flex-wrap:wrap}.most-size-controls button{min-height:44px;min-width:88px;border:1px solid #b8c3b6;border-radius:7px;background:transparent;color:#153e2c;padding:10px 16px;font-size:14px;transition:background .2s,color .2s}.most-size-controls button[aria-pressed=true]{background:#153e2c;border-color:#153e2c;color:#fff}.most-size-controls button:hover{border-color:#153e2c}.most-arrow[hidden],.most-size-controls[hidden]{display:none}
+@media(max-width:599px){.most-gallery{padding:16px}.most-gallery-stage{height:330px}.most-gallery .detail-main-image{padding:12px 48px}.most-arrow{width:44px;height:44px}.most-size-controls{gap:8px}.most-size-controls button{min-width:76px;padding:10px 12px}.most-gallery-caption p{font-size:26px}}
+@media(prefers-reduced-motion:reduce){.most-arrow,.most-size-controls button{transition:none}}
+
+/* Keep the original labels; give the larger capacity more visual presence. */
+.most-gallery[data-most-size="3"] .detail-main-image{scale:.82}
+.most-gallery[data-most-size="5"] .detail-main-image{scale:.74}
+.most-gallery[data-most-size="10"] .detail-main-image{scale:1}
