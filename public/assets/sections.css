@@ -391,3 +391,20 @@
 .vinegar-lineup-item.is-vinegar-impact:after{content:"";position:absolute;right:8%;top:37%;z-index:3;width:22px;height:22px;background:#c79a36;clip-path:polygon(50% 0,62% 36%,100% 50%,62% 63%,50% 100%,38% 63%,0 50%,38% 37%);filter:drop-shadow(0 1px 2px #6f511744);pointer-events:none;animation:vinegar-contact-flash .34s cubic-bezier(.2,.8,.2,1) both}
 @keyframes vinegar-contact-flash{0%{opacity:0;transform:scale(.25) rotate(-20deg)}32%{opacity:.9;transform:scale(1.08) rotate(8deg)}100%{opacity:0;transform:scale(.72) rotate(24deg)}}
 @media(prefers-reduced-motion:reduce) and (min-width:600px){.mosti-domino.is-bracing img,.vinegar-lineup-item.is-vinegar-impact img,.vinegar-lineup-item.is-vinegar-impact:after{animation:none}}
+
+/* Mosti hugs each bottle, carries it out of the lineup, then takes a sip from the last one. */
+.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item.is-vinegar-carried,
+.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item.is-vinegar-drunk{visibility:hidden;opacity:0}
+.mosti-domino.is-hugging img{animation:mosti-hold-bottle .32s ease-in-out infinite alternate}
+@keyframes mosti-hold-bottle{
+ 0%{transform:scaleX(-1) translateY(0) rotate(0deg)}
+ 100%{transform:scaleX(-1) translateY(-2px) rotate(-3deg)}
+}
+.mosti-domino.is-sipping img{animation:mosti-sip-bob .24s ease-in-out infinite alternate}
+@keyframes mosti-sip-bob{
+ 0%{transform:scaleX(-1) translateY(0) rotate(0deg)}
+ 100%{transform:scaleX(-1) translateY(-3px) rotate(-5deg)}
+}
+@media(prefers-reduced-motion:reduce) and (min-width:600px){
+ .mosti-domino.is-hugging img,.mosti-domino.is-sipping img{animation:none}
+}
