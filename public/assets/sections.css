@@ -237,7 +237,7 @@
 .vinegar-lineup.is-mosti-sequence .vinegar-lineup-item.is-vinegar-entering{visibility:visible}
 .vinegar-lineup.is-mosti-sequence .vinegar-lineup-item.is-vinegar-in{visibility:visible;opacity:1}
 
-@media(prefers-reduced-motion:reduce){.mosti-domino{cursor:default}.mosti-domino.is-walking img{animation:none}}
+@media(prefers-reduced-motion:reduce) and (min-width:600px){.mosti-domino{cursor:default}.mosti-domino.is-walking img{animation:none}}
 
 
 /* Mobile: Logo und Navigation bleiben auch bei 320px in einer Zeile bedienbar. */
