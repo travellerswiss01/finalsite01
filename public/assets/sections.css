@@ -227,7 +227,7 @@
 .is-mosti-playing .mosti-domino{pointer-events:none}
 @media(min-width:1600px){.mosti-domino{width:150px;height:162px}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:155px}}
 @media(max-width:899px) and (min-width:600px){.mosti-domino{width:94px;height:108px;bottom:53px}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:98px}}
-@media(max-width:599px){.mosti-domino{width:56px;height:62px;top:8px;bottom:auto;right:8px}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:8px}}
+@media(max-width:599px){.mosti-domino{width:84px;height:92px;top:auto;bottom:150px;right:8px}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:8px}}
 .vinegar-lineup.is-mosti-sequence .vinegar-lineup-item.is-vinegar-waiting{visibility:hidden;opacity:0}
 .vinegar-lineup.is-mosti-sequence .vinegar-lineup-item.is-vinegar-ready{visibility:visible;opacity:.68;transform:translateX(34px) scale(.96);transition:opacity .15s ease,transform .15s ease}
 .vinegar-lineup.is-mosti-sequence .vinegar-lineup-item.is-vinegar-entering{visibility:visible}
