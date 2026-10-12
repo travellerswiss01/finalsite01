@@ -3,9 +3,10 @@ on:
   pull_request:
     branches:
       - codex/mockup-homepage
+      - main
   push:
     branches:
-      - fix/render-cart-origin-review
+      - main
 permissions:
   contents: read
 jobs:
