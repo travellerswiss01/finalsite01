@@ -192,7 +192,7 @@ if(offerCarousel){
   }catch{soundEnabled=false;updateSound();}
  };
  const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
- const reducedMostiMotion=()=>motion.matches&&!window.matchMedia('(max-width: 599px)').matches;
+ const reducedMostiMotion=()=>motion.matches;
  const bottles=[...offerCarousel.querySelectorAll('[data-vinegar-bottle]')];
  // Mosti is one complete illustration. Only the intact sprite is animated.
  const mostiFrame=images.find(image=>image.classList.contains('vinegar-lineup-frame'));
@@ -352,7 +352,7 @@ if(offerCarousel){
   });
   if(mostiAutoTimer!==null){window.clearTimeout(mostiAutoTimer);mostiAutoTimer=null;}
   mostiAutoRemaining=0;
-  if(mostiFrame?.classList.contains('is-active')){prepareMostiSequence();window.setTimeout(()=>scheduleMostiAuto(),350);}
+  if(mostiFrame?.classList.contains('is-active')){prepareMostiSequence();window.setTimeout(()=>scheduleMostiAuto(),2200);}
  };
  const updateToggle=()=>{
   toggle.innerHTML=paused?'<svg class="offer-playback-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="m8 4 12 8-12 8z"/></svg>':'<svg class="offer-playback-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
@@ -395,24 +395,22 @@ if(offerCarousel){
   swayTimer=window.setTimeout(()=>{swayRunning=false;swayTimer=null;start();},duration+Math.max(origin,bottles.length-1-origin)*delay+60);
  };
  // Mosti pushes the bottles one by one; product taps still open their details.
- const scheduleMostiAuto=(delay=1100)=>{
+ const scheduleMostiAuto=(delay=1400)=>{
   if(mostiAutoTimer!==null)window.clearTimeout(mostiAutoTimer);
   const lineup=mostiFrame?.querySelector('.vinegar-lineup');
-  if(!lineup||!mostiButton||mostiButton.hidden||!mostiFrame.classList.contains('is-active'))return;
+  if(reducedMostiMotion()||!lineup||!mostiButton||mostiButton.hidden||!mostiFrame.classList.contains('is-active'))return;
   if(mostiAutoRemaining<=0)return;
   mostiAutoTimer=window.setTimeout(()=>{mostiAutoTimer=null;playMosti(true);},delay);
  };
  const playMosti=(automatic=false)=>{
-  if(!mostiButton||swayRunning||!mostiFrame.classList.contains('is-active')){if(automatic)scheduleMostiAuto(500);return;}
+  if(!mostiButton||swayRunning||!mostiFrame.classList.contains('is-active')){if(automatic)scheduleMostiAuto(700);return;}
   const lineup=mostiFrame.querySelector('.vinegar-lineup');
   if(!lineup)return;
   const items=[...lineup.querySelectorAll('.vinegar-lineup-item')];
   const item=items[mostiNextIndex];
   const isLastBottle=mostiNextIndex===items.length-1;
   if(!item){mostiAutoRemaining=0;start();return;}
-  const step=(item.getBoundingClientRect().width||lineup.clientWidth*.4)+8;
-  const maxScroll=Math.max(0,lineup.scrollWidth-lineup.clientWidth);
-  const target=Math.min(maxScroll,lineup.scrollLeft+step);
+  // Keep the bottle lineup fixed; only the bottle Mosti grabs will move.
   item.classList.remove('is-vinegar-waiting');item.classList.add('is-vinegar-ready');
   if(typeof mostiButton.animate!=='function'){
    item.classList.remove('is-vinegar-entering','is-vinegar-ready');item.classList.add('is-vinegar-ready');
@@ -421,19 +419,19 @@ if(offerCarousel){
   }
   resetSway();stop();swayRunning=true;
   mostiFrame.classList.add('is-mosti-playing');mostiButton.setAttribute('aria-busy','true');
-  const startScroll=lineup.scrollLeft;
   const bottleRect=item.getBoundingClientRect();
   const bottleImage=item.querySelector('img');
   const bottleImageRect=bottleImage?.getBoundingClientRect()||bottleRect;
   const mostiRect=mostiButton.getBoundingClientRect();
-  const handOffsetX=mostiRect.width*.25,handOffsetY=mostiRect.height*.61;
-  const dy=bottleImageRect.top+bottleImageRect.height*.48-(mostiRect.top+handOffsetY);
-  const scrollDelta=target-startScroll;
-  const approachX=bottleImageRect.left+bottleImageRect.width*.5-(mostiRect.left+handOffsetX);
-  const pushX=approachX-scrollDelta;
+  const handOffsetX=mostiRect.width*.10,handOffsetY=mostiRect.height*.49;
+  const bottleGripX=bottleImageRect.left+bottleImageRect.width*.68;
+  const bottleGripY=bottleImageRect.top+bottleImageRect.height*.52;
+  const dy=bottleGripY-(mostiRect.top+handOffsetY);
+  const approachX=bottleGripX-(mostiRect.left+handOffsetX);
+  const pushX=approachX;
   const isDrag=!isLastBottle&&mostiNextIndex%2===1;
   const isMobile=window.matchMedia('(max-width: 599px)').matches;
-  const approachDuration=isMobile?820:610,pauseDuration=isMobile?110:80,pushDuration=isMobile?1120:900,returnDuration=isMobile?980:720,sipHold=isLastBottle?(isMobile?1000:900):0,duration=approachDuration+pauseDuration+pushDuration+returnDuration+sipHold,startTime=performance.now();
+  const approachDuration=isMobile?820:610,pauseDuration=isMobile?150:120,pushDuration=isMobile?1250:1000,returnDuration=isMobile?980:720,sipHold=isLastBottle?(isMobile?1600:1450):0,duration=approachDuration+pauseDuration+pushDuration+returnDuration+sipHold,startTime=performance.now();
   const approachEnd=approachDuration/duration,pushStart=(approachDuration+pauseDuration)/duration,pushEnd=(approachDuration+pauseDuration+pushDuration)/duration;
   setMostiPose('walk');
   const enterTimer=window.setTimeout(()=>{
@@ -443,33 +441,41 @@ if(offerCarousel){
    const impactTimer=window.setTimeout(()=>item.classList.remove('is-vinegar-impact'),360);mostiPoseTimers.push(impactTimer);
    const imageCenterX=bottleImageRect.left+bottleImageRect.width*.5;
    const imageCenterY=bottleImageRect.top+bottleImageRect.height*.48;
-   const gripX=bottleImageRect.left+bottleImageRect.width*.5-(imageCenterX)+scrollDelta;
-   const gripY=mostiRect.top+dy+handOffsetY-imageCenterY;
-   const homeGripX=mostiRect.left+handOffsetX-imageCenterX+scrollDelta;
-   const homeGripY=mostiRect.top+handOffsetY-imageCenterY;
-   const mouthX=mostiRect.left+mostiRect.width*.56-imageCenterX+scrollDelta;
-   const mouthY=mostiRect.top+mostiRect.height*.31-imageCenterY;
+   const gripLocalX=bottleImageRect.width*.18,gripLocalY=bottleImageRect.height*.04;
+   const carryAngle=isDrag?12:-3,carryRadians=carryAngle*Math.PI/180;
+   const carryGripX=gripLocalX*Math.cos(carryRadians)-gripLocalY*Math.sin(carryRadians);
+   const carryGripY=gripLocalX*Math.sin(carryRadians)+gripLocalY*Math.cos(carryRadians);
+   const homeGripX=mostiRect.left+handOffsetX-imageCenterX-carryGripX;
+   const homeGripY=mostiRect.top+handOffsetY-imageCenterY-carryGripY;
+   const mouthX=mostiRect.left+mostiRect.width*.56-imageCenterX;
+   const mouthY=mostiRect.top+mostiRect.height*.50-imageCenterY;
+   const capLocalY=-bottleImageRect.height*.35;
+   const sipPosition=angle=>{const radians=angle*Math.PI/180;const capX=-capLocalY*Math.sin(radians),capY=capLocalY*Math.cos(radians);return{x:mouthX-capX,y:mouthY-capY};};
+   const sip18=sipPosition(18),sip58=sipPosition(58),sip64=sipPosition(64),sip68=sipPosition(68);
    const carryOutX=homeGripX+Math.max(90,lineup.clientWidth*.45);
    const carryDuration=pushDuration+returnDuration+sipHold;
+   const carryPushEnd=pushDuration/carryDuration,carryHomeEnd=(pushDuration+returnDuration)/carryDuration;
+   const sipTiltStart=carryHomeEnd+.04,sipFadeStart=1-.42/carryDuration;
    const baseTransform=(x,y,rotation=0,scale=1)=>'translate(-50%,-50%) translate3d('+Math.round(x)+'px,'+Math.round(y)+'px,0) rotate('+rotation+'deg) scale('+scale+')';
    const bottleFrames=isLastBottle?[
     {opacity:1,transform:baseTransform(0,0),offset:0,easing:'ease-out'},
     {opacity:1,transform:baseTransform(0,0),offset:approachEnd,easing:'linear'},
     {opacity:1,transform:baseTransform(0,0),offset:pushStart,easing:'linear'},
-    {opacity:1,transform:baseTransform(0,0),offset:pushEnd,easing:'ease-in-out'},
-    {opacity:1,transform:baseTransform(homeGripX*.55,homeGripY*.55,-2,1.02),offset:pushEnd+(1-pushEnd)*.24,easing:'cubic-bezier(.2,.72,.2,1)'},
-    {opacity:1,transform:baseTransform(homeGripX,homeGripY,-3,1),offset:pushEnd+(1-pushEnd)*.52,easing:'cubic-bezier(.2,.72,.2,1)'},
-    {opacity:1,transform:baseTransform(mouthX,mouthY,18,.96),offset:.88,easing:'ease-in-out'},
-    {opacity:.9,transform:baseTransform(mouthX,mouthY,58,.9),offset:.94,easing:'cubic-bezier(.2,.7,.2,1)'},
-    {opacity:.62,transform:baseTransform(mouthX+8,mouthY+3,64,.84),offset:.985,easing:'ease-in'},
-    {opacity:0,transform:baseTransform(mouthX+16,mouthY+8,68,.8),offset:1}
+    {opacity:1,transform:baseTransform(0,0),offset:carryPushEnd,easing:'ease-in-out'},
+    {opacity:1,transform:baseTransform(homeGripX*.55,homeGripY*.55,-2,1.02),offset:carryPushEnd+(carryHomeEnd-carryPushEnd)*.52,easing:'cubic-bezier(.2,.72,.2,1)'},
+    {opacity:1,transform:baseTransform(homeGripX,homeGripY,-3,1),offset:carryHomeEnd,easing:'cubic-bezier(.2,.72,.2,1)'},
+    {opacity:1,transform:baseTransform(sip18.x,sip18.y,18,.96),offset:sipTiltStart,easing:'ease-in-out'},
+    {opacity:1,transform:baseTransform(sip58.x,sip58.y,58,.9),offset:sipTiltStart+.06,easing:'cubic-bezier(.2,.7,.2,1)'},
+    {opacity:1,transform:baseTransform(sip58.x,sip58.y,58,.9),offset:sipFadeStart,easing:'ease-in'},
+    {opacity:.55,transform:baseTransform(sip68.x,sip68.y,68,.8),offset:sipFadeStart+.12,easing:'ease-in'},
+    {opacity:0,transform:baseTransform(sip68.x,sip68.y,68,.8),offset:1}
    ]:[
     {opacity:1,transform:baseTransform(0,0),offset:0,easing:'ease-out'},
     {opacity:1,transform:baseTransform(0,0),offset:approachEnd,easing:'linear'},
     {opacity:1,transform:baseTransform(0,0),offset:pushStart,easing:'linear'},
-    {opacity:1,transform:baseTransform(0,0),offset:pushEnd,easing:'ease-in-out'},
-    {opacity:1,transform:baseTransform(homeGripX*.55,homeGripY*.55+(isDrag?7:-7),isDrag?5:-3,1.02),offset:pushEnd+(1-pushEnd)*.28,easing:'cubic-bezier(.2,.72,.2,1)'},
-    {opacity:1,transform:baseTransform(homeGripX,homeGripY+(isDrag?14:-10),isDrag?12:-2,1),offset:pushEnd+(1-pushEnd)*.58,easing:'cubic-bezier(.2,.72,.2,1)'},
+    {opacity:1,transform:baseTransform(0,0),offset:carryPushEnd,easing:'ease-in-out'},
+    {opacity:1,transform:baseTransform(homeGripX*.55,homeGripY*.55+(isDrag?7:-7),isDrag?5:-3,1.02),offset:carryPushEnd+(carryHomeEnd-carryPushEnd)*.48,easing:'cubic-bezier(.2,.72,.2,1)'},
+    {opacity:1,transform:baseTransform(homeGripX,homeGripY+(isDrag?14:-10),isDrag?12:-2,1),offset:carryHomeEnd,easing:'cubic-bezier(.2,.72,.2,1)'},
     {opacity:.86,transform:baseTransform(carryOutX,homeGripY+(isDrag?18:-8),isDrag?16:2,.98),offset:.94,easing:'ease-in'},
     {opacity:0,transform:baseTransform(carryOutX+18,homeGripY+(isDrag?20:-6),isDrag?18:4,.94),offset:1}
    ];
@@ -498,21 +504,12 @@ if(offerCarousel){
    {transform:point(0,0),offset:1}
   ],{duration,easing:'linear',fill:'both'});
   mostiAnimations.push(mostiAnimation);
-  const push=now=>{
-   if(!swayRunning)return;
-   const elapsed=now-startTime;
-   const pushProgress=Math.max(0,Math.min(1,(elapsed-approachDuration-pauseDuration)/pushDuration));
-   const eased=pushProgress*pushProgress*(3-2*pushProgress);
-   lineup.scrollLeft=startScroll+(target-startScroll)*eased;
-   if(elapsed<duration)mostiFrameRequest=window.requestAnimationFrame(push);
-   else mostiFrameRequest=null;
-  };
-  mostiFrameRequest=window.requestAnimationFrame(push);
+  // The remaining bottles stay anchored while Mosti carries this one away.
   swayTimer=window.setTimeout(()=>{
    item.classList.remove('is-vinegar-entering','is-vinegar-ready','is-vinegar-hugging','is-vinegar-dragging','is-vinegar-sipping');item.classList.add(isLastBottle?'is-vinegar-drunk':'is-vinegar-carried');mostiButton.classList.remove('is-sipping','is-hugging');mostiNextIndex++;const nextItem=items[mostiNextIndex];if(nextItem){nextItem.classList.remove('is-vinegar-waiting');nextItem.classList.add('is-vinegar-ready');}
    mostiAnimations.forEach(animation=>animation.cancel());mostiAnimations=[];
    resetSway();
-   if(automatic){mostiAutoRemaining=Math.max(0,mostiAutoRemaining-1);if(mostiAutoRemaining>0&&mostiFrame.classList.contains('is-active'))scheduleMostiAuto(450);else if(paused&&mostiFrame.classList.contains('is-active')){prepareMostiSequence();scheduleMostiAuto(700);}else{mostiAutoRemaining=0;start();}}
+   if(automatic){mostiAutoRemaining=Math.max(0,mostiAutoRemaining-1);if(mostiAutoRemaining>0&&mostiFrame.classList.contains('is-active'))scheduleMostiAuto(1150);else{mostiAutoRemaining=0;start();}}
    else start();
   },duration);
  };
