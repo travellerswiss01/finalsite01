@@ -347,7 +347,7 @@ if(offerCarousel){
   });
   if(mostiAutoTimer!==null){window.clearTimeout(mostiAutoTimer);mostiAutoTimer=null;}
   mostiAutoRemaining=0;
-  if(mostiFrame?.classList.contains('is-active')){prepareMostiSequence();if(!motion.matches)window.setTimeout(()=>scheduleMostiAuto(),1100);}
+  if(mostiFrame?.classList.contains('is-active')){prepareMostiSequence();if(motion.matches){mostiFrame.querySelectorAll('.vinegar-lineup-item').forEach(item=>{item.classList.remove('is-vinegar-waiting','is-vinegar-entering');item.classList.add('is-vinegar-in');});mostiAutoRemaining=0;}else window.setTimeout(()=>scheduleMostiAuto(),350);}
  };
  const updateToggle=()=>{
   toggle.innerHTML=paused?'<svg class="offer-playback-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="m8 4 12 8-12 8z"/></svg>':'<svg class="offer-playback-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
@@ -478,6 +478,6 @@ if(offerCarousel){
  vinegarDialog?.querySelector('[data-vinegar-close]')?.addEventListener('click',()=>vinegarDialog.close());
  vinegarDialog?.addEventListener('close',start);
  offerCarousel.querySelector('[data-offer-controls]').hidden=false;
- show(window.location?.hash==='#mosti'?3:0);updateToggle();start();
+ show(3);updateToggle();start();
 }
 
