@@ -192,6 +192,7 @@ if(offerCarousel){
   }catch{soundEnabled=false;updateSound();}
  };
  const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
+ const reducedMostiMotion=()=>motion.matches&&!window.matchMedia('(max-width: 599px)').matches;
  const bottles=[...offerCarousel.querySelectorAll('[data-vinegar-bottle]')];
  // Mosti is one complete illustration. Only the intact sprite is animated.
  const mostiFrame=images.find(image=>image.classList.contains('vinegar-lineup-frame'));
@@ -228,7 +229,7 @@ if(offerCarousel){
   const items=[...lineup.querySelectorAll('.vinegar-lineup-item')];
   lineup.scrollLeft=0;lineup.classList.add('is-mosti-sequence');
   items.forEach(item=>{item.classList.remove('is-vinegar-entering','is-vinegar-in','is-vinegar-ready');item.classList.add('is-vinegar-waiting');});
-  if(!motion.matches&&items[0]){items[0].classList.remove('is-vinegar-waiting');items[0].classList.add('is-vinegar-ready');}
+  if(!reducedMostiMotion()&&items[0]){items[0].classList.remove('is-vinegar-waiting');items[0].classList.add('is-vinegar-ready');}
   mostiNextIndex=0;mostiAutoRemaining=items.length;
  };
  const resetMosti=()=>{
@@ -350,7 +351,7 @@ if(offerCarousel){
   });
   if(mostiAutoTimer!==null){window.clearTimeout(mostiAutoTimer);mostiAutoTimer=null;}
   mostiAutoRemaining=0;
-  if(mostiFrame?.classList.contains('is-active')){prepareMostiSequence();if(motion.matches){mostiFrame.querySelectorAll('.vinegar-lineup-item').forEach(item=>{item.classList.remove('is-vinegar-waiting','is-vinegar-entering');item.classList.add('is-vinegar-in');});mostiAutoRemaining=0;}else window.setTimeout(()=>scheduleMostiAuto(),350);}
+  if(mostiFrame?.classList.contains('is-active')){prepareMostiSequence();if(reducedMostiMotion()){mostiFrame.querySelectorAll('.vinegar-lineup-item').forEach(item=>{item.classList.remove('is-vinegar-waiting','is-vinegar-entering');item.classList.add('is-vinegar-in');});mostiAutoRemaining=0;}else window.setTimeout(()=>scheduleMostiAuto(),350);}
  };
  const updateToggle=()=>{
   toggle.innerHTML=paused?'<svg class="offer-playback-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="m8 4 12 8-12 8z"/></svg>':'<svg class="offer-playback-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
@@ -396,7 +397,7 @@ if(offerCarousel){
  const scheduleMostiAuto=(delay=1100)=>{
   if(mostiAutoTimer!==null)window.clearTimeout(mostiAutoTimer);
   const lineup=mostiFrame?.querySelector('.vinegar-lineup');
-  if(!lineup||!mostiButton||mostiButton.hidden||motion.matches||!mostiFrame.classList.contains('is-active'))return;
+  if(!lineup||!mostiButton||mostiButton.hidden||reducedMostiMotion()||!mostiFrame.classList.contains('is-active'))return;
   if(mostiAutoRemaining<=0)return;
   mostiAutoTimer=window.setTimeout(()=>{mostiAutoTimer=null;playMosti(true);},delay);
  };
@@ -411,7 +412,7 @@ if(offerCarousel){
   const maxScroll=Math.max(0,lineup.scrollWidth-lineup.clientWidth);
   const target=Math.min(maxScroll,lineup.scrollLeft+step);
   item.classList.remove('is-vinegar-waiting');item.classList.add('is-vinegar-ready');
-  if(motion.matches||typeof mostiButton.animate!=='function'){
+  if(reducedMostiMotion()||typeof mostiButton.animate!=='function'){
    item.classList.remove('is-vinegar-waiting','is-vinegar-entering','is-vinegar-ready');item.classList.add('is-vinegar-in');
    lineup.scrollLeft=target;mostiNextIndex++;
    if(automatic){mostiAutoRemaining=Math.max(0,mostiAutoRemaining-1);if(mostiAutoRemaining>0)scheduleMostiAuto(500);else start();}
@@ -460,7 +461,7 @@ if(offerCarousel){
    item.classList.remove('is-vinegar-entering','is-vinegar-ready');item.classList.add('is-vinegar-in');mostiNextIndex++;const nextItem=items[mostiNextIndex];if(nextItem){nextItem.classList.remove('is-vinegar-waiting');nextItem.classList.add('is-vinegar-ready');}
    mostiAnimations.forEach(animation=>animation.cancel());mostiAnimations=[];
    resetSway();
-   if(automatic){mostiAutoRemaining=Math.max(0,mostiAutoRemaining-1);if(mostiAutoRemaining>0&&mostiFrame.classList.contains('is-active'))scheduleMostiAuto(450);else{mostiAutoRemaining=0;start();}}
+   if(automatic){mostiAutoRemaining=Math.max(0,mostiAutoRemaining-1);if(mostiAutoRemaining>0&&mostiFrame.classList.contains('is-active'))scheduleMostiAuto(450);else if(paused&&mostiFrame.classList.contains('is-active')){prepareMostiSequence();scheduleMostiAuto(700);}else{mostiAutoRemaining=0;start();}}
    else start();
   },duration);
  };
