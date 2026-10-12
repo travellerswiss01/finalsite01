@@ -454,8 +454,8 @@ if(offerCarousel){
    const sip18=sipPosition(18),sip58=sipPosition(58),sip64=sipPosition(64),sip68=sipPosition(68);
    const carryOutX=homeGripX+Math.max(90,lineup.clientWidth*.45);
    const carryDuration=pushDuration+returnDuration+sipHold;
-   const carryPushEnd=pushDuration/carryDuration,carryHomeEnd=(pushDuration+returnDuration)/carryDuration;
-   const sipTiltStart=carryHomeEnd+.04,sipFadeStart=1-.42/carryDuration;
+   const carryPushEnd=pushDuration/carryDuration,carryHomeEnd=(pushDuration+(isLastBottle?returnDuration:returnDuration*.7))/carryDuration;
+   const sipTiltStart=carryHomeEnd+.04,sipFadeStart=1-.42/carryDuration,sipFadeEnd=Math.min(.985,sipFadeStart+.12);
    const baseTransform=(x,y,rotation=0,scale=1)=>'translate(-50%,-50%) translate3d('+Math.round(x)+'px,'+Math.round(y)+'px,0) rotate('+rotation+'deg) scale('+scale+')';
    const bottleFrames=isLastBottle?[
     {opacity:1,transform:baseTransform(0,0),offset:0,easing:'ease-out'},
@@ -467,7 +467,7 @@ if(offerCarousel){
     {opacity:1,transform:baseTransform(sip18.x,sip18.y,18,.96),offset:sipTiltStart,easing:'ease-in-out'},
     {opacity:1,transform:baseTransform(sip58.x,sip58.y,58,.9),offset:sipTiltStart+.06,easing:'cubic-bezier(.2,.7,.2,1)'},
     {opacity:1,transform:baseTransform(sip58.x,sip58.y,58,.9),offset:sipFadeStart,easing:'ease-in'},
-    {opacity:.55,transform:baseTransform(sip68.x,sip68.y,68,.8),offset:sipFadeStart+.12,easing:'ease-in'},
+    {opacity:.55,transform:baseTransform(sip68.x,sip68.y,68,.8),offset:sipFadeEnd,easing:'ease-in'},
     {opacity:0,transform:baseTransform(sip68.x,sip68.y,68,.8),offset:1}
    ]:[
     {opacity:1,transform:baseTransform(0,0),offset:0,easing:'ease-out'},
