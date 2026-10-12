@@ -382,3 +382,12 @@
  .offer-carousel:has(.seasonal-offer-products.is-active) .hero-content{width:60%;max-width:60%}
  .offer-carousel:has(.seasonal-offer-products.is-active) .hero h1{font-size:22px}
 }
+
+/* Contact, impact and recovery cues make each shove read as a single physical action. */
+@keyframes mosti-brace-pulse{0%{transform:scaleX(-1) translateX(0) rotate(0)}48%{transform:scaleX(-1) translateX(-2px) rotate(-2deg)}100%{transform:scaleX(-1) translateX(1px) rotate(1deg)}}
+.mosti-domino.is-bracing img{animation:mosti-brace-pulse .13s ease-in-out infinite alternate}
+@keyframes vinegar-glass-impact{0%{rotate:0deg}18%{rotate:5deg}43%{rotate:-4deg}70%{rotate:2deg}100%{rotate:0deg}}
+.vinegar-lineup-item.is-vinegar-impact img{animation:vinegar-glass-impact .42s cubic-bezier(.2,.7,.25,1) both}
+.vinegar-lineup-item.is-vinegar-impact:after{content:"";position:absolute;right:8%;top:37%;z-index:3;width:22px;height:22px;background:#c79a36;clip-path:polygon(50% 0,62% 36%,100% 50%,62% 63%,50% 100%,38% 63%,0 50%,38% 37%);filter:drop-shadow(0 1px 2px #6f511744);pointer-events:none;animation:vinegar-contact-flash .34s cubic-bezier(.2,.8,.2,1) both}
+@keyframes vinegar-contact-flash{0%{opacity:0;transform:scale(.25) rotate(-20deg)}32%{opacity:.9;transform:scale(1.08) rotate(8deg)}100%{opacity:0;transform:scale(.72) rotate(24deg)}}
+@media(prefers-reduced-motion:reduce) and (min-width:600px){.mosti-domino.is-bracing img,.vinegar-lineup-item.is-vinegar-impact img,.vinegar-lineup-item.is-vinegar-impact:after{animation:none}}
