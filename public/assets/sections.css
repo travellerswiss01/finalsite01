@@ -223,6 +223,10 @@
 .mosti-domino{position:absolute;right:5px;bottom:38px;z-index:4;width:128px;height:142px;display:block;border:0;padding:0;background:transparent;cursor:pointer;touch-action:manipulation;transform-origin:50% 93%;-webkit-tap-highlight-color:transparent}
 .mosti-domino[hidden]{display:none}
 .mosti-domino img{display:block;width:100%;height:100%;object-fit:contain;transform:scaleX(-1);filter:drop-shadow(0 4px 3px #173d2b18);pointer-events:none}
+@keyframes mosti-walk-bounce{from{transform:scaleX(-1) translateY(1px) rotate(1deg)}to{transform:scaleX(-1) translateY(-6px) rotate(-1deg)}}
+@keyframes mosti-walk-back-bounce{from{transform:scaleX(1) translateY(1px) rotate(-1deg)}to{transform:scaleX(1) translateY(-6px) rotate(1deg)}}
+.mosti-domino.is-walking img{animation:mosti-walk-bounce .22s ease-in-out infinite alternate}
+.mosti-domino.is-walking-back img{animation-name:mosti-walk-back-bounce}
 .mosti-domino:focus-visible{outline:2px solid #9c792b;outline-offset:3px;border-radius:18px}
 .is-mosti-playing .mosti-domino{pointer-events:none}
 @media(min-width:1600px){.mosti-domino{width:150px;height:162px}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:155px}}
@@ -233,7 +237,7 @@
 .vinegar-lineup.is-mosti-sequence .vinegar-lineup-item.is-vinegar-entering{visibility:visible}
 .vinegar-lineup.is-mosti-sequence .vinegar-lineup-item.is-vinegar-in{visibility:visible;opacity:1}
 
-@media(prefers-reduced-motion:reduce){.mosti-domino{cursor:default}}
+@media(prefers-reduced-motion:reduce){.mosti-domino{cursor:default}.mosti-domino.is-walking img{animation:none}}
 
 
 /* Mobile: Logo und Navigation bleiben auch bei 320px in einer Zeile bedienbar. */
