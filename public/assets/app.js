@@ -218,6 +218,7 @@ if(offerCarousel){
   currentMostiPose=pose;
   mostiButton?.classList.toggle('is-walking',pose==='walk');
   mostiButton?.classList.toggle('is-walking-back',pose==='walk'&&direction==='back');
+  mostiButton?.classList.toggle('is-bracing',pose==='push');
   const image=mostiPoseImages[pose];
   if(image?.complete&&image.naturalWidth&&mostiSprite.src!==image.src)mostiSprite.src=image.src;
   else if(image&&!image.complete)image.addEventListener('load',()=>{if(currentMostiPose===pose)mostiSprite.src=image.src;},{once:true});
@@ -321,7 +322,7 @@ if(offerCarousel){
   if(swayTimer!==null){window.clearTimeout(swayTimer);swayTimer=null;}
   swayRunning=false;
   setMostiPose('idle');
-  bottles.forEach(button=>button.closest('.vinegar-lineup-item').classList.remove('is-vinegar-sway'));
+  bottles.forEach(button=>button.closest('.vinegar-lineup-item').classList.remove('is-vinegar-sway','is-vinegar-impact'));
  };
  const loadOfferImage=index=>{
   const frame=images[index];
@@ -428,29 +429,49 @@ if(offerCarousel){
   const approachX=bottleRect.right-12-mostiRect.left;
   const pushX=approachX-scrollDelta;
   const isMobile=window.matchMedia('(max-width: 599px)').matches;
-  const approachDuration=isMobile?860:560,pushDuration=isMobile?1150:900,returnDuration=isMobile?720:540,duration=approachDuration+pushDuration+returnDuration,startTime=performance.now();
+  const approachDuration=isMobile?820:610,pauseDuration=isMobile?110:80,pushDuration=isMobile?1220:980,returnDuration=isMobile?780:560,duration=approachDuration+pauseDuration+pushDuration+returnDuration,startTime=performance.now();
+  const approachEnd=approachDuration/duration,pushStart=(approachDuration+pauseDuration)/duration,pushEnd=(approachDuration+pauseDuration+pushDuration)/duration;
   setMostiPose('walk');
-  const enterTimer=window.setTimeout(()=>{if(!swayRunning)return;item.classList.remove('is-vinegar-waiting','is-vinegar-ready');item.classList.add('is-vinegar-entering');setMostiPose('push');const bottleAnimation=item.animate([{opacity:.68,transform:'translateX(34px) scale(.96)'},{opacity:1,transform:'translateX(-7px) scale(1.015)',offset:.78},{opacity:1,transform:'translateX(0) scale(1)',offset:1}],{duration:pushDuration,easing:'cubic-bezier(.2,.75,.22,1)',fill:'both'});mostiAnimations.push(bottleAnimation);},approachDuration);
+  const enterTimer=window.setTimeout(()=>{
+   if(!swayRunning)return;
+   item.classList.remove('is-vinegar-waiting','is-vinegar-ready');item.classList.add('is-vinegar-entering','is-vinegar-impact');
+   mostiButton.classList.add('is-bracing');setMostiPose('push');
+   const impactTimer=window.setTimeout(()=>item.classList.remove('is-vinegar-impact'),360);mostiPoseTimers.push(impactTimer);
+   const bottleAnimation=item.animate([
+    {opacity:.72,transform:'translate3d(36px,2px,0) rotate(-3deg) scale(.96)',offset:0,easing:'cubic-bezier(.18,.72,.24,1)'},
+    {opacity:1,transform:'translate3d(8px,-3px,0) rotate(5deg) scale(1.035)',offset:.18,easing:'cubic-bezier(.1,.8,.2,1)'},
+    {opacity:1,transform:'translate3d(-4px,1px,0) rotate(-2.5deg) scale(1.015)',offset:.34,easing:'cubic-bezier(.2,.7,.2,1)'},
+    {opacity:1,transform:'translate3d(0,0,0) rotate(1deg) scale(1)',offset:.56,easing:'cubic-bezier(.25,.65,.2,1)'},
+    {opacity:1,transform:'translate3d(-2px,0,0) rotate(-1deg) scale(1)',offset:.78,easing:'ease-out'},
+    {opacity:1,transform:'translate3d(0,0,0) rotate(0deg) scale(1)',offset:1}
+   ],{duration:pushDuration,fill:'both'});
+   mostiAnimations.push(bottleAnimation);
+  },approachDuration+pauseDuration);
   mostiPoseTimers.push(enterTimer);
-  const returnTimer=window.setTimeout(()=>{if(swayRunning)setMostiPose('walk','back');},approachDuration+pushDuration);
+  const returnTimer=window.setTimeout(()=>{if(swayRunning){mostiButton.classList.remove('is-bracing');setMostiPose('walk','back');}},approachDuration+pauseDuration+pushDuration);
   mostiPoseTimers.push(returnTimer);
-  const idleTimer=window.setTimeout(()=>{if(swayRunning)setMostiPose('idle');},duration-90);
+  const idleTimer=window.setTimeout(()=>{if(swayRunning)setMostiPose('idle');},duration-110);
   mostiPoseTimers.push(idleTimer);
+  const point=(x,y,extra='')=>'translate3d('+Math.round(x)+'px,'+Math.round(y)+'px,0)'+extra;
   const mostiAnimation=mostiButton.animate([
-   {transform:'translate(0px,0px)',offset:0},
-   {transform:'translate('+Math.round(approachX*.42)+'px,'+Math.round(dy-5)+'px)',offset:.12},
-   {transform:'translate('+approachX+'px,'+dy+'px)',offset:approachDuration/duration},
-   {transform:'translate('+pushX+'px,'+dy+'px)',offset:(approachDuration+pushDuration*.78)/duration},
-   {transform:'translate('+pushX+'px,'+dy+'px) scale(.97,1.03)',offset:(approachDuration+pushDuration*.9)/duration},
-   {transform:'translate('+pushX+'px,'+dy+'px)',offset:(approachDuration+pushDuration)/duration},
-   {transform:'translate(0px,0px)',offset:.97},
-   {transform:'translate(0px,0px)',offset:1}
-  ],{duration,easing:'ease-in-out',fill:'both'});
+   {transform:point(0,0),offset:0,easing:'cubic-bezier(.22,.68,.2,1)'},
+   {transform:point(-8,7,' rotate(-5deg) scale(.96,1.04)'),offset:.055,easing:'cubic-bezier(.2,.7,.2,1)'},
+   {transform:point(approachX*.14,dy*.14-34,' rotate(3deg)'),offset:.2,easing:'cubic-bezier(.42,0,.75,.35)'},
+   {transform:point(approachX*.62,dy*.72-16,' rotate(-3deg)'),offset:approachEnd*.72,easing:'cubic-bezier(.18,.72,.22,1)'},
+   {transform:point(approachX,dy,' rotate(2deg) scale(1.02,.98)'),offset:approachEnd,easing:'linear'},
+   {transform:point(approachX,dy,' rotate(2deg) scale(1.02,.98)'),offset:pushStart,easing:'cubic-bezier(.12,.82,.25,1)'},
+   {transform:point(pushX+10,dy+7,' rotate(-4deg) scale(.94,1.06)'),offset:pushStart+(pushEnd-pushStart)*.24,easing:'cubic-bezier(.2,.75,.2,1)'},
+   {transform:point(pushX-3,dy+2,' rotate(2deg) scale(1.02,.98)'),offset:pushStart+(pushEnd-pushStart)*.76,easing:'cubic-bezier(.2,.72,.2,1)'},
+   {transform:point(pushX,dy),offset:pushEnd,easing:'cubic-bezier(.18,.72,.22,1)'},
+   {transform:point(pushX+8,dy-8,' rotate(3deg)'),offset:pushEnd+(1-pushEnd)*.12,easing:'cubic-bezier(.16,.76,.2,1)'},
+   {transform:point(approachX*.52,dy*.42-24,' rotate(-3deg)'),offset:pushEnd+(1-pushEnd)*.56,easing:'cubic-bezier(.2,.7,.2,1)'},
+   {transform:point(0,0),offset:1}
+  ],{duration,easing:'linear',fill:'both'});
   mostiAnimations.push(mostiAnimation);
   const push=now=>{
    if(!swayRunning)return;
    const elapsed=now-startTime;
-   const pushProgress=Math.max(0,Math.min(1,(elapsed-approachDuration)/pushDuration));
+   const pushProgress=Math.max(0,Math.min(1,(elapsed-approachDuration-pauseDuration)/pushDuration));
    const eased=pushProgress*pushProgress*(3-2*pushProgress);
    lineup.scrollLeft=startScroll+(target-startScroll)*eased;
    if(elapsed<duration)mostiFrameRequest=window.requestAnimationFrame(push);
