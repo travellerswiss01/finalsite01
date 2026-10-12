@@ -326,7 +326,7 @@
 }
 .offer-carousel:has(.seasonal-offer-products.is-active) .hero-offer.is-active a{pointer-events:auto}
 .offer-carousel:has(.seasonal-offer-products.is-active) .hero-offer.is-active{pointer-events:none}
-@media(max-width:599px){
+@media(max-width:899px){
  .offer-carousel .hero-offer-image.seasonal-offer-products{
   left:0;width:100%;padding:146px 9px 10px;gap:6px;grid-template-columns:repeat(3,minmax(0,1fr))
  }
@@ -334,7 +334,7 @@
   width:100%;max-width:100%;padding:22px 18px 0
  }
  .offer-carousel:has(.seasonal-offer-products.is-active) .hero h1{
-  max-width:100%;margin-bottom:11px;font-size:30px;line-height:1;letter-spacing:-.7px
+  max-width:100%;margin-bottom:11px;font-size:clamp(30px,4vw,38px);line-height:1;letter-spacing:-.7px
  }
  .offer-carousel:has(.seasonal-offer-products.is-active) .hero .button{
   min-height:40px;padding:8px 14px;font-size:15px
