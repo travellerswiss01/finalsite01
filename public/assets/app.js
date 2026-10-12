@@ -224,7 +224,7 @@ if(offerCarousel){
  const loadOfferImage=index=>{
   const frame=images[index];
   if(!frame)return;
-  const deferred=frame.matches('img')?[frame]:[...frame.querySelectorAll('img[data-src]')];
+  const deferred=frame.matches('img')?[frame]:[...(frame.querySelectorAll?.('img[data-src]')||[])];
   deferred.forEach(image=>{
    if(image.dataset.src&&!image.hasAttribute('src')){
     image.loading='eager';
