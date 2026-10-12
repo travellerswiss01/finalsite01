@@ -271,6 +271,9 @@
 @media(max-width:599px){
  .offer-carousel .most-trio-hint{display:none}
  .offer-carousel .most-size-hotspot{top:5%;height:80%}
+ .offer-carousel .most-size-3{left:35%;width:11%}
+ .offer-carousel .most-size-5{left:49%;width:12%}
+ .offer-carousel .most-size-10{left:63%;width:15%}
  .most-size-dialog{width:calc(100% - 20px);max-height:calc(100dvh - 20px);border-radius:18px}
  .most-size-dialog-inner{grid-template-columns:1fr;gap:16px;padding:14px}
  .most-size-dialog-image{height:clamp(185px,32dvh,280px);min-height:185px}
