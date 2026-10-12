@@ -69,7 +69,7 @@
 .vinegar-detail-grid figure{margin:0;text-align:center}
 .vinegar-detail-grid img{width:100%;height:auto}
 .vinegar-detail-grid figcaption{padding:8px;font-size:16px;font-weight:700}
-@media(max-width:599px){.hero{min-height:590px}.vinegar-lineup{inset:auto 8px 56px;height:248px;gap:8px;overflow-x:auto;overflow-y:hidden;padding:4px 8px;scroll-snap-type:x proximity;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}.vinegar-lineup::-webkit-scrollbar{display:none}.vinegar-lineup-item{flex:0 0 clamp(156px,44vw,180px);scroll-snap-align:center}.vinegar-lineup-item img{top:42%;height:min(72cqh,196px)}.vinegar-lineup-item figcaption{display:-webkit-box;bottom:2px;left:1px;right:1px;min-height:24px;overflow:hidden;overflow-wrap:anywhere;padding:0 2px;text-align:center;font-size:11px;line-height:1.1;-webkit-box-orient:vertical;-webkit-line-clamp:2}.vinegar-zoom{top:auto;bottom:8px;right:auto;left:8px;font-size:12px;padding:6px 8px}}
+@media(max-width:599px){.hero{min-height:500px}.vinegar-lineup{inset:auto 8px 56px;height:200px;gap:8px;overflow-x:auto;overflow-y:hidden;padding:4px 8px;scroll-snap-type:x proximity;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}.vinegar-lineup::-webkit-scrollbar{display:none}.vinegar-lineup-item{flex:0 0 clamp(112px,32vw,126px);scroll-snap-align:center}.vinegar-lineup-item img{top:42%;height:min(72cqh,150px)}.vinegar-lineup-item figcaption{display:-webkit-box;bottom:2px;left:1px;right:1px;min-height:30px;overflow:hidden;overflow-wrap:anywhere;padding:0 2px;text-align:center;font-size:13px;line-height:1.15;-webkit-box-orient:vertical;-webkit-line-clamp:2}.vinegar-zoom{top:auto;bottom:8px;right:auto;left:8px;font-size:12px;padding:6px 8px}.vinegar-motion,.vinegar-sound{display:none!important}}
 
 /* Let original bottle photos fall horizontally around their base, then rise gently. */
 .vinegar-bottle-trigger{position:absolute;inset:0;width:100%;padding:0;border:0;border-radius:8px;background:transparent;cursor:pointer;touch-action:manipulation}
@@ -227,7 +227,7 @@
 .is-mosti-playing .mosti-domino{pointer-events:none}
 @media(min-width:1600px){.mosti-domino{width:150px;height:162px}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:155px}}
 @media(max-width:899px) and (min-width:600px){.mosti-domino{width:94px;height:108px;bottom:53px}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:98px}}
-@media(max-width:599px){.mosti-domino{width:76px;height:84px;bottom:56px;right:2px}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:79px}}
+@media(max-width:599px){.mosti-domino{width:48px;height:54px;top:8px;bottom:auto;right:8px}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:8px}}
 @media(prefers-reduced-motion:reduce){.mosti-domino{cursor:default}}
 
 
