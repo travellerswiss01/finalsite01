@@ -403,20 +403,26 @@ if(offerCarousel){
   resetSway();stop();swayRunning=true;
   mostiFrame.classList.add('is-mosti-playing');mostiButton.setAttribute('aria-busy','true');
   const startScroll=lineup.scrollLeft;
-  const dy=Math.max(0,lineup.getBoundingClientRect().top-mostiButton.getBoundingClientRect().bottom+8);
-  const duration=1500,startTime=performance.now();
+  const bottleRect=item.getBoundingClientRect();
+  const mostiRect=mostiButton.getBoundingClientRect();
+  const dy=bottleRect.top+bottleRect.height*.58-(mostiRect.top+mostiRect.height*.58);
+  const scrollDelta=target-startScroll;
+  const approachX=bottleRect.right+8-mostiRect.left;
+  const pushX=approachX-scrollDelta;
+  const duration=1800,startTime=performance.now();
   const bottleAnimation=item.animate([
    {opacity:0,transform:'translateX(58px) scale(.94)',offset:0},
    {opacity:1,transform:'translateX(-7px) scale(1.015)',offset:.78},
    {opacity:1,transform:'translateX(0) scale(1)',offset:1}
   ],{duration,easing:'cubic-bezier(.2,.75,.22,1)',fill:'both'});
   mostiAnimations.push(bottleAnimation);
+  // Mosti runs up to the next bottle, nudges it along, then returns for another.
   mostiAnimations.push(mostiButton.animate([
    {transform:'translate(0px,0px)',offset:0},
-   {transform:`translate(-10px,${dy}px)`,offset:.24},
-   {transform:`translate(-16px,${dy}px)`,offset:.42},
-   {transform:`translate(-16px,${dy}px)`,offset:.68},
-   {transform:'translate(0px,0px)',offset:.94},
+   {transform:`translate(${approachX}px,${dy}px)`,offset:.28},
+   {transform:`translate(${pushX}px,${dy}px)`,offset:.72},
+   {transform:`translate(${pushX}px,${dy}px)`,offset:.78},
+   {transform:'translate(0px,0px)',offset:.96},
    {transform:'translate(0px,0px)',offset:1}
   ],{duration,easing:'ease-in-out',fill:'both'}));
   const push=now=>{
