@@ -90,10 +90,11 @@ test('touch-only devices ignore sticky hover and touch focus',()=>{
  const next=env.controls['[data-offer-next]'];env.document.activeElement=next;next.focusVisible=false;
  env.carousel.handlers.focusin({target:next});assert.equal(env.running(),true);
 });
-test('keyboard focus still pauses carousel rotation',()=>{
+test('keyboard focus pauses rotation and blur resumes it',()=>{
  const env=setup();const next=env.controls['[data-offer-next]'];env.document.activeElement=next;next.focusVisible=true;
  env.carousel.handlers.focusin({target:next});assert.equal(env.running(),false);
- next.focusVisible=false;env.controls['[data-offer-toggle]'].handlers.click();assert.equal(env.running(),true);
+ next.focusVisible=false;env.document.activeElement=null;
+ env.carousel.handlers.focusout({relatedTarget:null});env.finish();assert.equal(env.running(),true);
 });
 test('reduced motion keeps bottles still while allowing direct access to original labels',()=>{
  const env=setup(true);for(let i=0;i<3;i++)env.next();
