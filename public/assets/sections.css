@@ -229,3 +229,7 @@
 @media(max-width:899px) and (min-width:600px){.mosti-domino{width:94px;height:108px;bottom:53px}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:98px}}
 @media(max-width:599px){.mosti-domino{width:76px;height:84px;bottom:56px;right:2px}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:79px}}
 @media(prefers-reduced-motion:reduce){.mosti-domino{cursor:default}}
+
+
+/* Mobile: Logo und Navigation bleiben auch bei 320px in einer Zeile bedienbar. */
+@media(max-width:399px){.header{gap:.125rem;padding:1rem}.brand img.bundled-logo{width:clamp(9rem,45vw,10.3125rem)}.header-actions{gap:.5rem}}
