@@ -456,7 +456,7 @@ if(offerCarousel){
   const mostiAnimation=mostiButton.animate([
    {transform:point(0,0),offset:0,easing:'cubic-bezier(.22,.68,.2,1)'},
    {transform:point(-8,7,' rotate(-5deg) scale(.96,1.04)'),offset:.055,easing:'cubic-bezier(.2,.7,.2,1)'},
-   {transform:point(approachX*.14,dy*.14-34,' rotate(3deg)'),offset:.2,easing:'cubic-bezier(.42,0,.75,.35)'},
+   {transform:point(approachX*.14,dy*.14-34,' rotate(3deg)'),offset:.15,easing:'cubic-bezier(.42,0,.75,.35)'},
    {transform:point(approachX*.62,dy*.72-16,' rotate(-3deg)'),offset:approachEnd*.72,easing:'cubic-bezier(.18,.72,.22,1)'},
    {transform:point(approachX,dy,' rotate(2deg) scale(1.02,.98)'),offset:approachEnd,easing:'linear'},
    {transform:point(approachX,dy,' rotate(2deg) scale(1.02,.98)'),offset:pushStart,easing:'cubic-bezier(.12,.82,.25,1)'},
