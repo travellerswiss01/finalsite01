@@ -41,7 +41,7 @@ test('homepage rotates matching gift and cooking photos without changing the her
  const colorOrder=['essig-birnen','essig-holunder','essig-balsamico','essig-original','essig-kirsch','essig-himbeer','essig-kirschen-birnen'];
  for(const className of ['vinegar-lineup','vinegar-detail-grid']){
   const images=page.match(new RegExp(`<div class="${className}"[^>]*>([\\s\\S]*?)</div>`))[1];
-  assert.deepEqual([...images.matchAll(/<img src="\/assets\/([^"]+)\.webp"/g)].map(match=>match[1]),colorOrder);
+  assert.deepEqual([...images.matchAll(/<img (?:src|data-src)="\/assets\/([^"]+)\.webp"/g)].map(match=>match[1]),colorOrder);
  }
  assert.match(page,/data-vinegar-dialog/);
  assert.match(page,/data-vinegar-open/);
