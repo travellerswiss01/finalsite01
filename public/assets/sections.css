@@ -350,3 +350,25 @@
  }
  .seasonal-offer-card .product-form .button .icon{display:none}
 }
+
+/* Keep carousel controls clear of all three seasonal purchase buttons. */
+
+.offer-carousel:has(.seasonal-offer-products.is-active) .hero-offer-controls{
+ left:calc(50% - 140px);right:auto;bottom:8px
+}
+@media(max-width:899px){
+ .offer-carousel:has(.seasonal-offer-products.is-active) .hero-offer-controls{
+  top:8px;right:8px;bottom:auto;left:auto
+ }
+ .offer-carousel:has(.seasonal-offer-products.is-active) .hero-content{
+  width:68%;max-width:68%;padding:22px 0 0 18px
+ }
+ .offer-carousel:has(.seasonal-offer-products.is-active) .hero h1{
+  font-size:clamp(24px,7vw,34px);line-height:1;letter-spacing:-.5px
+ }
+}
+@media(max-width:359px){
+ .offer-carousel:has(.seasonal-offer-products.is-active) .hero-offer-controls{right:4px}
+ .offer-carousel:has(.seasonal-offer-products.is-active) .hero-content{width:60%;max-width:60%}
+ .offer-carousel:has(.seasonal-offer-products.is-active) .hero h1{font-size:22px}
+}
