@@ -4,13 +4,13 @@ import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 
 const carouselScript='const offerCarousel='+readFileSync(new URL('../public/assets/app.js',import.meta.url),'utf8').split('const offerCarousel=')[1];
-function setup(reduced=false,audioSupported=true,withMosti=false){
+function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=true){
  const animations=[];let mostiButton,mostiSprite;
  const element=()=>({
   handlers:{},attrs:{},inert:false,hidden:true,textContent:'',
   style:{values:{},setProperty(name,value){this.values[name]=value;}},
   classList:{values:new Set(),add(name){this.values.add(name);},remove(name){this.values.delete(name);},contains(name){return this.values.has(name);},toggle(name,value){if(value)this.add(name);else this.remove(name);}},
-  addEventListener(type,fn){this.handlers[type]=fn;},setAttribute(name,value){this.attrs[name]=value;},removeAttribute(name){delete this.attrs[name];},animate(frames,options){const animation={frames,options,cancelled:false,cancel(){this.cancelled=true;}};animations.push(animation);return animation;}
+  addEventListener(type,fn){this.handlers[type]=fn;},matches(selector){return selector===':focus-visible'&&this.focusVisible===true;},setAttribute(name,value){this.attrs[name]=value;},removeAttribute(name){delete this.attrs[name];},animate(frames,options){const animation={frames,options,cancelled:false,cancel(){this.cancelled=true;}};animations.push(animation);return animation;}
  });
  const slides=Array.from({length:5},element),images=Array.from({length:5},element);
  const figures=Array.from({length:7},element),bottles=figures.map(figure=>{const button=element();button.closest=selector=>selector==='[data-offer-image]'?images[3]:figure;return button;});
@@ -35,7 +35,7 @@ function setup(reduced=false,audioSupported=true,withMosti=false){
  if(withMosti)document.createElement=tag=>{const el=element();el.offsetWidth=128;el.append=sprite=>{mostiSprite=sprite;};return el;};document.activeElement=null;document.hidden=false;document.querySelector=selector=>selector==='[data-vinegar-dialog]'?dialog:carousel;
  const motion=element();motion.matches=reduced;
  let interval=null,id=0;const timeouts=new Map();
- const window={matchMedia:()=>motion,setInterval(fn){interval=fn;return 1;},clearInterval(){interval=null;},setTimeout(fn,ms){timeouts.set(++id,{fn,ms});return id;},clearTimeout(key){timeouts.delete(key);}};
+ const window={matchMedia:query=>query==='(prefers-reduced-motion: reduce)'?motion:{matches:hoverSupported},setInterval(fn){interval=fn;return 1;},clearInterval(){interval=null;},setTimeout(fn,ms){timeouts.set(++id,{fn,ms});return id;},clearTimeout(key){timeouts.delete(key);}};
  const audio={contexts:0,notes:0};
  class FakeAudioContext{
   constructor(){audio.contexts++;this.state='running';this.currentTime=0;this.destination={};}
@@ -78,6 +78,23 @@ test('the motion control starts the fall; opening labels or hiding the page rese
  env.dialog.close();assert.equal(env.running(),true);
  env.bottles[0].handlers.pointerenter({pointerType:'mouse'});env.document.hidden=true;env.document.handlers.visibilitychange();
  assert.equal(env.timeouts.size,0);assert.equal(env.running(),false);
+});
+test('reduced-motion users can explicitly start the carousel',()=>{
+ const env=setup(true);assert.equal(env.running(),false);
+ env.controls['[data-offer-toggle]'].handlers.click();
+ assert.equal(env.running(),true);assert.equal(env.controls['[data-offer-toggle]'].attrs['aria-pressed'],'false');
+});
+test('touch-only devices ignore sticky hover and touch focus',()=>{
+ const env=setup(false,true,false,false);assert.equal(env.running(),true);
+ assert.equal(env.carousel.handlers.mouseenter,undefined);assert.equal(env.carousel.handlers.mouseleave,undefined);
+ const next=env.controls['[data-offer-next]'];env.document.activeElement=next;next.focusVisible=false;
+ env.carousel.handlers.focusin({target:next});assert.equal(env.running(),true);
+});
+test('keyboard focus pauses rotation and blur resumes it',()=>{
+ const env=setup();const next=env.controls['[data-offer-next]'];env.document.activeElement=next;next.focusVisible=true;
+ env.carousel.handlers.focusin({target:next});assert.equal(env.running(),false);
+ next.focusVisible=false;env.document.activeElement=null;
+ env.carousel.handlers.focusout({relatedTarget:null});env.finish();assert.equal(env.running(),true);
 });
 test('reduced motion keeps bottles still while allowing direct access to original labels',()=>{
  const env=setup(true);for(let i=0;i<3;i++)env.next();

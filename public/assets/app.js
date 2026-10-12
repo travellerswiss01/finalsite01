@@ -211,7 +211,7 @@ if(offerCarousel){
  const stop=()=>{if(timer!==null){window.clearInterval(timer);timer=null;}};
  const start=()=>{
   stop();
-  if(slides.length>1&&!paused&&!motion.matches&&!hovered&&!document.hidden&&!vinegarDialog?.open&&!swayRunning&&!offerCarousel.contains(document.activeElement)){
+  if(slides.length>1&&!paused&&!hovered&&!document.hidden&&!vinegarDialog?.open&&!swayRunning&&!document.activeElement?.matches?.(':focus-visible')){
    timer=window.setInterval(()=>show(current+1),6000);
   }
  };
@@ -221,9 +221,23 @@ if(offerCarousel){
   swayRunning=false;
   bottles.forEach(button=>button.closest('.vinegar-lineup-item').classList.remove('is-vinegar-sway'));
  };
+ const loadOfferImage=index=>{
+  const frame=images[index];
+  if(!frame)return;
+  const deferred=frame.matches('img')?[frame]:[...(frame.querySelectorAll?.('img[data-src]')||[])];
+  deferred.forEach(image=>{
+   if(image.dataset.src&&!image.hasAttribute('src')){
+    image.loading='eager';
+    image.src=image.dataset.src;
+    image.removeAttribute('data-src');
+   }
+  });
+ };
  const show=index=>{
   resetSway();
   current=(index+slides.length)%slides.length;
+  loadOfferImage(current);
+  loadOfferImage((current+1)%slides.length);
   slides.forEach((slide,i)=>{
    const active=i===current;
    slide.classList.toggle('is-active',active);
@@ -242,9 +256,11 @@ if(offerCarousel){
  offerCarousel.querySelector('[data-offer-prev]').addEventListener('click',()=>{show(current-1);start();});
  offerCarousel.querySelector('[data-offer-next]').addEventListener('click',()=>{show(current+1);start();});
  toggle.addEventListener('click',()=>{paused=!paused;updateToggle();start();});
- offerCarousel.addEventListener('mouseenter',()=>{hovered=true;stop();});
- offerCarousel.addEventListener('mouseleave',()=>{hovered=false;start();});
- offerCarousel.addEventListener('focusin',stop);
+ if(window.matchMedia('(hover: hover)').matches){
+  offerCarousel.addEventListener('mouseenter',()=>{hovered=true;stop();});
+  offerCarousel.addEventListener('mouseleave',()=>{hovered=false;start();});
+ }
+ offerCarousel.addEventListener('focusin',event=>{if(event.target.matches?.(':focus-visible'))stop();});
  offerCarousel.addEventListener('focusout',event=>{if(!offerCarousel.contains(event.relatedTarget))window.setTimeout(start,0);});
  document.addEventListener('visibilitychange',()=>{if(document.hidden)resetSway();start();});
  motion.addEventListener('change',event=>{if(motionToggle)motionToggle.disabled=event.matches;if(event.matches){resetSway();paused=true;updateToggle();}start();});
