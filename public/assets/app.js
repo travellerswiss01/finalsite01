@@ -227,7 +227,8 @@ if(offerCarousel){
   const image=variant.image||mostCatalog.featuredImage;
   const picture=mostDialog.querySelector('[data-most-product-image]');
   picture.src=image?.url||'';picture.alt=image?.altText||`Süssmost ${variant.title}`;
-  mostDialog.querySelector('#MostSizeHeading').textContent=`Süssmost · ${variant.title}`;
+  mostDialog.querySelector('#MostSizeHeading').textContent='Süssmost';
+  mostDialog.querySelector('.most-size-kicker').textContent=`${variant.title} · Direkt aus dem Thurgau`;
   mostDialog.querySelector('[data-most-price]').textContent=formatMostPrice(variant.price);
   const add=mostDialog.querySelector('[data-most-add]');
   add.disabled=!variant.availableForSale;
@@ -253,7 +254,7 @@ if(offerCarousel){
      const button=event.target.closest('[data-most-option]');
      if(button){const variant=mostCatalog.variants.find(item=>item.title===button.dataset.mostOption);if(variant)paintMostVariant(variant);}
     });
-    mostDialog.querySelector('[data-most-description]').textContent=mostCatalog.description;
+    mostDialog.querySelector('[data-most-description]').textContent='Pasteurisierter Apfelsaft aus bis zu 33 verschiedenen Thurgauer Apfelsorten.';
    }
    const variant=mostCatalog.variants.find(item=>item.title===size)||mostCatalog.variants[0];
    paintMostVariant(variant);
