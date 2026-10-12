@@ -203,7 +203,7 @@ if(offerCarousel){
   mostiButton.title='Mosti zeigt weitere Sorten';
   mostiSprite=document.createElement('img');
   mostiSprite.alt='Mosti, unser Apfelmaskottchen';mostiSprite.width=420;mostiSprite.height=432;
-  mostiSprite.addEventListener('load',()=>{mostiFrame.classList.add('has-mosti');mostiButton.hidden=false;});
+  mostiSprite.addEventListener('load',()=>{mostiFrame.classList.add('has-mosti');mostiButton.hidden=false;if(mostiFrame.classList.contains('is-active'))scheduleMostiAuto();});
   mostiSprite.addEventListener('error',()=>{mostiFrame.classList.remove('has-mosti');mostiButton.hidden=true;});
   mostiSprite.src='/assets/mosti-domino.webp';
   mostiButton.append(mostiSprite);mostiFrame.append(mostiButton);
@@ -214,7 +214,7 @@ if(offerCarousel){
   mostiFrame?.classList.remove('is-mosti-playing');
   if(mostiButton)mostiButton.removeAttribute('aria-busy');
  };
- let current=0,timer=null,swayTimer=null,swayRunning=false,paused=motion.matches,hovered=false;
+ let current=0,timer=null,swayTimer=null,swayRunning=false,paused=motion.matches,hovered=false,mostiAutoTimer=null,mostiAutoRemaining=0;
  const stop=()=>{if(timer!==null){window.clearInterval(timer);timer=null;}};
  const start=()=>{
   stop();
@@ -323,6 +323,9 @@ if(offerCarousel){
    images[i]?.setAttribute('aria-hidden',String(!active));
    if(images[i])images[i].inert=!active;
   });
+  if(mostiAutoTimer!==null){window.clearTimeout(mostiAutoTimer);mostiAutoTimer=null;}
+  mostiAutoRemaining=0;
+  if(mostiFrame?.classList.contains('is-active')&&!motion.matches)window.setTimeout(()=>scheduleMostiAuto(),1100);
  };
  const updateToggle=()=>{
   toggle.innerHTML=paused?'<svg class="offer-playback-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="m8 4 12 8-12 8z"/></svg>':'<svg class="offer-playback-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
@@ -365,8 +368,19 @@ if(offerCarousel){
   swayTimer=window.setTimeout(()=>{resetSway();start();},duration+Math.max(origin,bottles.length-1-origin)*rippleDelay);
  };
  // Explicit tap only: no unsolicited scene and no hijacked product clicks.
- const playMosti=()=>{
-  if(!mostiButton||swayRunning||!mostiFrame.classList.contains('is-active'))return;
+ const scheduleMostiAuto=(delay=1100)=>{
+  if(mostiAutoTimer!==null)window.clearTimeout(mostiAutoTimer);
+  const lineup=mostiFrame?.querySelector('.vinegar-lineup');
+  if(!lineup||!mostiButton||mostiButton.hidden||motion.matches||!mostiFrame.classList.contains('is-active'))return;
+  const firstItem=lineup.querySelector('.vinegar-lineup-item');
+  const step=(firstItem?.getBoundingClientRect().width||lineup.clientWidth*.65)+8;
+  const maxScroll=Math.max(0,lineup.scrollWidth-lineup.clientWidth);
+  if(maxScroll-lineup.scrollLeft<=20)return;
+  if(mostiAutoRemaining===0)mostiAutoRemaining=Math.max(1,Math.ceil((maxScroll-lineup.scrollLeft)/step));
+  mostiAutoTimer=window.setTimeout(()=>{mostiAutoTimer=null;playMosti(true);},delay);
+ };
+ const playMosti=(automatic=false)=>{
+  if(!mostiButton||swayRunning||!mostiFrame.classList.contains('is-active')){if(automatic)scheduleMostiAuto(500);return;}
   const lineup=mostiFrame.querySelector('.vinegar-lineup');
   if(!lineup)return;
   const firstItem=lineup.querySelector('.vinegar-lineup-item');
@@ -375,6 +389,7 @@ if(offerCarousel){
   const target=maxScroll-lineup.scrollLeft<=20?0:Math.min(maxScroll,lineup.scrollLeft+step);
   if(motion.matches||typeof mostiButton.animate!=='function'){
    lineup.scrollLeft=target;
+   if(automatic){mostiAutoRemaining=Math.max(0,mostiAutoRemaining-1);if(mostiAutoRemaining>0)scheduleMostiAuto(500);else start();}
    return;
   }
   resetSway();stop();swayRunning=true;
@@ -400,9 +415,13 @@ if(offerCarousel){
    else mostiFrameRequest=null;
   };
   mostiFrameRequest=window.requestAnimationFrame(push);
-  swayTimer=window.setTimeout(()=>{resetSway();start();},duration);
+  swayTimer=window.setTimeout(()=>{
+   resetSway();
+   if(automatic){mostiAutoRemaining=Math.max(0,mostiAutoRemaining-1);if(mostiAutoRemaining>0&&mostiFrame.classList.contains('is-active'))scheduleMostiAuto(500);else{mostiAutoRemaining=0;start();}}
+   else start();
+  },duration);
  };
- mostiButton?.addEventListener('click',playMosti);
+ mostiButton?.addEventListener('click',()=>{if(mostiAutoTimer!==null){window.clearTimeout(mostiAutoTimer);mostiAutoTimer=null;}mostiAutoRemaining=0;playMosti();});
  bottles.forEach((button,index)=>{
   button.addEventListener('click',()=>{playGlass();openVinegar(index);});
   button.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!motion.matches)playSway(index);});
