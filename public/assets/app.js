@@ -206,20 +206,20 @@ if(offerCarousel){
   mostiSprite.addEventListener('load',()=>{mostiFrame.classList.add('has-mosti');mostiButton.hidden=false;if(mostiFrame.classList.contains('is-active'))scheduleMostiAuto();});
   mostiSprite.addEventListener('error',()=>{mostiFrame.classList.remove('has-mosti');mostiButton.hidden=true;});
   mostiSprite.src='/assets/mosti-domino.webp';
-  const mostiPoseImages={idle:mostiSprite};
-  for(const [pose,src] of Object.entries({walk:'/assets/mosti-walk-v2.webp',push:'/assets/mosti-push-v2.webp'})){
-   const image=new Image();image.src=src;mostiPoseImages[pose]=image;
-  }
-  let currentMostiPose='idle';
-  const setMostiPose=pose=>{
-   currentMostiPose=pose;
-   const image=mostiPoseImages[pose];
-   if(image?.complete&&image.naturalWidth&&mostiSprite.src!==image.src)mostiSprite.src=image.src;
-   else if(image&&!image.complete)image.addEventListener('load',()=>{if(currentMostiPose===pose)mostiSprite.src=image.src;},{once:true});
-  };
-  const mostiPoseTimers=[];
   mostiButton.append(mostiSprite);mostiFrame.append(mostiButton);
  }
+ const mostiPoseImages={idle:mostiSprite};
+ if(mostiSprite)for(const [pose,src] of Object.entries({walk:'/assets/mosti-walk-v2.webp',push:'/assets/mosti-push-v2.webp'})){
+  const image=new Image();image.src=src;mostiPoseImages[pose]=image;
+ }
+ let currentMostiPose='idle';
+ const setMostiPose=pose=>{
+  currentMostiPose=pose;
+  const image=mostiPoseImages[pose];
+  if(image?.complete&&image.naturalWidth&&mostiSprite.src!==image.src)mostiSprite.src=image.src;
+  else if(image&&!image.complete)image.addEventListener('load',()=>{if(currentMostiPose===pose)mostiSprite.src=image.src;},{once:true});
+ };
+ const mostiPoseTimers=[];
  const prepareMostiSequence=()=>{
   const lineup=mostiFrame?.querySelector('.vinegar-lineup');
   if(!lineup)return;
