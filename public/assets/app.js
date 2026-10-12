@@ -225,7 +225,8 @@ if(offerCarousel){
   if(!lineup)return;
   const items=[...lineup.querySelectorAll('.vinegar-lineup-item')];
   lineup.scrollLeft=0;lineup.classList.add('is-mosti-sequence');
-  items.forEach(item=>{item.classList.remove('is-vinegar-entering','is-vinegar-in');item.classList.add('is-vinegar-waiting');});
+  items.forEach(item=>{item.classList.remove('is-vinegar-entering','is-vinegar-in','is-vinegar-ready');item.classList.add('is-vinegar-waiting');});
+  if(!motion.matches&&items[0]){items[0].classList.remove('is-vinegar-waiting');items[0].classList.add('is-vinegar-ready');}
   mostiNextIndex=0;mostiAutoRemaining=items.length;
  };
  const resetMosti=()=>{
@@ -407,8 +408,9 @@ if(offerCarousel){
   const step=(item.getBoundingClientRect().width||lineup.clientWidth*.4)+8;
   const maxScroll=Math.max(0,lineup.scrollWidth-lineup.clientWidth);
   const target=Math.min(maxScroll,lineup.scrollLeft+step);
+  item.classList.remove('is-vinegar-waiting');item.classList.add('is-vinegar-ready');
   if(motion.matches||typeof mostiButton.animate!=='function'){
-   item.classList.remove('is-vinegar-waiting','is-vinegar-entering');item.classList.add('is-vinegar-in');
+   item.classList.remove('is-vinegar-waiting','is-vinegar-entering','is-vinegar-ready');item.classList.add('is-vinegar-in');
    lineup.scrollLeft=target;mostiNextIndex++;
    if(automatic){mostiAutoRemaining=Math.max(0,mostiAutoRemaining-1);if(mostiAutoRemaining>0)scheduleMostiAuto(500);else start();}
    return;
@@ -424,18 +426,12 @@ if(offerCarousel){
   const pushX=approachX-scrollDelta;
   const approachDuration=560,pushDuration=900,returnDuration=540,duration=approachDuration+pushDuration+returnDuration,startTime=performance.now();
   setMostiPose('walk');
-  const enterTimer=window.setTimeout(()=>{if(!swayRunning)return;item.classList.remove('is-vinegar-waiting');item.classList.add('is-vinegar-entering');setMostiPose('push');},approachDuration);
+  const enterTimer=window.setTimeout(()=>{if(!swayRunning)return;item.classList.remove('is-vinegar-waiting','is-vinegar-ready');item.classList.add('is-vinegar-entering');setMostiPose('push');const bottleAnimation=item.animate([{opacity:.68,transform:'translateX(34px) scale(.96)'},{opacity:1,transform:'translateX(-7px) scale(1.015)',offset:.78},{opacity:1,transform:'translateX(0) scale(1)',offset:1}],{duration:pushDuration,easing:'cubic-bezier(.2,.75,.22,1)',fill:'both'});mostiAnimations.push(bottleAnimation);},approachDuration);
   mostiPoseTimers.push(enterTimer);
   const returnTimer=window.setTimeout(()=>{if(swayRunning)setMostiPose('walk');},approachDuration+pushDuration);
   mostiPoseTimers.push(returnTimer);
   const idleTimer=window.setTimeout(()=>{if(swayRunning)setMostiPose('idle');},duration-90);
   mostiPoseTimers.push(idleTimer);
-  const bottleAnimation=item.animate([
-   {opacity:0,transform:'translateX(58px) scale(.94)',offset:0},
-   {opacity:1,transform:'translateX(-7px) scale(1.015)',offset:.78},
-   {opacity:1,transform:'translateX(0) scale(1)',offset:1}
-  ],{duration:pushDuration,delay:approachDuration,easing:'cubic-bezier(.2,.75,.22,1)',fill:'both'});
-  mostiAnimations.push(bottleAnimation);
   const mostiAnimation=mostiButton.animate([
    {transform:'translate(0px,0px)',offset:0},
    {transform:'translate('+Math.round(approachX*.42)+'px,'+Math.round(dy-5)+'px)',offset:.12},
@@ -458,7 +454,7 @@ if(offerCarousel){
   };
   mostiFrameRequest=window.requestAnimationFrame(push);
   swayTimer=window.setTimeout(()=>{
-   item.classList.remove('is-vinegar-entering');item.classList.add('is-vinegar-in');mostiNextIndex++;
+   item.classList.remove('is-vinegar-entering','is-vinegar-ready');item.classList.add('is-vinegar-in');mostiNextIndex++;const nextItem=items[mostiNextIndex];if(nextItem){nextItem.classList.remove('is-vinegar-waiting');nextItem.classList.add('is-vinegar-ready');}
    mostiAnimations.forEach(animation=>animation.cancel());mostiAnimations=[];
    resetSway();
    if(automatic){mostiAutoRemaining=Math.max(0,mostiAutoRemaining-1);if(mostiAutoRemaining>0&&mostiFrame.classList.contains('is-active'))scheduleMostiAuto(450);else{mostiAutoRemaining=0;start();}}
