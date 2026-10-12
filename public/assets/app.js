@@ -221,9 +221,23 @@ if(offerCarousel){
   swayRunning=false;
   bottles.forEach(button=>button.closest('.vinegar-lineup-item').classList.remove('is-vinegar-sway'));
  };
+ const loadOfferImage=index=>{
+  const frame=images[index];
+  if(!frame)return;
+  const deferred=frame.matches('img')?[frame]:[...frame.querySelectorAll('img[data-src]')];
+  deferred.forEach(image=>{
+   if(image.dataset.src&&!image.hasAttribute('src')){
+    image.loading='eager';
+    image.src=image.dataset.src;
+    image.removeAttribute('data-src');
+   }
+  });
+ };
  const show=index=>{
   resetSway();
   current=(index+slides.length)%slides.length;
+  loadOfferImage(current);
+  loadOfferImage((current+1)%slides.length);
   slides.forEach((slide,i)=>{
    const active=i===current;
    slide.classList.toggle('is-active',active);
