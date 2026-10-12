@@ -238,3 +238,48 @@
 .offer-carousel .hero-image.most-trio-banner{left:43%;width:55%;object-fit:contain;object-position:center;background:transparent;padding:18px 24px 40px;}
 @media(min-width:600px) and (max-width:1199px){.offer-carousel .hero-image.most-trio-banner{left:52%;width:46%;padding:18px 16px 40px;}}
 @media(max-width:599px){.offer-carousel .hero-image.most-trio-banner{left:0;top:auto;bottom:44px;width:100%;height:105px;padding:0 18px;object-position:center;}}
+
+/* Tap a juice pack in the existing hero to inspect its Shopify variant and buy. */
+.offer-carousel .most-trio-banner{z-index:2;overflow:visible;background:transparent;}
+.offer-carousel .most-trio-art{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;z-index:-1;pointer-events:none;}
+.offer-carousel .most-size-hotspot{position:absolute;top:18%;height:72%;padding:0;border:0;border-radius:12px;background:transparent;cursor:pointer;z-index:2;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+.offer-carousel .most-size-hotspot:hover,.offer-carousel .most-size-hotspot:focus-visible{background:#ffffff18;outline:2px solid #7b5d29;outline-offset:2px;}
+.offer-carousel .most-size-3{left:4%;width:20%}
+.offer-carousel .most-size-5{left:40%;width:20%}
+.offer-carousel .most-size-10{left:76%;width:23%}
+.offer-carousel .most-trio-hint{position:absolute;right:8%;bottom:13px;z-index:2;padding:5px 10px;border:1px solid #d6c8af;border-radius:999px;background:#fffdf9ed;color:#38533e;font-size:12px;line-height:1.2;white-space:nowrap;pointer-events:none}
+.most-size-dialog{width:min(850px,calc(100% - 32px));max-width:850px;max-height:min(88dvh,820px);overflow:auto;border:1px solid #e8dfd2;border-radius:22px;padding:0;background:#fffdf9;color:#173c2b;box-shadow:0 24px 80px #10271d40}
+.most-size-dialog::backdrop{background:#10231eb3;backdrop-filter:blur(3px)}
+.most-size-dialog-inner{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.9fr);gap:clamp(20px,4vw,42px);align-items:center;padding:clamp(18px,4vw,36px)}
+.most-size-dialog-image{height:min(54vh,470px);min-height:240px;display:grid;place-items:center;background:#f8f4ed;border-radius:16px;overflow:hidden}
+.most-size-dialog-image img{width:100%;height:100%;object-fit:contain}
+.most-size-dialog-copy{min-width:0}
+.most-size-dialog-header{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.most-size-dialog h2{font-family:inherit;font-size:clamp(28px,4vw,42px);margin:0 0 6px;line-height:1.05;color:#17452f}
+.most-size-dialog-close{width:44px;height:44px;flex:0 0 44px;border:1px solid #ded7ca;border-radius:50%;background:white;color:#173c2b;font-size:28px;cursor:pointer}
+.most-size-kicker{margin:0 0 8px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#886b36}
+.most-size-description{line-height:1.55;color:#4d5b52}
+.most-size-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:20px 0 14px}
+.most-size-option{min-height:54px;border:1px solid #d9d2c6;border-radius:12px;background:#fff;color:#173c2b;font:inherit;cursor:pointer}
+.most-size-option[aria-pressed=true]{border-color:#235936;background:#edf4ed;box-shadow:inset 0 0 0 1px #235936;font-weight:700}
+.most-size-purchase-row{display:grid;grid-template-columns:100px 1fr;gap:10px;align-items:stretch}
+.most-size-quantity{min-height:54px;padding:0 12px;border:1px solid #d9d2c6;border-radius:12px;background:white;font:inherit;color:#173c2b}
+.most-size-add{min-height:54px;width:100%;border:0;border-radius:12px;background:#cf061d;color:#fff;font:inherit;font-weight:700;cursor:pointer}
+.most-size-add:disabled{opacity:.6;cursor:wait}
+.most-size-price{font-size:26px;font-weight:700;margin:16px 0}
+.most-size-error{min-height:24px;margin:10px 0 0;color:#a32020}
+@media(max-width:599px){
+ .offer-carousel .most-trio-hint{right:50%;transform:translateX(50%);bottom:4px;font-size:10px;padding:4px 8px}
+ .offer-carousel .most-size-hotspot{top:5%;height:80%}
+ .most-size-dialog{width:calc(100% - 20px);max-height:calc(100dvh - 20px);border-radius:18px}
+ .most-size-dialog-inner{grid-template-columns:1fr;gap:16px;padding:14px}
+ .most-size-dialog-image{height:clamp(185px,32dvh,280px);min-height:185px}
+ .most-size-dialog h2{font-size:28px}
+ .most-size-dialog-copy{padding:0 2px 4px}
+ .most-size-description{font-size:14px;margin:8px 0}
+ .most-size-options{margin:12px 0 8px}
+ .most-size-option{min-height:48px}
+ .most-size-price{font-size:22px;margin:10px 0}
+ .most-size-purchase-row{grid-template-columns:78px 1fr;gap:8px}
+ .most-size-add,.most-size-quantity{min-height:50px}
+}
