@@ -225,8 +225,8 @@ if(offerCarousel){
   if(!lineup)return;
   const items=[...lineup.querySelectorAll('.vinegar-lineup-item')];
   lineup.scrollLeft=0;lineup.classList.add('is-mosti-sequence');
-  items.forEach((item,index)=>{item.classList.remove('is-vinegar-entering','is-vinegar-in');item.classList.toggle('is-vinegar-waiting',index>0);});
-  mostiNextIndex=1;mostiAutoRemaining=Math.max(0,items.length-1);
+  items.forEach(item=>{item.classList.remove('is-vinegar-entering','is-vinegar-in');item.classList.add('is-vinegar-waiting');});
+  mostiNextIndex=0;mostiAutoRemaining=items.length;
  };
  const resetMosti=()=>{
   mostiAnimations.forEach(animation=>animation.cancel());mostiAnimations=[];
