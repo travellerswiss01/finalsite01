@@ -286,3 +286,10 @@
  .most-size-purchase-row{grid-template-columns:78px 1fr;gap:8px}
  .most-size-add,.most-size-quantity{min-height:50px}
 }
+
+/* Preserve clear access to the 10L box and carousel controls. */
+@media(min-width:1200px){.offer-carousel:has(.most-trio-banner.is-active) .hero-offer-controls{left:34%;right:auto}}
+@media(max-width:599px){
+ .offer-carousel .hero-image.most-trio-banner{bottom:68px}
+ .offer-carousel:has(.most-trio-banner.is-active) .hero-offer-controls{left:auto;right:10px;bottom:10px}
+}
