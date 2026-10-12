@@ -339,6 +339,7 @@
  .offer-carousel:has(.seasonal-offer-products.is-active) .hero .button{
   min-height:40px;padding:8px 14px;font-size:15px
  }
+ .offer-carousel:has(.seasonal-offer-products.is-active) .hero-offer.is-active>a{display:none}
  .seasonal-offer-card{border-radius:8px}
  .seasonal-offer-image{padding:5px 5px 0}
  .seasonal-offer-image img{max-height:70px}
