@@ -213,8 +213,10 @@ if(offerCarousel){
   const image=new Image();image.src=src;mostiPoseImages[pose]=image;
  }
  let currentMostiPose='idle';
- const setMostiPose=pose=>{
+ const setMostiPose=(pose,direction='toward')=>{
   currentMostiPose=pose;
+  mostiButton?.classList.toggle('is-walking',pose==='walk');
+  mostiButton?.classList.toggle('is-walking-back',pose==='walk'&&direction==='back');
   const image=mostiPoseImages[pose];
   if(image?.complete&&image.naturalWidth&&mostiSprite.src!==image.src)mostiSprite.src=image.src;
   else if(image&&!image.complete)image.addEventListener('load',()=>{if(currentMostiPose===pose)mostiSprite.src=image.src;},{once:true});
@@ -424,11 +426,12 @@ if(offerCarousel){
   const scrollDelta=target-startScroll;
   const approachX=bottleRect.right-12-mostiRect.left;
   const pushX=approachX-scrollDelta;
-  const approachDuration=560,pushDuration=900,returnDuration=540,duration=approachDuration+pushDuration+returnDuration,startTime=performance.now();
+  const isMobile=window.matchMedia('(max-width: 599px)').matches;
+  const approachDuration=isMobile?860:560,pushDuration=isMobile?1150:900,returnDuration=isMobile?720:540,duration=approachDuration+pushDuration+returnDuration,startTime=performance.now();
   setMostiPose('walk');
   const enterTimer=window.setTimeout(()=>{if(!swayRunning)return;item.classList.remove('is-vinegar-waiting','is-vinegar-ready');item.classList.add('is-vinegar-entering');setMostiPose('push');const bottleAnimation=item.animate([{opacity:.68,transform:'translateX(34px) scale(.96)'},{opacity:1,transform:'translateX(-7px) scale(1.015)',offset:.78},{opacity:1,transform:'translateX(0) scale(1)',offset:1}],{duration:pushDuration,easing:'cubic-bezier(.2,.75,.22,1)',fill:'both'});mostiAnimations.push(bottleAnimation);},approachDuration);
   mostiPoseTimers.push(enterTimer);
-  const returnTimer=window.setTimeout(()=>{if(swayRunning)setMostiPose('walk');},approachDuration+pushDuration);
+  const returnTimer=window.setTimeout(()=>{if(swayRunning)setMostiPose('walk','back');},approachDuration+pushDuration);
   mostiPoseTimers.push(returnTimer);
   const idleTimer=window.setTimeout(()=>{if(swayRunning)setMostiPose('idle');},duration-90);
   mostiPoseTimers.push(idleTimer);
