@@ -26,3 +26,46 @@ test('serverless adapter accepts a body already parsed by the platform',async()=
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
  try{const response=await fetch(`http://127.0.0.1:${server.address().port}/api/cart/add`,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});assert.equal(response.status,200);assert.equal((await response.json()).cart.totalQuantity,1);}finally{server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
 });
+
+// Render terminates TLS at its proxy; the Node server receives HTTP behind HTTPS.
+test('accepts same-origin HTTPS cart requests behind Render proxy',async()=>{
+ const store={catalog:async()=>[],shop:async()=>null,cart:async()=>null,mutateCart:async()=>({cart:cartFixture(),warnings:[]})};
+ const app=createApp({store,origin:''});
+ await new Promise(resolve=>app.listen(0,'127.0.0.1',resolve));
+ const base='http://127.0.0.1:'+app.address().port;
+ try{
+  const headers={'Content-Type':'application/json','X-Forwarded-Proto':'https',Origin:'https://127.0.0.1:'+app.address().port};
+  const body=JSON.stringify({variantId:'gid://shopify/ProductVariant/1',quantity:1});
+  const accepted=await fetch(base+'/api/cart/add',{method:'POST',headers,body});
+  assert.equal(accepted.status,200);
+  assert.match(accepted.headers.get('set-cookie')||'',/; Secure(?:;|$)/);
+  const rejected=await fetch(base+'/api/cart/add',{method:'POST',headers:{...headers,Origin:'https://attacker.example'},body});
+  assert.equal(rejected.status,403);
+  const crossSite=await fetch(base+'/api/cart/add',{method:'POST',headers:{...headers,'Sec-Fetch-Site':'cross-site'},body});
+  assert.equal(crossSite.status,403);
+ }finally{app.closeAllConnections();await new Promise(resolve=>app.close(resolve));}
+});
+
+
+test('uses the request host for cart checks while keeping the configured canonical origin',async()=>{
+ const store={catalog:async()=>[],shop:async()=>null,cart:async()=>null,mutateCart:async()=>({cart:cartFixture(),warnings:[]})};
+ const app=createApp({store,origin:'https://canonical.example'});
+ const handler=app.listeners('request')[0];
+ const server=createServer((req,res)=>{req.headers.host='alias.example';handler(req,res);});
+ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+ const base='http://127.0.0.1:'+server.address().port;
+ try{
+  const headers={'Content-Type':'application/json','X-Forwarded-Proto':'https',Origin:'https://alias.example'};
+  const body=JSON.stringify({variantId:'gid://shopify/ProductVariant/1',quantity:1});
+  const accepted=await fetch(base+'/api/cart/add',{method:'POST',headers,body});
+  assert.equal(accepted.status,200);
+  assert.match(accepted.headers.get('set-cookie')||'',/; Secure(?:;|$)/);
+  const rejected=await fetch(base+'/api/cart/add',{method:'POST',headers:{...headers,Origin:'https://attacker.example'},body});
+  assert.equal(rejected.status,403);
+  const crossSite=await fetch(base+'/api/cart/add',{method:'POST',headers:{...headers,'Sec-Fetch-Site':'cross-site'},body});
+  assert.equal(crossSite.status,403);
+  const page=await fetch(base+'/',{headers:{'X-Forwarded-Proto':'https'}});
+  assert.equal(page.status,200);
+  assert.match(await page.text(),/rel="canonical" href="https:\/\/canonical\.example\//);
+ }finally{server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
+});

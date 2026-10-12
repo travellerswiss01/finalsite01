@@ -42,7 +42,8 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
   res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https://cdn.shopify.com; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' mailto:");
   let url;try{url=new URL(req.url,'http://localhost');}catch{sendJson(res,400,{error:'Ungültige Adresse.'});return;}
   const pathname=url.pathname;
-  const requestOrigin=origin||`${process.env.VERCEL?'https':'http'}://${req.headers.host}`;
+  const requestOrigin=`${req.headers['x-forwarded-proto']?.split(',')[0]?.trim()==='https'||process.env.VERCEL?'https':'http'}://${req.headers.host}`;
+  const publicOrigin=origin||requestOrigin;
   const secure=requestOrigin.startsWith('https://');
   try {
    if(pathname.startsWith('/assets/')){
@@ -114,10 +115,10 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
    }
    if(req.method!=='GET'&&req.method!=='HEAD'){sendJson(res,405,{error:'Methode nicht erlaubt.'});return;}
    if(pathname==='/health'){sendJson(res,200,{status:'ok'});return;}
-   if(pathname==='/robots.txt'){res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8'});res.end(`User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /warenkorb\nDisallow: /suche\nSitemap: ${requestOrigin}/sitemap.xml\n`);return;}
+   if(pathname==='/robots.txt'){res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8'});res.end(`User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /warenkorb\nDisallow: /suche\nSitemap: ${publicOrigin}/sitemap.xml\n`);return;}
    if(pathname==='/sitemap.xml'){
     const products=await store.catalog();const routes=['/','/sortiment','/saisonales','/geschenkkoerbe','/geschenk-konfigurator','/kochservice','/garten','/ueber-uns','/kontakt',...products.map(view.productUrl)];
-    res.writeHead(200,{'Content-Type':'application/xml; charset=utf-8'});res.end(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${routes.map(route=>`<url><loc>${view.escape(requestOrigin+route)}</loc></url>`).join('')}</urlset>`);return;
+    res.writeHead(200,{'Content-Type':'application/xml; charset=utf-8'});res.end(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${routes.map(route=>`<url><loc>${view.escape(publicOrigin+route)}</loc></url>`).join('')}</urlset>`);return;
    }
    const shop=await store.shop();let content,title,description,product,status=200;
    if(pathname==='/'){content=view.home(await store.catalog());title='Geschenke aus dem Thurgau';}
@@ -135,7 +136,7 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
    else if(pathname==='/warenkorb'){content=view.cartPage();title='Warenkorb';}
    else if(pathname.startsWith('/rechtliches/')){const result=view.legal(shop,pathname.split('/').pop());if(result){content=result.content;title=result.title;}}
    if(!content){status=404;title='Seite nicht gefunden';content='<section class="container page-content service-error"><h1>Diese Seite wurde nicht gefunden.</h1><p>Entdecke unsere aktuellen Produkte im Sortiment.</p><a class="button" href="/sortiment">Zum Sortiment</a></section>';}
-   res.writeHead(status,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end(req.method==='HEAD'?undefined:view.shell(content,{path:pathname,title,description,product,shop,origin:requestOrigin,status}));
+   res.writeHead(status,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end(req.method==='HEAD'?undefined:view.shell(content,{path:pathname,title,description,product,shop,origin:publicOrigin,status}));
   }catch(err){
     const status=err instanceof StorefrontError?err.status:500;
     const error=err instanceof StorefrontError?err.message:'Die Anfrage konnte nicht abgeschlossen werden. Bitte versuche es später erneut.';

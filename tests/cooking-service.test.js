@@ -14,8 +14,8 @@ test('Lucia has a dedicated service page with the agreed offer and a prepared in
  assert.match(page,/data-subject="Kochservice-Anfrage für Lucia"/);
  assert.match(page,/src="\/assets\/lucia-kocht\.jpg"/);
  assert.match(page,/class="cooking-inspiration"/);
- assert.match(readFileSync(new URL('../public/assets/sections.css',import.meta.url),'utf8'),/url\('\/assets\/lucia-salate\.webp'\)/);
- assert.equal((page.match(/class="cooking-menu-image"/g)||[]).length,7);
+ assert.match(readFileSync(new URL('../public/assets/sections.css',import.meta.url),'utf8'),/url\('\/assets\/lucia-hero-banner\.webp'\)/);
+ assert.equal((page.match(/class="cooking-menu-image"/g)||[]).length,4);
  for(let i=1;i<=7;i++)assert.match(page,new RegExp(`/assets/lucia-menu-${i}\\.webp`));
 });
 
