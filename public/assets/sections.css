@@ -55,8 +55,8 @@
 .vinegar-lineup-frame{z-index:0;background:var(--vinegar-backdrop)}
 .vinegar-lineup{position:absolute;inset:5px 12px 8px 20%;display:flex;gap:4px;align-items:end;isolation:isolate;background:var(--vinegar-backdrop)}
 .vinegar-lineup-item{position:relative;container-type:size;flex:1;height:100%;min-width:0;margin:0;overflow:visible;background:var(--vinegar-backdrop)}
-.vinegar-lineup-item img{position:absolute;left:50%;top:45%;height:min(72cqh,140cqw);width:auto;max-width:none;transform:translate(-50%,-50%);filter:brightness(1.003937)}
-@media(min-width:900px){.vinegar-lineup-item img{height:min(82cqh,155cqw)}}
+.vinegar-lineup-item img{position:absolute;left:50%;top:45%;height:min(94cqh,182cqw);width:auto;max-width:none;transform:translate(-50%,-50%);filter:brightness(1.003937)}
+@media(min-width:900px){.vinegar-lineup-item img{height:min(107cqh,202cqw)}}
 .vinegar-lineup-item figcaption{position:absolute;bottom:4px;left:2px;right:2px;text-align:center;color:#173d2b;font-size:11px;line-height:1.2}
 .vinegar-zoom{position:absolute;right:12px;top:8px;display:flex;align-items:center;gap:5px;min-height:44px;padding:6px 10px;border:1px solid #173d2b26;border-radius:24px;background:#fffefaee;color:#173d2b;font-size:13px}
 .vinegar-zoom .icon{width:18px;height:18px}
@@ -70,7 +70,7 @@
 .vinegar-detail-grid figure{margin:0;text-align:center}
 .vinegar-detail-grid img{width:100%;height:auto}
 .vinegar-detail-grid figcaption{padding:8px;font-size:16px;font-weight:700}
-@media(max-width:599px){.offer-carousel{min-height:410px}.offer-carousel:has(.vinegar-lineup-frame.is-active){min-height:630px}.vinegar-lineup{inset:auto 8px 56px;height:330px;gap:8px;overflow-x:auto;overflow-y:hidden;padding:4px 8px;scroll-snap-type:x proximity;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}.vinegar-lineup::-webkit-scrollbar{display:none}.vinegar-lineup-item{flex:0 0 clamp(160px,44vw,174px);scroll-snap-align:center}.vinegar-lineup-item img{top:42%;height:min(72cqh,230px)}.vinegar-lineup-item figcaption{display:-webkit-box;bottom:2px;left:1px;right:1px;min-height:38px;overflow:hidden;overflow-wrap:anywhere;padding:0 2px;text-align:center;font-size:16px;line-height:1.2;-webkit-box-orient:vertical;-webkit-line-clamp:2}.vinegar-zoom{top:auto;bottom:8px;right:auto;left:8px;font-size:12px;padding:6px 8px}.vinegar-motion,.vinegar-sound{display:none!important}.vinegar-lineup.is-mosti-sequence{inset:auto 8px 100px;height:440px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:4px;padding:0;overflow:visible;scroll-snap-type:none}.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item{width:auto;min-width:0;min-height:0;height:100%;flex:none;scroll-snap-align:none}.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item img{top:43%;height:min(70cqh,200px)}.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item figcaption{font-size:clamp(10px,2.8vw,13px);min-height:30px;line-height:1.08;bottom:0}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:8px}.vinegar-lineup-frame.has-mosti .mosti-domino{bottom:18px;right:8px}}
+@media(max-width:599px){.offer-carousel{min-height:410px}.offer-carousel:has(.vinegar-lineup-frame.is-active){min-height:630px}.vinegar-lineup{inset:auto 8px 56px;height:330px;gap:8px;overflow-x:auto;overflow-y:hidden;padding:4px 8px;scroll-snap-type:x proximity;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}.vinegar-lineup::-webkit-scrollbar{display:none}.vinegar-lineup-item{flex:0 0 clamp(160px,44vw,174px);scroll-snap-align:center}.vinegar-lineup-item img{top:42%;height:min(94cqh,299px)}.vinegar-lineup-item figcaption{display:-webkit-box;bottom:2px;left:1px;right:1px;min-height:38px;overflow:hidden;overflow-wrap:anywhere;padding:0 2px;text-align:center;font-size:16px;line-height:1.2;-webkit-box-orient:vertical;-webkit-line-clamp:2}.vinegar-zoom{top:auto;bottom:8px;right:auto;left:8px;font-size:12px;padding:6px 8px}.vinegar-motion,.vinegar-sound{display:none!important}.vinegar-lineup.is-mosti-sequence{inset:auto 8px 100px;height:440px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:4px;padding:0;overflow:visible;scroll-snap-type:none}.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item{width:auto;min-width:0;min-height:0;height:100%;flex:none;scroll-snap-align:none}.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item img{top:43%;height:min(91cqh,260px)}.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item figcaption{font-size:clamp(10px,2.8vw,13px);min-height:30px;line-height:1.08;bottom:0}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:8px}.vinegar-lineup-frame.has-mosti .mosti-domino{bottom:18px;right:8px}}
 
 /* Let original bottle photos fall horizontally around their base, then rise gently. */
 .vinegar-bottle-trigger{position:absolute;inset:0;display:block;width:100%;padding:0;border:0;border-radius:8px;background:transparent;color:inherit;text-decoration:none;cursor:pointer;touch-action:manipulation}
@@ -408,8 +408,6 @@
 @media(prefers-reduced-motion:reduce) and (min-width:600px){.mosti-domino.is-bracing img,.vinegar-lineup-item.is-vinegar-impact img,.vinegar-lineup-item.is-vinegar-impact:after{animation:none}}
 
 /* Mosti hugs each bottle, carries it out of the lineup, then takes a sip from the last one. */
-.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item.is-vinegar-carried,
-.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item.is-vinegar-drunk{visibility:hidden;opacity:0}
 .mosti-domino.is-hugging img{animation:mosti-hold-bottle .32s ease-in-out infinite alternate}
 @keyframes mosti-hold-bottle{
  0%{transform:scaleX(-1) translateY(0) rotate(0deg)}
@@ -424,19 +422,6 @@
  .mosti-domino.is-hugging img,.mosti-domino.is-sipping img{animation:none}
 }
 
-/* A single carry assembly keeps both hands in physical contact with the bottle. */
-.mosti-carry{position:absolute;inset:0;pointer-events:none}
-.mosti-carry-arms{position:absolute;inset:0;z-index:1}
-.mosti-carry-arms svg{width:100%;height:100%;overflow:visible}
-.mosti-held-object{position:absolute;z-index:2;transform-origin:50% 55%}
-.mosti-domino .mosti-held-bottle{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transform:none;filter:none;animation:none}
-.mosti-empty-glass{position:absolute;inset:0;z-index:1;display:block;clip-path:inset(100% 0 0 0)}
-.mosti-empty-glass svg{display:block;width:100%;height:100%;overflow:visible}
-.mosti-grip{position:absolute;z-index:3;display:block;filter:drop-shadow(0 1px 1px #291f2840)}
-.mosti-grip svg{display:block;width:100%;height:100%;overflow:visible}
-.mosti-grip-left{transform:rotate(-12deg)}
-.mosti-grip-right{transform:scaleX(-1) rotate(-12deg)}
-.mosti-domino.is-carrying>img{animation:none;transform:scaleX(-1)}
-.vinegar-lineup-item.is-vinegar-held>button>img{visibility:hidden}
+/* The original bottle image flies; it is never replaced by a scaled duplicate. */
 .offer-carousel:has(.vinegar-lineup-frame.is-active){min-height:340px}
 @media(max-width:599px){.offer-carousel:has(.vinegar-lineup-frame.is-active){min-height:650px}}

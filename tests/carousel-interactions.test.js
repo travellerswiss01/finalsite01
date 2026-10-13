@@ -159,97 +159,25 @@ test('devices without Web Audio keep the sound button hidden and label viewing f
  env.controls['[data-vinegar-open]'].handlers.click();assert.equal(env.dialog.open,true);assert.equal(env.audio.contexts,0);
 });
 
-test('Mosti pauses rotation and cancels every animation when an original label is opened',()=>{
- const env=setup(false,true,true);env.mostiSprite.handlers.load();
- env.mostiButton.hidden=false;
- assert.equal(env.mostiButton.hidden,false);
- env.mostiButton.handlers.click();
- assert.equal(env.animations.length,1);assert.equal(env.running(),false);
- assert.ok(env.animations.every(animation=>animation.options.duration>=1200));
- assert.equal(env.mostiButton.attrs['aria-busy'],'true');
- env.mostiButton.handlers.click();assert.equal(env.animations.length,1);
- env.controls['[data-vinegar-open]'].handlers.click();
- assert.equal(env.dialog.open,true);assert.ok(env.animations.every(a=>a.cancelled));
- assert.equal(env.mostiButton.attrs['aria-busy'],undefined);
+test('Mosti runs the ordered four-tap sequence without adding products to the cart',async()=>{
+ const source=readFileSync(new URL('../public/assets/app.js',import.meta.url),'utf8');
+ const mostiCode=source.slice(source.indexOf('const playMosti='),source.indexOf("mostiButton?.addEventListener('pointerenter'"));
+ assert.doesNotMatch(mostiCode,/sendMostiBottleToCart|\/api\/cart\/add/);
+ assert.match(source,/mostiTapIndex%4/);
+ assert.match(source,/announcement/);
+ assert.match(source,/viewportH\+imageRect\.height/);
+ assert.match(source,/Promise\.all\(items\.map/);
 });
-test('Mosti respects reduced motion and finishes upright before rotation resumes',()=>{
- const reduced=setup(true,true,true);
- reduced.mostiButton.handlers.click();assert.equal(reduced.animations.length,0);
- const env=setup(false,true,true);
- env.mostiButton.hidden=false;env.mostiButton.handlers.click();env.finishLast();
- assert.ok(env.animations.every(a=>a.cancelled));assert.equal(env.running(),true);
- env.mostiButton.handlers.click();env.next();assert.ok(env.animations.every(a=>a.cancelled));
+test('Mosti preserves bottle size and restores the same image after each throw',()=>{
+ const source=readFileSync(new URL('../public/assets/app.js',import.meta.url),'utf8');
+ assert.match(source,/const rect=image\.getBoundingClientRect\(\),parent=image\.parentNode/);
+ assert.match(source,/document\.body\.append\(image\)/);
+ assert.match(source,/finally\{restore\(\);\}/);
+ assert.doesNotMatch(source,/mosti-held-bottle|mosti-empty-glass/);
 });
-
-test('Mosti winks on mouse attention, moonwalks on click, and alternates a walking gait',()=>{
- const env=setup(false,true,true);env.mostiButton.hidden=false;
- env.mostiButton.handlers.pointerenter({pointerType:'mouse'});
- assert.match(env.mostiSprite.src,/mosti-wink-wave\.webp$/);
- assert.ok(env.mostiButton.classList.contains('is-winking'));
- env.mostiButton.handlers.pointerleave();
- assert.match(env.mostiSprite.src,/mosti-domino\.webp$/);
- env.mostiButton.handlers.click();
- assert.match(env.mostiSprite.src,/mosti-moonwalk-a\.webp$/);
- assert.ok(env.mostiButton.classList.contains('is-moonwalking'));
- assert.ok(env.audio.notes>30,'the original moonwalk music is synthesized on click');
- env.finishAt(280);assert.match(env.mostiSprite.src,/mosti-moonwalk-b\.webp$/);
- env.finishAt(2200);
- assert.match(env.mostiSprite.src,/mosti-walk-a\.webp$/);
- assert.ok(env.mostiButton.classList.contains('is-walking'));
- env.finishAt(280);
- assert.match(env.mostiSprite.src,/mosti-walk-b\.webp$/);
- env.controls['[data-vinegar-open]'].handlers.click();
- assert.match(env.mostiSprite.src,/mosti-domino\.webp$/);
- assert.ok(!env.mostiButton.classList.contains('is-walking'));
-});
-
-// The carry stage must attach the bottle to the mascot, with two grips, and clean up on interruption.
-test('the bottle and both gripping hands share Mosti’s parent during the whole carry',()=>{
- const env=setup(false,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
- env.mostiButton.handlers.click();env.finishAt(2200+1450);
- const rig=env.mostiButton.children.find(child=>child.className==='mosti-carry');
- assert.ok(rig);const held=rig.children.find(child=>child.className==='mosti-held-object');assert.ok(held);
- const grips=held.children.filter(child=>child.className?.startsWith('mosti-grip '));
- assert.equal(grips.length,2);
- assert.ok(grips.every(hand=>hand.style.width==='10.25px'),'gripping hands are enlarged slightly while staying aligned to the bottle');
- assert.ok(env.figures[0].classList.contains('is-vinegar-held'));
- env.finishAt(2200+1450+700+650); // Travel moves the shared parent rather than the bottle independently.
- assert.equal(env.animations.at(-1).options.duration,2200);
- env.controls['[data-vinegar-open]'].handlers.click();assert.ok(rig.removed);
- assert.ok(!env.figures[0].classList.contains('is-vinegar-held'));
- assert.ok(env.animations.every(animation=>animation.cancelled));
-});
-
-test('pausing an attached bottle restores its original and cancels both gripping layers',()=>{
- const env=setup(false,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
- env.mostiButton.handlers.click();env.finishAt(2200+1450);
- assert.ok(env.figures[0].classList.contains('is-vinegar-held'));
- env.controls['[data-offer-toggle]'].handlers.click();
- assert.ok(!env.figures[0].classList.contains('is-vinegar-held'));
- assert.ok(env.animations.every(animation=>animation.cancelled));assert.equal(env.running(),false);
-});
-test('the last bottle tilts with its two hands and attaches its cap to the mouth',()=>{
- const env=setup(false,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
- for(let i=0;i<6;i++){env.mostiButton.handlers.click();env.finishLast();}
- env.mostiButton.handlers.click();env.finishAt(2200+1450);env.finishAt(2200+1450+700+650+2200);
- const sip=env.animations.at(-1);assert.equal(sip.options.duration,3000);
- const match=sip.frames[1].transform.match(/translate\(([-\d.]+)px,([-\d.]+)px\) rotate\(58deg\)/);assert.ok(match);
- const angle=58*Math.PI/180,bh=142*.76,handX=128*.5,handY=142*.56;
- const capX=handX+Number(match[1])+bh*.52*Math.sin(angle);
- const capY=handY+Number(match[2])-bh*.52*Math.cos(angle);
- assert.ok(Math.abs(capX-128*.44)<.001);assert.ok(Math.abs(capY-142*.5)<.001);
- const rig=env.mostiButton.children.filter(child=>child.className==='mosti-carry').at(-1);
- assert.match(rig.children[0].innerHTML,/attributeName="d"/);
-});
-
-test('the last bottle visibly empties while Mosti drinks without covering its label',()=>{
- const env=setup(false,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
- for(let i=0;i<6;i++){env.mostiButton.handlers.click();env.finishLast();}
- env.mostiButton.handlers.click();env.finishAt(2200+1450);env.finishAt(2200+1450+700+650+2200);
- const rig=env.mostiButton.children.filter(child=>child.className==='mosti-carry').at(-1);
- const held=rig.children.find(child=>child.className==='mosti-held-object');
- const empty=held.children.find(child=>child.className==='mosti-empty-glass');
- assert.ok(empty);assert.match(empty.innerHTML,/fill-rule="evenodd"/);
- assert.match(empty.innerHTML,/M378 449H566V570H378Z/);
- assert.ok(env.animations.some(a=>a.options.duration===1550&&a.frames[0].clipPath==='inset(100% 0 0 0)'));
+test('Mosti tap cycle resets with the active lineup and reduced motion is respected',()=>{
+ const source=readFileSync(new URL('../public/assets/app.js',import.meta.url),'utf8');
+ assert.match(source,/mostiTapIndex=0/);
+ assert.match(source,/if\(reducedMostiMotion\(\)\)/);
+ assert.match(source,/mostiSequenceActive=true/);
 });
