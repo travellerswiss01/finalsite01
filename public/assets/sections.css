@@ -74,13 +74,13 @@
 /* Let original bottle photos fall horizontally around their base, then rise gently. */
 .vinegar-bottle-trigger{position:absolute;inset:0;width:100%;padding:0;border:0;border-radius:8px;background:transparent;cursor:pointer;touch-action:manipulation}
 .vinegar-bottle-trigger:focus-visible{outline:2px solid #205532;outline-offset:2px}
-.vinegar-lineup-item img{pointer-events:none;transform-origin:50% 94%;mix-blend-mode:multiply}
-.vinegar-lineup-item.is-vinegar-sway img{animation:vinegar-sway var(--bottle-duration,900ms) cubic-bezier(.2,.7,.25,1) var(--bottle-delay,0ms) both}
+.vinegar-lineup-item img{pointer-events:none;transform-origin:50% 94%}
+.vinegar-lineup-item.is-vinegar-sway img{animation:vinegar-sway var(--bottle-duration,1500ms) cubic-bezier(.2,.7,.25,1) var(--bottle-delay,0ms) both}
 @keyframes vinegar-sway{
- 0%{transform:translate(-50%,-50%) rotate(0deg);animation-timing-function:cubic-bezier(.55,.04,.86,.48)}
- 28%{transform:translate(-50%,-50%) rotate(var(--bottle-angle,72deg));animation-timing-function:cubic-bezier(.2,.7,.25,1)}
- 38%{transform:translate(-50%,-50%) rotate(calc(var(--bottle-angle,72deg) * .94));animation-timing-function:ease-out}
- 48%,100%{transform:translate(-50%,-50%) rotate(var(--bottle-angle,72deg))}
+ 0%{transform:translate(-50%,-50%) rotate(0deg);animation-timing-function:cubic-bezier(.45,.05,.82,.42)}
+ 58%{transform:translate(-50%,-50%) rotate(var(--bottle-angle,78deg));animation-timing-function:cubic-bezier(.2,.65,.25,1)}
+ 72%{transform:translate(-50%,-50%) translateY(3px) rotate(calc(var(--bottle-angle,78deg) * .96));animation-timing-function:ease-out}
+ 84%,100%{transform:translate(-50%,-50%) translateY(1px) rotate(var(--bottle-angle,78deg))}
 }
 .offer-carousel:has(.vinegar-lineup-frame.is-active) .hero-content,
 .offer-carousel:has(.vinegar-lineup-frame.is-active) .hero-offer.is-active{pointer-events:none}
@@ -224,7 +224,7 @@
 .mosti-domino img{display:block;width:100%;height:100%;object-fit:contain;transform:scaleX(-1);filter:drop-shadow(0 4px 3px #173d2b18);pointer-events:none}
 @keyframes mosti-walk-bounce{from{transform:scaleX(-1) translateY(1px) rotate(1deg)}to{transform:scaleX(-1) translateY(-6px) rotate(-1deg)}}
 @keyframes mosti-walk-back-bounce{from{transform:scaleX(1) translateY(1px) rotate(-1deg)}to{transform:scaleX(1) translateY(-6px) rotate(1deg)}}
-.mosti-domino.is-walking img{animation:mosti-walk-bounce .22s ease-in-out infinite alternate}
+.mosti-domino.is-walking img{animation:mosti-walk-bounce .48s ease-in-out infinite alternate}
 .mosti-domino.is-walking-back img{animation-name:mosti-walk-back-bounce}
 .mosti-domino:focus-visible{outline:2px solid #9c792b;outline-offset:3px;border-radius:18px}
 .is-mosti-playing .mosti-domino{pointer-events:none}
@@ -240,7 +240,7 @@
 .vinegar-lineup-item.is-vinegar-dragging,
 .vinegar-lineup-item.is-vinegar-sipping{z-index:3}
 .vinegar-lineup-item.is-vinegar-hugging img,.vinegar-lineup-item.is-vinegar-dragging img,.vinegar-lineup-item.is-vinegar-sipping img{transform-origin:50% 50%}
-.mosti-domino.is-sipping img{animation:mosti-gulp .34s ease-in-out 2 alternate}
+.mosti-domino.is-sipping img{animation:mosti-gulp .72s ease-in-out 3 alternate}
 @keyframes mosti-gulp{from{transform:scaleX(-1) rotate(0deg) translateY(0)}to{transform:scaleX(-1) rotate(-5deg) translateY(-3px)}}
 
 @media(prefers-reduced-motion:reduce) and (min-width:600px){.mosti-domino{cursor:default}.mosti-domino.is-walking img{animation:none}}

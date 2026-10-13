@@ -379,26 +379,25 @@ if(offerCarousel){
   if(detailHeading)detailHeading.textContent=selected===null?detailTitle:detailPhotos[selected].querySelector('figcaption').textContent+' – Originaletikett';
   resetSway();stop();vinegarDialog.showModal();
  };
- const playSway=origin=>{
+ const playSway=(origin,direction=1)=>{
   if(swayRunning||!bottles[origin]?.closest('[data-offer-image]').classList.contains('is-active'))return;
   if(motion.matches){openVinegar();return;}
-  const duration=900,delay=45,direction=origin===bottles.length-1?-1:1;
+  const duration=1500,delay=130;
   swayRunning=true;stop();
   bottles.forEach((button,index)=>{
    const bottle=button.closest('.vinegar-lineup-item');
    bottle.style.setProperty('--bottle-delay',Math.abs(index-origin)*delay+'ms');
    bottle.style.setProperty('--bottle-duration',duration+'ms');
-   const lean=(index%2===0?1:-1)*direction;
-   bottle.style.setProperty('--bottle-angle',lean*58+'deg');
+   bottle.style.setProperty('--bottle-angle',(direction>0?78:-78)+'deg');
    bottle.classList.add('is-vinegar-sway');
   });
-  swayTimer=window.setTimeout(()=>{swayRunning=false;swayTimer=null;start();},duration+Math.max(origin,bottles.length-1-origin)*delay+60);
+  swayTimer=window.setTimeout(()=>{bottles.forEach(button=>button.closest('.vinegar-lineup-item').classList.remove('is-vinegar-sway'));swayRunning=false;swayTimer=null;start();},duration+Math.max(origin,bottles.length-1-origin)*delay+180);
  };
  // Mosti pushes the bottles one by one; product taps still open their details.
  const scheduleMostiAuto=(delay=1400)=>{
   if(mostiAutoTimer!==null)window.clearTimeout(mostiAutoTimer);
   const lineup=mostiFrame?.querySelector('.vinegar-lineup');
-  if(reducedMostiMotion()||!lineup||!mostiButton||mostiButton.hidden||!mostiFrame.classList.contains('is-active'))return;
+  if(reducedMostiMotion()||vinegarDialog?.open||mostDialog.open||!lineup||!mostiButton||mostiButton.hidden||!mostiFrame.classList.contains('is-active'))return;
   if(mostiAutoRemaining<=0)return;
   mostiAutoTimer=window.setTimeout(()=>{mostiAutoTimer=null;playMosti(true);},delay);
  };
@@ -410,6 +409,14 @@ if(offerCarousel){
   const item=items[mostiNextIndex];
   const isLastBottle=mostiNextIndex===items.length-1;
   if(!item){mostiAutoRemaining=0;start();return;}
+  if(reducedMostiMotion()){
+   item.classList.remove('is-vinegar-waiting','is-vinegar-ready');
+   item.classList.add(isLastBottle?'is-vinegar-drunk':'is-vinegar-carried');
+   mostiNextIndex++;
+   const nextItem=items[mostiNextIndex];
+   if(nextItem){nextItem.classList.remove('is-vinegar-waiting');nextItem.classList.add('is-vinegar-ready');}
+   return;
+  }
   // Keep the bottle lineup fixed; only the bottle Mosti grabs will move.
   item.classList.remove('is-vinegar-waiting');item.classList.add('is-vinegar-ready');
   if(typeof mostiButton.animate!=='function'){
@@ -431,7 +438,7 @@ if(offerCarousel){
   const pushX=approachX;
   const isDrag=!isLastBottle&&mostiNextIndex%2===1;
   const isMobile=window.matchMedia('(max-width: 599px)').matches;
-  const approachDuration=isMobile?820:610,pauseDuration=isMobile?150:120,pushDuration=isMobile?1250:1000,returnDuration=isMobile?980:720,sipHold=isLastBottle?(isMobile?1600:1450):0,duration=approachDuration+pauseDuration+pushDuration+returnDuration+sipHold,startTime=performance.now();
+  const approachDuration=isMobile?1550:1350,pauseDuration=isMobile?520:450,pushDuration=isMobile?2300:2050,returnDuration=isMobile?1750:1550,sipHold=isLastBottle?(isMobile?3600:3200):0,duration=approachDuration+pauseDuration+pushDuration+returnDuration+sipHold;
   const approachEnd=approachDuration/duration,pushStart=(approachDuration+pauseDuration)/duration,pushEnd=(approachDuration+pauseDuration+pushDuration)/duration;
   setMostiPose('walk');
   const enterTimer=window.setTimeout(()=>{
@@ -516,7 +523,12 @@ if(offerCarousel){
  mostiButton?.addEventListener('click',()=>{if(mostiAutoTimer!==null){window.clearTimeout(mostiAutoTimer);mostiAutoTimer=null;}mostiAutoRemaining=0;playMosti();});
  bottles.forEach((button,index)=>{
   button.addEventListener('click',()=>{playGlass();openVinegar(index);});
-  button.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!motion.matches)playSway(index);});
+  button.addEventListener('pointerenter',event=>{
+   if(event.pointerType!=='mouse'||motion.matches)return;
+   const rect=button.getBoundingClientRect();
+   const direction=Number.isFinite(event.clientX)&&rect.width?event.clientX<rect.left+rect.width/2?1:-1:1;
+   playSway(index,direction);
+  });
  });
  if(motionToggle){
   motionToggle.hidden=false;motionToggle.disabled=motion.matches;
