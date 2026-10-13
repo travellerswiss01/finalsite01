@@ -234,12 +234,12 @@ if(offerCarousel){
  const bottles=[...offerCarousel.querySelectorAll('[data-vinegar-bottle]')];
  // Mosti is one complete illustration. Only the intact sprite is animated.
  const mostiFrame=images.find(image=>image.classList.contains('vinegar-lineup-frame'));
- let mostiButton=null,mostiSprite=null,mostiAnimations=[],mostiFrameRequest=null,mostiBottleRestore=null;
+ let mostiButton=null,mostiSprite=null;
  if(mostiFrame&&typeof document.createElement==='function'){
   mostiButton=document.createElement('button');
   mostiButton.type='button';mostiButton.className='mosti-domino';mostiButton.hidden=true;
-  mostiButton.setAttribute('aria-label','Mosti macht einen Moonwalk mit Musik');
-  mostiButton.title='Mosti macht einen Moonwalk mit Musik';
+  mostiButton.setAttribute('aria-label','Mosti winkt und tanzt mit Musik');
+  mostiButton.title='Mosti winkt und tanzt mit Musik';
   mostiSprite=document.createElement('img');
   mostiSprite.alt='Mosti, unser Apfelmaskottchen';mostiSprite.width=420;mostiSprite.height=432;
   mostiSprite.addEventListener('load',()=>{mostiFrame.classList.add('has-mosti');mostiButton.hidden=false;});
@@ -283,31 +283,18 @@ if(offerCarousel){
   if(image&&mostiSprite&&mostiSprite.src!==image.src)mostiSprite.src=image.src;
  };
  const mostiPoseTimers=[];
- const prepareMostiSequence=()=>{
-  const lineup=mostiFrame?.querySelector('.vinegar-lineup');
-  if(!lineup)return;
-  const items=[...lineup.querySelectorAll('.vinegar-lineup-item')];
-  lineup.scrollLeft=0;lineup.classList.add('is-mosti-sequence');
-  items.forEach(item=>{item.classList.remove('is-vinegar-entering','is-vinegar-in','is-vinegar-ready','is-vinegar-carried','is-vinegar-drunk','is-vinegar-hugging','is-vinegar-sip');item.classList.add('is-vinegar-waiting');});
-  if(!reducedMostiMotion()&&items[0]){items[0].classList.remove('is-vinegar-waiting');items[0].classList.add('is-vinegar-ready');}
-  mostiTapIndex=0;mostiSequenceActive=true;
- };
  const resetMosti=()=>{
-  mostiAnimations.forEach(animation=>animation.cancel());mostiAnimations=[];
   stopMostiWalk();
   mostiPoseTimers.splice(0).forEach(id=>window.clearTimeout(id));
-  mostiBottleRestore?.();mostiBottleRestore=null;
-  bottles.forEach(button=>button.closest('.vinegar-lineup-item').classList.remove('is-vinegar-held'));
-  if(mostiFrameRequest!==null){window.cancelAnimationFrame(mostiFrameRequest);mostiFrameRequest=null;}
   mostiFrame?.classList.remove('is-mosti-playing');
   if(mostiButton)mostiButton.removeAttribute('aria-busy');
  };
- let current=0,timer=null,swayTimer=null,swayRunning=false,paused=motion.matches,hovered=false,mostiTapIndex=0,mostiSequenceActive=false;
+ let current=0,timer=null,swayTimer=null,swayRunning=false,paused=motion.matches,hovered=false;
  const stop=()=>{if(timer!==null){window.clearInterval(timer);timer=null;}};
  const start=()=>{
   stop();
   if(slides.length>1&&!paused&&!hovered&&!document.hidden&&!vinegarDialog?.open&&!mostDialog.open&&!swayRunning&&!document.activeElement?.matches?.(':focus-visible')){
-   timer=window.setInterval(()=>{if(mostiFrame?.classList.contains('is-active')&&mostiSequenceActive)return;show(current+1);},6000);
+   timer=window.setInterval(()=>show(current+1),6000);
   }
  };
  const formatMostPrice=value=>money(value);
@@ -415,8 +402,6 @@ if(offerCarousel){
    images[i]?.setAttribute('aria-hidden',String(!active));
    if(images[i])images[i].inert=!active;
   });
-  mostiSequenceActive=false;
-  if(mostiFrame?.classList.contains('is-active'))prepareMostiSequence();
  };
  const updateToggle=()=>{
   toggle.innerHTML=paused?'<svg class="offer-playback-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="m8 4 12 8-12 8z"/></svg>':'<svg class="offer-playback-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
@@ -472,90 +457,24 @@ if(offerCarousel){
   swayTimer=window.setTimeout(()=>{swayRunning=false;swayTimer=null;start();},duration+Math.max(origin,bottles.length-1-origin)*delay+180);
  };
  // Mosti pushes the bottles one by one; bottle links open their matching product pages.
- const moveOriginalBottle=async(image,frames,duration,delay=0)=>{
-  if(!image||!image.parentNode||typeof image.getBoundingClientRect!=='function')return;
-  const rect=image.getBoundingClientRect(),parent=image.parentNode,next=image.nextSibling,style=image.getAttribute?.('style');
-  const restore=()=>{
-   if(parent?.insertBefore)parent.insertBefore(image,next?.parentNode===parent?next:null);
-   else parent?.append?.(image);
-   if(style===null||style===undefined)image.removeAttribute?.('style');else image.setAttribute?.('style',style);
-   if(mostiBottleRestore===restore)mostiBottleRestore=null;
-  };
-  mostiBottleRestore=restore;
-  Object.assign(image.style,{position:'fixed',zIndex:'10020',pointerEvents:'none',objectFit:'contain',left:rect.left+'px',top:rect.top+'px',width:rect.width+'px',height:rect.height+'px',margin:'0'});
-  document.body.append(image);
-  try{
-   if(reducedMostiMotion()||typeof image.animate!=='function')return;
-   const animation=image.animate(frames,{duration,delay,easing:'cubic-bezier(.22,.7,.28,1)',fill:'forwards'});mostiAnimations.push(animation);
-   await animation.finished;
-  }catch{}
-  finally{restore();}
- };
- const playMosti=async()=>{
-  if(!mostiButton||swayRunning||!mostiFrame.classList.contains('is-active'))return;
-  const lineup=mostiFrame.querySelector('.vinegar-lineup');
-  if(!lineup)return;
-  const items=[...lineup.querySelectorAll('.vinegar-lineup-item')];
-  if(items.length<2)return;
-  // Four deterministic taps: toss and return, drink, drop, then a playful group toss.
-  const step=mostiTapIndex%4;
-  const item=items[step===2?1:0];
-  const image=item?.querySelector('img');
-  if(!image)return;
-  mostiTapIndex=(mostiTapIndex+1)%4;
+ const playMosti=()=>{
+  if(!mostiButton||swayRunning||!mostiFrame?.classList.contains('is-active'))return;
+  resetSway();stop();swayRunning=true;
+  mostiFrame.classList.add('is-mosti-playing');
   if(reducedMostiMotion()){
-   setMostiPose(step===1?'wave':'wink');
-   mostiPoseTimers.push(window.setTimeout(()=>{if(currentMostiPose==='wave'||currentMostiPose==='wink')setMostiPose('idle');},900));
-   if(mostiTapIndex===0){mostiSequenceActive=false;start();}
+   setMostiPose('wave');
+   swayTimer=window.setTimeout(()=>{swayTimer=null;swayRunning=false;setMostiPose('idle');mostiFrame.classList.remove('is-mosti-playing');start();},950);
    return;
   }
-  if(typeof image.animate!=='function')return;
-  resetSway();stop();swayRunning=true;
-  mostiFrame.classList.add('is-mosti-playing');mostiButton.setAttribute('aria-busy','true');
-  const imageRect=image.getBoundingClientRect();
-  const band=document.querySelector('.announcement'),bandRect=band?.getBoundingClientRect?.();
-  const viewportH=window.innerHeight||document.documentElement?.clientHeight||768;
-  const viewportW=window.innerWidth||document.documentElement?.clientWidth||1024;
-  const centerX=imageRect.left+imageRect.width/2,centerY=imageRect.top+imageRect.height/2;
-  const fixed=(x,y,rotate=0,scale=1,size=imageRect)=>({left:(x-size.width/2)+'px',top:(y-size.height/2)+'px',transform:`rotate(${rotate}deg) scale(${scale})`});
-  const returnStyle=image.getAttribute?.('style');
-  const finish=()=>{
-   mostiBottleRestore?.();mostiBottleRestore=null;
-   mostiAnimations.forEach(animation=>animation.cancel());mostiAnimations=[];
-   item.classList.remove('is-vinegar-held','is-vinegar-carried','is-vinegar-drunk','is-vinegar-waiting');
-   mostiButton.classList.remove('is-sipping','is-hugging');
-   mostiFrame.classList.remove('is-mosti-playing');mostiButton.removeAttribute('aria-busy');
-   setMostiPose('idle');swayRunning=false;if(mostiTapIndex===0)mostiSequenceActive=false;start();
-  };
-  try{
-   if(step===0){
-    const bandY=bandRect?bandRect.top+bandRect.height/2:35;
-    const bandX=Math.max(imageRect.width/2+8,Math.min(viewportW-imageRect.width/2-8,viewportW*.72));
-    setMostiPose('wave');
-    await moveOriginalBottle(image,[fixed(centerX,centerY),{...fixed(centerX-35,centerY-viewportH*.32,-24),offset:.32},{...fixed(bandX,bandY,90),offset:.68},fixed(centerX,centerY)],1850);
-   }else if(step===1){
-    setMostiPose('carry');mostiButton.classList.add('is-sipping');item.classList.add('is-vinegar-held');
-    const mouthX=mostiButton.getBoundingClientRect().left+mostiButton.getBoundingClientRect().width*.52;
-    const mouthY=mostiButton.getBoundingClientRect().top+mostiButton.getBoundingClientRect().height*.48;
-    await moveOriginalBottle(image,[fixed(centerX,centerY),{...fixed(mouthX,mouthY,30),offset:.22},{...fixed(mouthX,mouthY,62),offset:.35},{...fixed(mouthX,mouthY,62),offset:.76},fixed(centerX,centerY)],3000);
-   }else if(step===2){
-    setMostiPose('push');item.classList.add('is-vinegar-held');
-    await moveOriginalBottle(image,[fixed(centerX,centerY),{...fixed(centerX+30,centerY+90,-35),offset:.2},{...fixed(centerX+55,viewportH+imageRect.height,-155),offset:.86},fixed(centerX+55,viewportH+imageRect.height,-155)],2200);
-   }else{
-    setMostiPose('wave');
-    await Promise.all(items.map((figure,index)=>{
-     const bottle=figure.querySelector('img'),rect=bottle?.getBoundingClientRect();
-     if(!bottle||!rect)return Promise.resolve();
-     const x=rect.left+rect.width/2,y=rect.top+rect.height/2;
-     const dx=index%2===0?Math.min(viewportW*.3,150):-Math.min(viewportW*.3,150);
-     const dy=index%3===0?-125:index%3===1?95:-45;
-     return moveOriginalBottle(bottle,[fixed(x,y,0,1,rect),{...fixed(x+dx*.65,y+dy,-24+index*9,1,rect),offset:.45},{...fixed(x+dx,y+dy*.55,45-index*12,1,rect),offset:.72},fixed(x,y,0,1,rect)],1750,index*65);
-    }));
-   }
-  }finally{
-   if(returnStyle!==undefined&&step===0)image.setAttribute?.('style',returnStyle);
-   finish();
-  }
+  // Start sound directly from the user's tap, then wave and dance in place.
+  playMoonwalkMusic();
+  setMostiPose('wave');
+  mostiPoseTimers.push(window.setTimeout(()=>{if(swayRunning)setMostiPose('moonwalk');},900));
+  mostiPoseTimers.push(window.setTimeout(()=>{if(swayRunning)setMostiPose('walk');},3000));
+  swayTimer=window.setTimeout(()=>{
+   swayTimer=null;swayRunning=false;
+   stopMostiMusic();setMostiPose('idle');mostiFrame.classList.remove('is-mosti-playing');start();
+  },4500);
  };
  mostiButton?.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!swayRunning&&currentMostiPose==='idle')setMostiPose('wink');});
  mostiButton?.addEventListener('pointerleave',()=>{if(currentMostiPose==='wink'&&!swayRunning)setMostiPose('idle');});
