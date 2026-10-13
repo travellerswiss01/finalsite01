@@ -7,13 +7,13 @@ const carouselScript='const offerCarousel='+readFileSync(new URL('../public/asse
 function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=true){
  const animations=[];let mostiButton,mostiSprite;
  const element=()=>({
-  handlers:{},attrs:{},inert:false,hidden:true,textContent:'',
+  children:[],remove(){this.removed=true;},append(child){this.children.push(child);},handlers:{},attrs:{},inert:false,hidden:true,textContent:'',
   style:{values:{},setProperty(name,value){this.values[name]=value;}},
-  classList:{values:new Set(),add(name){this.values.add(name);},remove(name){this.values.delete(name);},contains(name){return this.values.has(name);},toggle(name,value){if(value)this.add(name);else this.remove(name);}},
+  classList:{values:new Set(),add(...names){names.forEach(name=>this.values.add(name));},remove(...names){names.forEach(name=>this.values.delete(name));},contains(name){return this.values.has(name);},toggle(name,value){if(value)this.add(name);else this.remove(name);}},
   addEventListener(type,fn){this.handlers[type]=fn;},matches(selector){return selector===':focus-visible'&&this.focusVisible===true;},setAttribute(name,value){this.attrs[name]=value;},removeAttribute(name){delete this.attrs[name];},animate(frames,options){const animation={frames,options,cancelled:false,cancel(){this.cancelled=true;}};animations.push(animation);return animation;}
  });
  const slides=Array.from({length:5},element),images=Array.from({length:5},element);
- const figures=Array.from({length:7},element),bottles=figures.map((figure,index)=>{const button=element();button.closest=selector=>selector==='[data-offer-image]'?images[3]:figure;button.getBoundingClientRect=()=>({left:index*100,width:80});figure.querySelector=()=>({getBoundingClientRect:()=>({left:index*100,width:80,top:0,height:160}),animate:(frames,options)=>{const animation={frames,options,cancelled:false,cancel(){this.cancelled=true;}};animations.push(animation);return animation;}});figure.getBoundingClientRect=()=>({left:index*100,width:80,top:0,height:160});return button;});
+ const figures=Array.from({length:7},element),bottles=figures.map((figure,index)=>{const button=element();button.closest=selector=>selector==='[data-offer-image]'?images[3]:figure;button.getBoundingClientRect=()=>({left:index*100,width:80});figure.querySelector=()=>({src:'/assets/essig-birnen-cutout.svg',getBoundingClientRect:()=>({left:index*100,width:160,top:0,height:160}),animate:(frames,options)=>{const animation={frames,options,cancelled:false,cancel(){this.cancelled=true;}};animations.push(animation);return animation;}});figure.getBoundingClientRect=()=>({left:index*100,width:80,top:0,height:160});return button;});
  const controls=Object.fromEntries(['prev','next','toggle','controls'].map(name=>['[data-offer-'+name+']',element()]));
  controls['[data-vinegar-open]']=element();
  controls['[data-vinegar-sound]']=element();
@@ -34,7 +34,7 @@ function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=
   bottles.forEach(button=>{button.querySelector=()=>element();});
  }
  const document=element();
- document.createElement=tag=>{const el=element();el.offsetWidth=128;el.append=sprite=>{mostiSprite=sprite;};el.querySelector=()=>element();el.querySelectorAll=()=>[];el.showModal=()=>{el.open=true;};el.close=()=>{el.open=false;el.handlers.close?.();};return el;};
+ document.createElement=tag=>{const el=element();el.offsetWidth=128;el.append=sprite=>{el.children.push(sprite);if(tag==='button')mostiSprite=sprite;};el.querySelector=()=>element();el.querySelectorAll=()=>[];el.showModal=()=>{el.open=true;};el.close=()=>{el.open=false;el.handlers.close?.();};return el;};
  document.body={append(){}};document.activeElement=null;document.hidden=false;document.querySelector=selector=>selector==='[data-vinegar-dialog]'?dialog:carousel;
  const motion=element();motion.matches=reduced;
  let interval=null,id=0;const timeouts=new Map();
@@ -51,7 +51,8 @@ function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=
  return {mostiButton,mostiSprite,animations,bottles,figures,images,controls,carousel,dialog,detailGrid,detailHeading,detailPhotos,document,motion,timeouts,audio,
   next(){controls['[data-offer-next]'].handlers.click();},running:()=>interval!==null,
   finish(){const [key,timeout]=timeouts.entries().next().value;timeouts.delete(key);timeout.fn();}
- ,finishLast(){const [key,timeout]=[...timeouts.entries()].at(-1);timeouts.delete(key);timeout.fn();}
+ ,finishAt(ms){const entry=[...timeouts.entries()].find(([,timeout])=>timeout.ms===ms);assert.ok(entry,'Scheduled stage '+ms+' exists');const [key,timeout]=entry;timeouts.delete(key);timeout.fn();},
+ finishLast(){const [key,timeout]=[...timeouts.entries()].at(-1);timeouts.delete(key);timeout.fn();}
  };
 }
 test('bottles fall together in one direction in a staggered wave and pause rotation until settled',()=>{
@@ -151,7 +152,7 @@ test('Mosti pauses rotation and cancels every animation when an original label i
  assert.equal(env.mostiButton.hidden,false);
  env.mostiButton.handlers.click();
  assert.equal(env.animations.length,1);assert.equal(env.running(),false);
- assert.ok(env.animations.every(animation=>animation.options.duration>=3500));
+ assert.ok(env.animations.every(animation=>animation.options.duration>=1200));
  assert.equal(env.mostiButton.attrs['aria-busy'],'true');
  env.mostiButton.handlers.click();assert.equal(env.animations.length,1);
  env.bottles[2].handlers.click();
@@ -165,4 +166,41 @@ test('Mosti respects reduced motion and finishes upright before rotation resumes
  env.mostiButton.hidden=false;env.mostiButton.handlers.click();env.finishLast();
  assert.ok(env.animations.every(a=>a.cancelled));assert.equal(env.running(),true);
  env.mostiButton.handlers.click();env.next();assert.ok(env.animations.every(a=>a.cancelled));
+});
+
+// The carry stage must attach the bottle to the mascot, with two grips, and clean up on interruption.
+test('the bottle and both gripping hands share Mosti’s parent during the whole carry',()=>{
+ const env=setup(false,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
+ env.mostiButton.handlers.click();env.finishAt(1450);
+ const rig=env.mostiButton.children.find(child=>child.className==='mosti-carry');
+ assert.ok(rig);const held=rig.children.find(child=>child.className==='mosti-held-object');assert.ok(held);
+ assert.equal(held.children.filter(child=>child.className?.startsWith('mosti-grip ')).length,2);
+ assert.ok(env.figures[0].classList.contains('is-vinegar-held'));
+ env.finishAt(1450+700+650); // Travel moves the shared parent rather than the bottle independently.
+ assert.equal(env.animations.at(-1).options.duration,2200);
+ env.bottles[1].handlers.click();assert.ok(rig.removed);
+ assert.ok(!env.figures[0].classList.contains('is-vinegar-held'));
+ assert.ok(env.animations.every(animation=>animation.cancelled));
+});
+
+test('pausing an attached bottle restores its original and cancels both gripping layers',()=>{
+ const env=setup(false,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
+ env.mostiButton.handlers.click();env.finishAt(1450);
+ assert.ok(env.figures[0].classList.contains('is-vinegar-held'));
+ env.controls['[data-offer-toggle]'].handlers.click();
+ assert.ok(!env.figures[0].classList.contains('is-vinegar-held'));
+ assert.ok(env.animations.every(animation=>animation.cancelled));assert.equal(env.running(),false);
+});
+test('the last bottle tilts with its two hands and attaches its cap to the mouth',()=>{
+ const env=setup(false,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
+ for(let i=0;i<6;i++){env.mostiButton.handlers.click();env.finishLast();}
+ env.mostiButton.handlers.click();env.finishAt(1450);env.finishAt(5000);
+ const sip=env.animations.at(-1);assert.equal(sip.options.duration,3000);
+ const match=sip.frames[1].transform.match(/translate\(([-\d.]+)px,([-\d.]+)px\) rotate\(58deg\)/);assert.ok(match);
+ const angle=58*Math.PI/180,bh=160,handX=128*.14,handY=142*.55;
+ const capX=handX+Number(match[1])+bh*.52*Math.sin(angle);
+ const capY=handY+Number(match[2])-bh*.52*Math.cos(angle);
+ assert.ok(Math.abs(capX-128*.44)<.001);assert.ok(Math.abs(capY-142*.5)<.001);
+ const rig=env.mostiButton.children.filter(child=>child.className==='mosti-carry').at(-1);
+ assert.match(rig.children[0].innerHTML,/attributeName="d"/);
 });

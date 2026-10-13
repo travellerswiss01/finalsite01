@@ -1,0 +1,23 @@
+import {readFile,writeFile} from 'node:fs/promises';
+import {pathToFileURL} from 'node:url';
+// Optional authoring renderer; production consumes the checked-in SVG files directly.
+const runtimeModules=process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES;
+const sharp=runtimeModules?(await import(pathToFileURL(runtimeModules+'/sharp/dist/index.mjs').href)).default:null;
+const embedded=async file=>{const source=await readFile(file);return sharp?{mime:'png',data:await sharp(source).png().toBuffer()}:{mime:'webp',data:source};};
+const paths={
+ birnen:'M421 20 Q480 -4 539 20 L540 89 L534 105 L534 258 Q539 283 568 315 Q596 345 596 382 L596 858 Q596 914 483 918 Q369 915 369 860 L369 383 Q367 346 397 315 Q420 289 422 263 L422 105 L417 88 L417 31 Z',
+ holunder:'M422 23 Q480 5 538 22 L539 69 L535 83 L535 283 Q537 300 559 322 Q596 357 596 399 L595 854 Q597 916 481 916 Q365 916 365 855 L365 397 Q365 360 396 324 Q417 301 420 285 L424 126 L419 109 L423 91 L418 70 Z',
+ balsamico:'M418 13 Q466 0 524 12 L524 42 L547 44 Q560 45 563 62 L576 107 L595 132 L615 158 L632 190 L640 215 L653 239 L665 275 L645 282 L605 277 L577 294 L555 304 L588 331 L637 370 L629 385 L562 344 Q601 427 602 489 L602 853 Q602 910 483 913 Q362 914 362 857 L362 487 Q362 429 389 359 L357 386 L312 411 L261 449 L241 443 L268 382 L319 321 L350 302 Q296 322 274 299 L273 266 Q278 251 316 252 L334 229 L353 218 L365 156 L381 65 Q383 42 419 40 Z',
+ original:'M428 17 Q480 1 534 17 L536 68 L530 81 L531 96 L546 102 L558 126 L591 130 L625 138 L642 152 L657 159 L655 179 L631 182 L664 216 L674 225 L662 237 L627 207 L607 183 L594 169 L592 264 L571 257 L554 247 Q553 303 575 368 Q615 461 614 497 L614 859 Q614 919 486 922 Q360 920 360 859 L360 492 Q359 446 384 388 L401 319 L386 347 L370 356 L355 341 L353 291 L326 288 L359 249 L303 260 L259 278 L258 258 L270 226 L327 209 L368 189 L387 169 L422 152 L425 82 L421 68 L423 33 Z',
+ kirsch:'M427 23 Q478 8 536 23 L535 55 L555 55 Q572 55 576 83 L596 183 L601 219 L597 249 L586 274 L574 274 L573 234 L560 201 L547 195 L548 276 Q550 314 574 383 Q603 459 603 500 L603 862 Q601 915 486 916 Q363 915 363 860 L363 497 Q362 452 384 390 L399 346 L371 372 L344 399 L309 410 L308 381 L285 381 L255 417 L193 456 L186 449 L224 391 L260 340 L254 310 L265 282 L322 270 L327 246 L287 218 L313 210 L360 213 L376 134 L386 77 Q390 53 427 55 Z',
+ himbeer:'M555 31 Q615 7 684 30 L687 99 L682 138 L681 188 L688 204 L686 231 L674 242 L676 318 Q678 339 704 361 Q745 393 745 438 L740 1033 Q745 1097 750 1117 Q752 1158 618 1167 Q478 1165 480 1120 L491 1098 L494 1041 L491 438 Q485 395 518 365 L550 328 L552 283 L535 301 L518 294 L462 296 L430 292 L355 350 L286 393 L282 379 L284 363 L361 315 L452 252 L455 208 Q449 182 457 161 Q470 142 498 141 L553 143 L550 94 L554 54 Z',
+ 'kirschen-birnen':'M415 21 Q480 1 540 22 L542 90 L535 112 L533 199 L536 217 L531 255 Q535 275 553 294 Q576 319 575 356 L575 859 Q575 911 482 914 Q386 914 386 862 L386 354 L397 329 L370 349 L354 354 L349 380 L348 424 L341 418 L336 377 L301 388 L269 402 L268 385 L294 365 L319 351 L331 331 L305 319 L285 297 L270 262 L253 236 L249 174 L269 167 L278 155 L287 177 L322 182 L353 196 L392 226 L418 239 L423 215 L421 122 L415 109 L415 91 Z'
+};
+for(const [name,d] of Object.entries(paths)){
+ const size=name==='himbeer'?1200:960;
+ const source=await embedded(new URL('../public/assets/essig-'+name+'.webp',import.meta.url));
+ const svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'"><defs><clipPath id="bottle"><path d="'+d+'"/></clipPath></defs><image width="'+size+'" height="'+size+'" href="data:image/'+source.mime+';base64,'+source.data.toString('base64')+'" clip-path="url(#bottle)"/></svg>';
+ await writeFile(new URL('../public/assets/essig-'+name+'-cutout.svg',import.meta.url),svg);
+}
+const source=await embedded(new URL('../public/assets/mosti-domino.webp',import.meta.url));
+await writeFile(new URL('../public/assets/mosti-carry-body.svg',import.meta.url),'<svg xmlns="http://www.w3.org/2000/svg" width="420" height="432" viewBox="0 0 420 432"><defs><clipPath id="body"><path d="M0 0H420V198H315Q308 246 278 275Q246 302 175 294Q90 294 68 201H0Z M120 280H316V330H420V432H0V330H120Z"/></clipPath><linearGradient id="apple-repair" x1="0" x2="1"><stop stop-color="#c50719"/><stop offset="1" stop-color="#ff2834"/></linearGradient></defs><image width="420" height="432" href="data:image/'+source.mime+';base64,'+source.data.toString('base64')+'" clip-path="url(#body)"/><path d="M72 185C64 221 75 257 109 279L128 261Q104 246 95 203Z" fill="url(#apple-repair)"/><path d="M72 185C64 221 75 257 109 279" fill="none" stroke="#231d21" stroke-width="3.5"/></svg>');
