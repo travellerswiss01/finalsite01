@@ -4,6 +4,14 @@ import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 
 const carouselScript='const offerCarousel='+readFileSync(new URL('../public/assets/app.js',import.meta.url),'utf8').split('const offerCarousel=')[1];
+test('all seven bottle cutouts use a close-fitting viewBox so the throw does not hit invisible margins',()=>{
+ const names=['essig-birnen','essig-holunder','essig-balsamico','essig-original','essig-kirsch','essig-kirschen-birnen','essig-himbeer'];
+ for(const name of names){
+  const svg=readFileSync(new URL('../public/assets/'+name+'-cutout.svg',import.meta.url),'utf8');
+  const viewBox=svg.match(/viewBox="([^"]+)"/);assert.ok(viewBox,name);
+  const [, ,width,height]=viewBox[1].split(/\s+/).map(Number);assert.ok(width/height<.55,name);
+ }
+});
 function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=true){
  const animations=[];let mostiButton,mostiSprite;
  const element=()=>({
@@ -203,4 +211,16 @@ test('the last bottle tilts with its two hands and attaches its cap to the mouth
  assert.ok(Math.abs(capX-128*.44)<.001);assert.ok(Math.abs(capY-142*.5)<.001);
  const rig=env.mostiButton.children.filter(child=>child.className==='mosti-carry').at(-1);
  assert.match(rig.children[0].innerHTML,/attributeName="d"/);
+});
+
+test('the last bottle visibly empties while Mosti drinks without covering its label',()=>{
+ const env=setup(false,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
+ for(let i=0;i<6;i++){env.mostiButton.handlers.click();env.finishLast();}
+ env.mostiButton.handlers.click();env.finishAt(1450);env.finishAt(5000);
+ const rig=env.mostiButton.children.filter(child=>child.className==='mosti-carry').at(-1);
+ const held=rig.children.find(child=>child.className==='mosti-held-object');
+ const empty=held.children.find(child=>child.className==='mosti-empty-glass');
+ assert.ok(empty);assert.match(empty.innerHTML,/fill-rule="evenodd"/);
+ assert.match(empty.innerHTML,/M378 449H566V570H378Z/);
+ assert.ok(env.animations.some(a=>a.options.duration===1550&&a.frames[0].clipPath==='inset(100% 0 0 0)'));
 });

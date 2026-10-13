@@ -421,6 +421,8 @@
 .mosti-carry-arms svg{width:100%;height:100%;overflow:visible}
 .mosti-held-object{position:absolute;z-index:2;transform-origin:50% 55%}
 .mosti-domino .mosti-held-bottle{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transform:none;filter:none;animation:none}
+.mosti-empty-glass{position:absolute;inset:0;z-index:1;display:block;clip-path:inset(100% 0 0 0)}
+.mosti-empty-glass svg{display:block;width:100%;height:100%;overflow:visible}
 .mosti-grip{position:absolute;z-index:3;display:block;filter:drop-shadow(0 1px 1px #291f2840)}
 .mosti-grip svg{display:block;width:100%;height:100%;overflow:visible}
 .mosti-grip-left{transform:rotate(-12deg)}
