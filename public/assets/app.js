@@ -539,7 +539,7 @@ if(offerCarousel){
     emptyGlass.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" viewBox="245 0 365 925" preserveAspectRatio="none"><defs><linearGradient id="empty-glass" x1="0" x2="1"><stop stop-color="#d5e1dd"/><stop offset=".16" stop-color="#fff"/><stop offset=".48" stop-color="#fcf8f1"/><stop offset=".82" stop-color="#fff"/><stop offset="1" stop-color="#d5e1dd"/></linearGradient></defs><path fill="url(#empty-glass)" fill-rule="evenodd" d="M420 204H530L529 255Q533 278 551 301Q569 322 569 356V856Q567 887 482 891Q396 887 392 856V356Q392 326 414 300Q430 280 432 255L431 204ZM378 449H566V570H378Z"/><path d="M393 374Q392 355 408 326L425 299M565 390V851Q565 882 482 888Q399 884 399 851V390" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="8"/></svg>';
     mostiHeldObject.append(emptyGlass);mostiEmptyGlass=emptyGlass;
    }
-   const bw=carryWidth,bh=carryHeight,glove=Math.max(9,bh*.07);
+   const bw=carryWidth,bh=carryHeight,glove=Math.max(10.25,bh*.08);
    mostiHeldObject.style.width=bw+'px';mostiHeldObject.style.height=bh+'px';
    mostiHeldObject.style.left=(handX-bw*.5)+'px';mostiHeldObject.style.top=(handY-bh*.55)+'px';
    mostiHeldObject.append(heldImage);

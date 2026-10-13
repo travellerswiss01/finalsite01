@@ -209,7 +209,9 @@ test('the bottle and both gripping hands share Mosti’s parent during the whole
  env.mostiButton.handlers.click();env.finishAt(2200+1450);
  const rig=env.mostiButton.children.find(child=>child.className==='mosti-carry');
  assert.ok(rig);const held=rig.children.find(child=>child.className==='mosti-held-object');assert.ok(held);
- assert.equal(held.children.filter(child=>child.className?.startsWith('mosti-grip ')).length,2);
+ const grips=held.children.filter(child=>child.className?.startsWith('mosti-grip '));
+ assert.equal(grips.length,2);
+ assert.ok(grips.every(hand=>hand.style.width==='10.25px'),'gripping hands are enlarged slightly while staying aligned to the bottle');
  assert.ok(env.figures[0].classList.contains('is-vinegar-held'));
  env.finishAt(2200+1450+700+650); // Travel moves the shared parent rather than the bottle independently.
  assert.equal(env.animations.at(-1).options.duration,2200);
