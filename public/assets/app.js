@@ -201,7 +201,7 @@ if(offerCarousel){
  if(mostiFrame&&typeof document.createElement==='function'){
   mostiButton=document.createElement('button');
   mostiButton.type='button';mostiButton.className='mosti-domino';mostiButton.hidden=true;
-  mostiButton.setAttribute('aria-label','Mosti schiebt die Flaschen weiter und zeigt weitere Sorten');
+  mostiButton.setAttribute('aria-label','Mosti winkt und schiebt die Flaschen weiter');
   mostiButton.title='Mosti zeigt weitere Sorten';
   mostiSprite=document.createElement('img');
   mostiSprite.alt='Mosti, unser Apfelmaskottchen';mostiSprite.width=420;mostiSprite.height=432;
@@ -210,20 +210,37 @@ if(offerCarousel){
   mostiSprite.src='/assets/mosti-domino.webp';
   mostiButton.append(mostiSprite);mostiFrame.append(mostiButton);
  }
- const idleMosti=new Image();idleMosti.src='/assets/mosti-domino.webp';
- const mostiPoseImages={idle:idleMosti};
- if(mostiSprite)for(const [pose,src] of Object.entries({walk:'/assets/mosti-walk-v2.webp',push:'/assets/mosti-push-v2.webp',carry:'/assets/mosti-carry-body.svg'})){
-  const image=new Image();image.src=src;mostiPoseImages[pose]=image;
- }
- let currentMostiPose='idle';
+ const mostiImage=src=>{const image=new Image();image.src=src;return image;};
+ const mostiPoseImages={
+  idle:mostiImage('/assets/mosti-domino.webp'),
+  wink:mostiImage('/assets/mosti-wink-wave.webp'),
+  wave:mostiImage('/assets/mosti-wink-wave.webp'),
+  push:mostiImage('/assets/mosti-push-v2.webp'),
+  carry:mostiImage('/assets/mosti-carry-body.svg')
+ };
+ const mostiWalkFrames=[mostiImage('/assets/mosti-walk-a.webp'),mostiImage('/assets/mosti-walk-b.webp')];
+ let currentMostiPose='idle',mostiWalkTimer=null,mostiWalkFrame=0;
+ const stopMostiWalk=()=>{if(mostiWalkTimer!==null){window.clearTimeout(mostiWalkTimer);mostiWalkTimer=null;}};
  const setMostiPose=(pose,direction='toward')=>{
   currentMostiPose=pose;
+  stopMostiWalk();
   mostiButton?.classList.toggle('is-walking',pose==='walk');
   mostiButton?.classList.toggle('is-walking-back',pose==='walk'&&direction==='back');
   mostiButton?.classList.toggle('is-bracing',pose==='push');
-  const image=mostiPoseImages[pose];
-  if(image?.complete&&image.naturalWidth&&mostiSprite.src!==image.src)mostiSprite.src=image.src;
-  else if(image&&!image.complete)image.addEventListener('load',()=>{if(currentMostiPose===pose)mostiSprite.src=image.src;},{once:true});
+  mostiButton?.classList.toggle('is-winking',pose==='wink');
+  mostiButton?.classList.toggle('is-waving',pose==='wave');
+  if(pose==='walk'){
+   mostiWalkFrame=0;
+   const step=()=>{
+    if(currentMostiPose!=='walk'||!mostiSprite)return;
+    const image=mostiWalkFrames[mostiWalkFrame];mostiSprite.src=image.src;
+    mostiWalkFrame=1-mostiWalkFrame;
+    mostiWalkTimer=window.setTimeout(step,260);
+   };
+   step();return;
+  }
+  const image=mostiPoseImages[pose]||mostiPoseImages.idle;
+  if(image&&mostiSprite&&mostiSprite.src!==image.src)mostiSprite.src=image.src;
  };
  const mostiPoseTimers=[];
  const prepareMostiSequence=()=>{
@@ -237,6 +254,8 @@ if(offerCarousel){
  };
  const resetMosti=()=>{
   mostiAnimations.forEach(animation=>animation.cancel());mostiAnimations=[];
+  stopMostiWalk();
+  mostiPoseTimers.splice(0).forEach(id=>window.clearTimeout(id));
   removeMostiCarry();
   bottles.forEach(button=>button.closest('.vinegar-lineup-item').classList.remove('is-vinegar-held'));
   if(mostiFrameRequest!==null){window.cancelAnimationFrame(mostiFrameRequest);mostiFrameRequest=null;}
@@ -393,14 +412,15 @@ if(offerCarousel){
    const bottle=button.closest('.vinegar-lineup-item');
    bottle.style.setProperty('--bottle-delay',Math.abs(index-origin)*delay+'ms');
    bottle.style.setProperty('--bottle-duration',duration+'ms');
-   bottle.style.setProperty('--bottle-angle',(direction>0?78:-78)+'deg');
+   bottle.style.setProperty('--bottle-angle',(direction>0?24:-24)+'deg');
    const imageRect=button.querySelector?.('img')?.getBoundingClientRect?.();
    const stage=mostiFrame?.getBoundingClientRect?.();
    if(imageRect&&stage){
-    const radians=(direction>0?78:-78)*Math.PI/180;
+    const radians=(direction>0?24:-24)*Math.PI/180;
     const corners=[[0,0],[1,0],[0,1],[1,1]];
     const xs=corners.map(([x,y])=>imageRect.left+imageRect.width*.5+(x-.5)*imageRect.width*Math.cos(radians)-(y-.94)*imageRect.height*Math.sin(radians));
-    const shift=Math.max(0,stage.left+8-Math.min(...xs))-Math.max(0,Math.max(...xs)-stage.right+8);
+    const minX=Math.min(...xs),maxX=Math.max(...xs);
+    const shift=minX<stage.left+10?stage.left+10-minX:maxX>stage.right-10?stage.right-10-maxX:0;
     bottle.style.setProperty('--bottle-shift',shift+'px');
    }
 
@@ -425,6 +445,7 @@ if(offerCarousel){
   const isLastBottle=mostiNextIndex===items.length-1;
   if(!item){mostiAutoRemaining=0;start();return;}
   if(reducedMostiMotion()){
+   if(!automatic){setMostiPose('wave');mostiPoseTimers.push(window.setTimeout(()=>{if(currentMostiPose==='wave')setMostiPose('idle');},900));}
    item.classList.remove('is-vinegar-waiting','is-vinegar-ready');
    item.classList.add(isLastBottle?'is-vinegar-drunk':'is-vinegar-carried');
    mostiNextIndex++;
@@ -447,19 +468,22 @@ if(offerCarousel){
   const mostiRect=mostiButton.getBoundingClientRect();
   const frameRect=mostiFrame.getBoundingClientRect?.()||{left:0,top:0,right:mostiRect.left+mostiRect.width,bottom:mostiRect.top+mostiRect.height};
   // One shared parent moves the body, both gripping hands, and original bottle.
-  const handX=mostiRect.width*.14,handY=mostiRect.height*.55;
+  const handX=mostiRect.width*.5,handY=mostiRect.height*.56;
   const approachX=bottleRect.left+bottleRect.width*.5-mostiRect.left-handX;
   const approachY=bottleRect.top+bottleRect.height*.55-mostiRect.top-handY;
+  const carryScale=Math.min(1,mostiRect.height*.76/bottleRect.height);
+  const carryWidth=bottleRect.width*carryScale,carryHeight=bottleRect.height*carryScale;
   const pickup=1450,grip=700,lift=650,travel=2200,hold=isLastBottle?3000:650,release=650,returnTime=1700;
   const duration=pickup+grip+lift+travel+hold+release+returnTime;
   const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
-  const carryingX=clamp(0,frameRect.left+12-mostiRect.left+bottleRect.width*.5-handX,frameRect.right-12-mostiRect.left-mostiRect.width);
-  const carryingY=clamp(0,frameRect.top+12-mostiRect.top+bottleRect.height*.55-handY,frameRect.bottom-16-mostiRect.top-Math.max(mostiRect.height,handY+bottleRect.height*.45));
+  const carryingX=clamp(0,frameRect.left+12-mostiRect.left+carryWidth*.5-handX,frameRect.right-12-mostiRect.left-mostiRect.width);
+  const carryingY=clamp(0,frameRect.top+12-mostiRect.top+carryHeight*.55-handY,frameRect.bottom-16-mostiRect.top-mostiRect.height);
   const point=(x,y,angle=0)=>'translate3d('+x+'px,'+y+'px,0) rotate('+angle+'deg)';
   const move=(frames,ms)=>{const animation=mostiButton.animate(frames,{duration:ms,fill:'forwards',easing:'cubic-bezier(.35,0,.25,1)'});mostiAnimations.push(animation);};
   const later=(fn,ms)=>{mostiPoseTimers.push(window.setTimeout(()=>{if(swayRunning)fn();},ms));};
-  setMostiPose('walk');
+  setMostiPose(automatic?'walk':'wave');
   move([{transform:point(0,0)},{transform:point(approachX,approachY)}],pickup);
+  if(!automatic)later(()=>setMostiPose('walk'),540);
   later(()=>{
    setMostiPose('carry');mostiButton.classList.add('is-carrying');
    mostiCarry=document.createElement('span');mostiCarry.className='mosti-carry';mostiCarry.setAttribute('aria-hidden','true');
@@ -470,23 +494,24 @@ if(offerCarousel){
     emptyGlass.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" viewBox="245 0 365 925" preserveAspectRatio="none"><defs><linearGradient id="empty-glass" x1="0" x2="1"><stop stop-color="#d5e1dd"/><stop offset=".16" stop-color="#fff"/><stop offset=".48" stop-color="#fcf8f1"/><stop offset=".82" stop-color="#fff"/><stop offset="1" stop-color="#d5e1dd"/></linearGradient></defs><path fill="url(#empty-glass)" fill-rule="evenodd" d="M420 204H530L529 255Q533 278 551 301Q569 322 569 356V856Q567 887 482 891Q396 887 392 856V356Q392 326 414 300Q430 280 432 255L431 204ZM378 449H566V570H378Z"/><path d="M393 374Q392 355 408 326L425 299M565 390V851Q565 882 482 888Q399 884 399 851V390" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="8"/></svg>';
     mostiHeldObject.append(emptyGlass);mostiEmptyGlass=emptyGlass;
    }
-   const bw=bottleRect.width,bh=bottleRect.height,glove=Math.max(12,bh*.095);
+   const bw=carryWidth,bh=carryHeight,glove=Math.max(9,bh*.07);
    mostiHeldObject.style.width=bw+'px';mostiHeldObject.style.height=bh+'px';
    mostiHeldObject.style.left=(handX-bw*.5)+'px';mostiHeldObject.style.top=(handY-bh*.55)+'px';
    mostiHeldObject.append(heldImage);
    // Rounded gloves wrap opposite bottle edges; fingers lie in front of the glass.
    const gloveMarkup='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42 48"><defs><linearGradient id="glove" x2="1" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#dce1ee"/></linearGradient></defs><path d="M8 43C3 39 3 32 5 28L4 18C3 13 7 10 10 13L13 7C15 3 20 4 21 8C24 3 30 5 30 10C35 8 39 13 36 18L31 29C38 23 42 27 38 34L31 43C25 47 16 46 8 43Z" fill="url(#glove)" stroke="#25242a" stroke-width="2.4" stroke-linejoin="round"/><path d="M10 13L12 25M21 8L20 23M30 10L26 25M31 29L24 34" fill="none" stroke="#44404a" stroke-width="1.7" stroke-linecap="round"/></svg>';
-   for(const [side,x,y] of [['left',.385,.53],['right',.615,.60]]){
+   for(const [side,x,y] of [['left',.30,.58],['right',.70,.58]]){
     const hand=document.createElement('span');hand.className='mosti-grip mosti-grip-'+side;hand.innerHTML=gloveMarkup;
     hand.style.width=glove+'px';hand.style.height=glove*48/42+'px';hand.style.left=(bw*x-glove*.5)+'px';hand.style.top=(bh*y-glove*.5)+'px';
     mostiHeldObject.append(hand);
    }
    const rear=document.createElement('span');rear.className='mosti-carry-arms';mostiCarryArms=rear;
-   const lx=handX-bw*.115,ly=handY-bh*.02,rx=handX+bw*.115,ry=handY+bh*.05;
+   const lx=handX-bw*.24,ly=handY+bh*.08,rx=handX+bw*.24,ry=handY+bh*.08;
    const w=mostiRect.width,h=mostiRect.height;
-   mostiCarryGeometry={w,h,bw,bh,handX,handY,lx,ly,rx,ry};
-   const armPaths='M '+w*.48+' '+h*.52+' Q '+w*.34+' '+h*.40+' '+lx+' '+ly+' M '+w*.43+' '+h*.61+' Q '+w*.34+' '+h*.73+' '+rx+' '+ry;
-   rear.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+w+' '+h+'"><path d="'+armPaths+'" fill="none" stroke="#241e22" stroke-width="'+w*.09+'" stroke-linecap="round"/><path d="'+armPaths+'" fill="none" stroke="#f31a2a" stroke-width="'+w*.062+'" stroke-linecap="round"/></svg>';
+   mostiCarryGeometry={w,h,bw,bh,handX,handY,lx,ly,rx,ry,leftShoulderX:w*.34,leftShoulderY:h*.50,rightShoulderX:w*.66,rightShoulderY:h*.53};
+   const arms=(x1,y1,x2,y2)=>'M '+w*.34+' '+h*.50+' C '+(w*.34+w*.05)+' '+(h*.50-h*.01)+' '+(x1-bw*.08)+' '+(y1-bh*.04)+' '+x1+' '+y1+' M '+w*.66+' '+h*.53+' C '+(w*.66-w*.05)+' '+(h*.53-h*.02)+' '+(x2+bw*.08)+' '+(y2-bh*.04)+' '+x2+' '+y2;
+   const armPaths=arms(lx,ly,rx,ry);
+   rear.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+w+' '+h+'"><path d="'+armPaths+'" fill="none" stroke="#241e22" stroke-width="'+w*.055+'" stroke-linecap="round"/><path d="'+armPaths+'" fill="none" stroke="#f31a2a" stroke-width="'+w*.036+'" stroke-linecap="round"/></svg>';
    mostiCarry.append(rear);mostiCarry.append(mostiHeldObject);mostiButton.append(mostiCarry);
    item.classList.add('is-vinegar-held');
    move([{transform:point(approachX,approachY)},{transform:point(approachX,approachY)}],grip);
@@ -515,7 +540,7 @@ if(offerCarousel){
     ],{duration:hold,easing:'linear',fill:'forwards'});mostiAnimations.push(sip);
     const wrist=(x,y)=>({x:g.handX+dx+(x-g.handX)*Math.cos(angle)-(y-g.handY)*Math.sin(angle),y:g.handY+dy+(x-g.handX)*Math.sin(angle)+(y-g.handY)*Math.cos(angle)});
     const left=wrist(g.lx,g.ly),right=wrist(g.rx,g.ry);
-    const arms=(lx,ly,rx,ry)=>'M '+g.w*.48+' '+g.h*.52+' Q '+g.w*.34+' '+g.h*.40+' '+lx+' '+ly+' M '+g.w*.43+' '+g.h*.61+' Q '+g.w*.34+' '+g.h*.73+' '+rx+' '+ry;
+    const arms=(lx,ly,rx,ry)=>'M '+g.leftShoulderX+' '+g.leftShoulderY+' C '+(g.leftShoulderX+g.w*.05)+' '+(g.leftShoulderY-g.h*.01)+' '+(lx-g.bw*.08)+' '+(ly-g.bh*.04)+' '+lx+' '+ly+' M '+g.rightShoulderX+' '+g.rightShoulderY+' C '+(g.rightShoulderX-g.w*.05)+' '+(g.rightShoulderY-g.h*.02)+' '+(rx+g.bw*.08)+' '+(ry-g.bh*.04)+' '+rx+' '+ry;
     const start=arms(g.lx,g.ly,g.rx,g.ry),end=arms(left.x,left.y,right.x,right.y);
     const motion='<animate attributeName="d" values="'+start+';'+end+';'+end+';'+start+'" keyTimes="0;.25;.8;1" dur="'+hold+'ms" fill="freeze" calcMode="spline" keySplines=".42 0 .58 1;0 0 1 1;.42 0 .58 1"/>';
     mostiCarryArms.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+g.w+' '+g.h+'"><path d="'+start+'" fill="none" stroke="#241e22" stroke-width="'+g.w*.09+'" stroke-linecap="round">'+motion+'</path><path d="'+start+'" fill="none" stroke="#f31a2a" stroke-width="'+g.w*.062+'" stroke-linecap="round">'+motion+'</path></svg>';
@@ -539,6 +564,8 @@ if(offerCarousel){
    else start();
   },duration);
  };
+ mostiButton?.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!swayRunning&&currentMostiPose==='idle')setMostiPose('wink');});
+ mostiButton?.addEventListener('pointerleave',()=>{if(currentMostiPose==='wink'&&!swayRunning)setMostiPose('idle');});
  mostiButton?.addEventListener('click',()=>{if(mostiAutoTimer!==null){window.clearTimeout(mostiAutoTimer);mostiAutoTimer=null;}mostiAutoRemaining=0;playMosti();});
   bottles.forEach((button,index)=>{
   button.addEventListener('click',()=>{playGlass();openVinegar(index);});

@@ -55,7 +55,7 @@
 .vinegar-lineup-frame{z-index:0;background:var(--vinegar-backdrop)}
 .vinegar-lineup{position:absolute;inset:5px 12px 8px 20%;display:flex;gap:4px;align-items:end;isolation:isolate;background:var(--vinegar-backdrop)}
 .vinegar-lineup-item{position:relative;container-type:size;flex:1;height:100%;min-width:0;margin:0;overflow:visible;background:var(--vinegar-backdrop)}
-.vinegar-lineup-item img{position:absolute;left:50%;top:45%;height:min(78cqh,150cqw);width:auto;max-width:none;transform:translate(-50%,-50%);filter:brightness(1.003937)}
+.vinegar-lineup-item img{position:absolute;left:50%;top:45%;height:min(72cqh,140cqw);width:auto;max-width:none;transform:translate(-50%,-50%);filter:brightness(1.003937)}
 .vinegar-lineup-item figcaption{position:absolute;bottom:4px;left:2px;right:2px;text-align:center;color:#173d2b;font-size:11px;line-height:1.2}
 .vinegar-zoom{position:absolute;right:12px;top:8px;display:flex;align-items:center;gap:5px;min-height:44px;padding:6px 10px;border:1px solid #173d2b26;border-radius:24px;background:#fffefaee;color:#173d2b;font-size:13px}
 .vinegar-zoom .icon{width:18px;height:18px}
@@ -78,9 +78,9 @@
 .vinegar-lineup-item.is-vinegar-sway img{animation:vinegar-sway var(--bottle-duration,1500ms) cubic-bezier(.2,.7,.25,1) var(--bottle-delay,0ms) both}
 @keyframes vinegar-sway{
  0%{transform:translate(-50%,-50%) rotate(0deg);animation-timing-function:cubic-bezier(.45,.05,.82,.42)}
- 58%{transform:translate(-50%,-50%) translateX(var(--bottle-shift,0px)) rotate(var(--bottle-angle,78deg));animation-timing-function:cubic-bezier(.2,.65,.25,1)}
- 72%{transform:translate(-50%,-50%) translateX(var(--bottle-shift,0px)) translateY(3px) rotate(calc(var(--bottle-angle,78deg) * .96));animation-timing-function:ease-out}
- 84%,100%{transform:translate(-50%,-50%) translateX(var(--bottle-shift,0px)) translateY(1px) rotate(var(--bottle-angle,78deg))}
+ 58%{transform:translate(-50%,-50%) translateX(var(--bottle-shift,0px)) rotate(var(--bottle-angle,24deg));animation-timing-function:cubic-bezier(.2,.65,.25,1)}
+ 72%{transform:translate(-50%,-50%) translateX(var(--bottle-shift,0px)) translateY(2px) rotate(calc(var(--bottle-angle,24deg) * .96));animation-timing-function:ease-out}
+ 84%,100%{transform:translate(-50%,-50%) translateX(var(--bottle-shift,0px)) translateY(1px) rotate(var(--bottle-angle,24deg))}
 }
 .offer-carousel:has(.vinegar-lineup-frame.is-active) .hero-content,
 .offer-carousel:has(.vinegar-lineup-frame.is-active) .hero-offer.is-active{pointer-events:none}
@@ -218,19 +218,23 @@
 
 
 /* Mosti lives only inside the existing vinegar slide; hero heights stay unchanged. */
-.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:132px}
+.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:184px}
 .mosti-domino{position:absolute;right:5px;bottom:38px;z-index:4;width:128px;height:142px;display:block;border:0;padding:0;background:transparent;cursor:pointer;touch-action:manipulation;transform-origin:50% 93%;-webkit-tap-highlight-color:transparent}
 .mosti-domino[hidden]{display:none}
 .mosti-domino img{display:block;width:100%;height:100%;object-fit:contain;transform:scaleX(-1);filter:drop-shadow(0 4px 3px #173d2b18);pointer-events:none}
 @keyframes mosti-walk-bounce{from{transform:scaleX(-1) translateX(var(--bottle-shift,0px)) translateY(1px) rotate(1deg)}to{transform:scaleX(-1) translateY(-6px) rotate(-1deg)}}
 @keyframes mosti-walk-back-bounce{from{transform:scaleX(1) translateX(var(--bottle-shift,0px)) translateY(1px) rotate(-1deg)}to{transform:scaleX(1) translateY(-6px) rotate(1deg)}}
-.mosti-domino.is-walking img{animation:mosti-walk-bounce .48s ease-in-out infinite alternate}
+.mosti-domino.is-walking img{animation:mosti-walk-bounce .52s ease-in-out infinite alternate}
 .mosti-domino.is-walking-back img{animation-name:mosti-walk-back-bounce}
+.mosti-domino.is-winking img{animation:mosti-wink .16s ease-out}
+.mosti-domino.is-waving img{animation:mosti-wave .24s ease-in-out 3 alternate}
+@keyframes mosti-wink{from{transform:scaleX(-1) scaleY(1)}to{transform:scaleX(-1) scaleY(.985)}}
+@keyframes mosti-wave{from{transform:scaleX(-1) rotate(-1deg) translateY(0)}to{transform:scaleX(-1) rotate(1deg) translateY(-3px)}}
 .mosti-domino:focus-visible{outline:2px solid #9c792b;outline-offset:3px;border-radius:18px}
 .is-mosti-playing .mosti-domino{pointer-events:none}
-@media(min-width:1600px){.mosti-domino{width:150px;height:162px}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:155px}}
-@media(max-width:899px) and (min-width:600px){.mosti-domino{width:94px;height:108px;bottom:53px}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:98px}}
-@media(max-width:599px){.mosti-domino{width:84px;height:92px;top:auto;bottom:150px;right:8px}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:8px}}
+@media(min-width:1600px){.mosti-domino{width:136px;height:148px}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:198px}}
+@media(max-width:899px) and (min-width:600px){.mosti-domino{width:94px;height:108px;bottom:53px}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:126px}}
+@media(max-width:599px){.mosti-domino{width:84px;height:92px;top:auto;bottom:150px;right:8px}.vinegar-lineup-frame.has-mosti .vinegar-lineup{right:88px}}
 .vinegar-lineup.is-mosti-sequence .vinegar-lineup-item.is-vinegar-waiting,
 .vinegar-lineup.is-mosti-sequence .vinegar-lineup-item.is-vinegar-ready,
 .vinegar-lineup.is-mosti-sequence .vinegar-lineup-item.is-vinegar-entering{visibility:visible;opacity:1;transform:none}
@@ -243,6 +247,7 @@
 .mosti-domino.is-sipping img{animation:mosti-gulp .72s ease-in-out 3 alternate}
 @keyframes mosti-gulp{from{transform:scaleX(-1) rotate(0deg) translateY(0)}to{transform:scaleX(-1) rotate(-5deg) translateY(-3px)}}
 
+@media(prefers-reduced-motion:reduce){.mosti-domino.is-winking img,.mosti-domino.is-waving img{animation:none}}
 @media(prefers-reduced-motion:reduce) and (min-width:600px){.mosti-domino{cursor:default}.mosti-domino.is-walking img{animation:none}}
 
 

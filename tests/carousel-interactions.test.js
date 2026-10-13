@@ -12,6 +12,14 @@ test('all seven bottle cutouts use a close-fitting viewBox so the throw does not
   const [, ,width,height]=viewBox[1].split(/\s+/).map(Number);assert.ok(width/height<.55,name);
  }
 });
+test('Mosti has separate transparent walk frames and a wink-and-wave pose',()=>{
+ for(const name of ['mosti-walk-a.webp','mosti-walk-b.webp','mosti-wink-wave.webp']){
+  const image=readFileSync(new URL('../public/assets/'+name,import.meta.url));
+  assert.ok(image.length>10000,name);
+  assert.equal(image.toString('ascii',0,4),'RIFF',name);
+  assert.equal(image.toString('ascii',8,12),'WEBP',name);
+ }
+});
 function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=true){
  const animations=[];let mostiButton,mostiSprite;
  const element=()=>({
@@ -70,7 +78,7 @@ test('bottles fall together in one direction in a staggered wave and pause rotat
  assert.ok(env.figures.every(figure=>figure.classList.contains('is-vinegar-sway')));
  assert.deepEqual(env.figures.map(figure=>figure.style.values['--bottle-delay']),['260ms','130ms','0ms','130ms','260ms','390ms','520ms']);
  assert.ok(env.figures.every(figure=>figure.style.values['--bottle-duration']==='1500ms'));
- assert.ok(env.figures.every(figure=>figure.style.values['--bottle-angle']==='78deg'));
+ assert.ok(env.figures.every(figure=>figure.style.values['--bottle-angle']==='24deg'));
  assert.equal([...env.timeouts.values()][0].ms,2200);
  env.bottles[4].handlers.pointerenter({pointerType:'mouse'});assert.equal(env.timeouts.size,1);
  env.carousel.handlers.mouseleave();assert.equal(env.running(),false);
@@ -79,7 +87,7 @@ test('bottles fall together in one direction in a staggered wave and pause rotat
 test('entering a bottle from its right makes the whole row fall left',()=>{
  const env=setup();
  env.bottles[2].handlers.pointerenter({pointerType:'mouse',clientX:270});
- assert.ok(env.figures.every(figure=>figure.style.values['--bottle-angle']==='-78deg'));
+ assert.ok(env.figures.every(figure=>figure.style.values['--bottle-angle']==='-24deg'));
 });
 test('hover and the motion control trigger a full fall on the active bottle slide',()=>{
  const env=setup();env.bottles[0].handlers.pointerenter({pointerType:'mouse'});assert.equal(env.timeouts.size,1);
@@ -176,6 +184,25 @@ test('Mosti respects reduced motion and finishes upright before rotation resumes
  env.mostiButton.handlers.click();env.next();assert.ok(env.animations.every(a=>a.cancelled));
 });
 
+test('Mosti winks on mouse attention, waves on click, and alternates a walking gait',()=>{
+ const env=setup(false,true,true);env.mostiButton.hidden=false;
+ env.mostiButton.handlers.pointerenter({pointerType:'mouse'});
+ assert.match(env.mostiSprite.src,/mosti-wink-wave\.webp$/);
+ assert.ok(env.mostiButton.classList.contains('is-winking'));
+ env.mostiButton.handlers.pointerleave();
+ assert.match(env.mostiSprite.src,/mosti-domino\.webp$/);
+ env.mostiButton.handlers.click();
+ assert.match(env.mostiSprite.src,/mosti-wink-wave\.webp$/);
+ env.finishAt(540);
+ assert.match(env.mostiSprite.src,/mosti-walk-a\.webp$/);
+ assert.ok(env.mostiButton.classList.contains('is-walking'));
+ env.finishAt(260);
+ assert.match(env.mostiSprite.src,/mosti-walk-b\.webp$/);
+ env.bottles[0].handlers.click();
+ assert.match(env.mostiSprite.src,/mosti-domino\.webp$/);
+ assert.ok(!env.mostiButton.classList.contains('is-walking'));
+});
+
 // The carry stage must attach the bottle to the mascot, with two grips, and clean up on interruption.
 test('the bottle and both gripping hands share Mosti’s parent during the whole carry',()=>{
  const env=setup(false,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
@@ -205,7 +232,7 @@ test('the last bottle tilts with its two hands and attaches its cap to the mouth
  env.mostiButton.handlers.click();env.finishAt(1450);env.finishAt(5000);
  const sip=env.animations.at(-1);assert.equal(sip.options.duration,3000);
  const match=sip.frames[1].transform.match(/translate\(([-\d.]+)px,([-\d.]+)px\) rotate\(58deg\)/);assert.ok(match);
- const angle=58*Math.PI/180,bh=160,handX=128*.14,handY=142*.55;
+ const angle=58*Math.PI/180,bh=142*.76,handX=128*.5,handY=142*.56;
  const capX=handX+Number(match[1])+bh*.52*Math.sin(angle);
  const capY=handY+Number(match[2])-bh*.52*Math.cos(angle);
  assert.ok(Math.abs(capX-128*.44)<.001);assert.ok(Math.abs(capY-142*.5)<.001);
