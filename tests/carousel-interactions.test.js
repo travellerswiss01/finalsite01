@@ -71,23 +71,24 @@ function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=
  finishLast(){const [key,timeout]=[...timeouts.entries()].at(-1);timeouts.delete(key);timeout.fn();}
  };
 }
-test('bottles fall together in one direction in a staggered wave and pause rotation until settled',()=>{
+test('bottles topple like dominoes in a staggered wave and stay down until the slide resets',()=>{
  const env=setup();
  env.bottles[2].handlers.pointerenter({pointerType:'touch'});assert.equal(env.timeouts.size,0);
  env.bottles[2].handlers.pointerenter({pointerType:'mouse',clientX:230});assert.equal(env.running(),false);
  assert.ok(env.figures.every(figure=>figure.classList.contains('is-vinegar-sway')));
- assert.deepEqual(env.figures.map(figure=>figure.style.values['--bottle-delay']),['260ms','130ms','0ms','130ms','260ms','390ms','520ms']);
- assert.ok(env.figures.every(figure=>figure.style.values['--bottle-duration']==='1500ms'));
- assert.ok(env.figures.every(figure=>figure.style.values['--bottle-angle']==='24deg'));
- assert.equal([...env.timeouts.values()][0].ms,2200);
+ assert.deepEqual(env.figures.map(figure=>figure.style.values['--bottle-delay']),['360ms','180ms','0ms','180ms','360ms','540ms','720ms']);
+ assert.ok(env.figures.every(figure=>figure.style.values['--bottle-duration']==='2800ms'));
+ assert.ok(env.figures.every(figure=>figure.style.values['--bottle-angle']==='72deg'));
+ assert.equal([...env.timeouts.values()][0].ms,3700);
  env.bottles[4].handlers.pointerenter({pointerType:'mouse'});assert.equal(env.timeouts.size,1);
  env.carousel.handlers.mouseleave();assert.equal(env.running(),false);
- env.finish();assert.ok(env.figures.every(figure=>!figure.classList.contains('is-vinegar-sway')));assert.equal(env.running(),true);
+ env.finish();assert.ok(env.figures.every(figure=>figure.classList.contains('is-vinegar-sway')));assert.equal(env.running(),true);
+ env.next();assert.ok(env.figures.every(figure=>!figure.classList.contains('is-vinegar-sway')));
 });
 test('entering a bottle from its right makes the whole row fall left',()=>{
  const env=setup();
  env.bottles[2].handlers.pointerenter({pointerType:'mouse',clientX:270});
- assert.ok(env.figures.every(figure=>figure.style.values['--bottle-angle']==='-24deg'));
+ assert.ok(env.figures.every(figure=>figure.style.values['--bottle-angle']==='-72deg'));
 });
 test('hover and the motion control trigger a full fall on the active bottle slide',()=>{
  const env=setup();env.bottles[0].handlers.pointerenter({pointerType:'mouse'});assert.equal(env.timeouts.size,1);
@@ -196,6 +197,7 @@ test('Mosti winks on mouse attention, waves on click, and alternates a walking g
  env.finishAt(540);
  assert.match(env.mostiSprite.src,/mosti-walk-a\.webp$/);
  assert.ok(env.mostiButton.classList.contains('is-walking'));
+ assert.ok(env.mostiButton.classList.contains('is-moonwalking'));
  env.finishAt(260);
  assert.match(env.mostiSprite.src,/mosti-walk-b\.webp$/);
  env.bottles[0].handlers.click();
@@ -251,3 +253,4 @@ test('the last bottle visibly empties while Mosti drinks without covering its la
  assert.match(empty.innerHTML,/M378 449H566V570H378Z/);
  assert.ok(env.animations.some(a=>a.options.duration===1550&&a.frames[0].clipPath==='inset(100% 0 0 0)'));
 });
+

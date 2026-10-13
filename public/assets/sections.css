@@ -75,12 +75,12 @@
 .vinegar-bottle-trigger{position:absolute;inset:0;width:100%;padding:0;border:0;border-radius:8px;background:transparent;cursor:pointer;touch-action:manipulation}
 .vinegar-bottle-trigger:focus-visible{outline:2px solid #205532;outline-offset:2px}
 .vinegar-lineup-item img{pointer-events:none;transform-origin:50% 94%}
-.vinegar-lineup-item.is-vinegar-sway img{animation:vinegar-sway var(--bottle-duration,1500ms) cubic-bezier(.2,.7,.25,1) var(--bottle-delay,0ms) both}
+.vinegar-lineup-item.is-vinegar-sway img{animation:vinegar-sway var(--bottle-duration,2800ms) cubic-bezier(.2,.7,.25,1) var(--bottle-delay,0ms) both}
 @keyframes vinegar-sway{
  0%{transform:translate(-50%,-50%) rotate(0deg);animation-timing-function:cubic-bezier(.45,.05,.82,.42)}
- 58%{transform:translate(-50%,-50%) translateX(var(--bottle-shift,0px)) rotate(var(--bottle-angle,24deg));animation-timing-function:cubic-bezier(.2,.65,.25,1)}
- 72%{transform:translate(-50%,-50%) translateX(var(--bottle-shift,0px)) translateY(2px) rotate(calc(var(--bottle-angle,24deg) * .96));animation-timing-function:ease-out}
- 84%,100%{transform:translate(-50%,-50%) translateX(var(--bottle-shift,0px)) translateY(1px) rotate(var(--bottle-angle,24deg))}
+ 58%{transform:translate(calc(-50% + var(--bottle-shift,0px)),calc(-50% + var(--bottle-shift-y,0px))) rotate(var(--bottle-angle,72deg));animation-timing-function:cubic-bezier(.2,.65,.25,1)}
+ 72%{transform:translate(calc(-50% + var(--bottle-shift,0px)),calc(-50% + var(--bottle-shift-y,0px) + 2px)) rotate(calc(var(--bottle-angle,72deg) * .96));animation-timing-function:ease-out}
+ 84%,100%{transform:translate(calc(-50% + var(--bottle-shift,0px)),calc(-50% + var(--bottle-shift-y,0px) + 1px)) rotate(var(--bottle-angle,72deg))}
 }
 .offer-carousel:has(.vinegar-lineup-frame.is-active) .hero-content,
 .offer-carousel:has(.vinegar-lineup-frame.is-active) .hero-offer.is-active{pointer-events:none}
@@ -222,10 +222,11 @@
 .mosti-domino{position:absolute;right:5px;bottom:38px;z-index:4;width:128px;height:142px;display:block;border:0;padding:0;background:transparent;cursor:pointer;touch-action:manipulation;transform-origin:50% 93%;-webkit-tap-highlight-color:transparent}
 .mosti-domino[hidden]{display:none}
 .mosti-domino img{display:block;width:100%;height:100%;object-fit:contain;transform:scaleX(-1);filter:drop-shadow(0 4px 3px #173d2b18);pointer-events:none}
-@keyframes mosti-walk-bounce{from{transform:scaleX(-1) translateX(var(--bottle-shift,0px)) translateY(1px) rotate(1deg)}to{transform:scaleX(-1) translateY(-6px) rotate(-1deg)}}
-@keyframes mosti-walk-back-bounce{from{transform:scaleX(1) translateX(var(--bottle-shift,0px)) translateY(1px) rotate(-1deg)}to{transform:scaleX(1) translateY(-6px) rotate(1deg)}}
-.mosti-domino.is-walking img{animation:mosti-walk-bounce .52s ease-in-out infinite alternate}
-.mosti-domino.is-walking-back img{animation-name:mosti-walk-back-bounce}
+@keyframes mosti-moonwalk-glide{0%,100%{translate:0 0}50%{translate:-18px 0}}
+@keyframes mosti-moonwalk-rock{0%,100%{transform:scaleX(-1) translateY(0) rotate(0)}50%{transform:scaleX(-1) translateY(-2px) rotate(-1deg)}}
+.mosti-domino.is-moonwalking{animation:mosti-moonwalk-glide .78s ease-in-out infinite}
+.mosti-domino.is-moonwalking img{animation:mosti-moonwalk-rock .78s ease-in-out infinite}
+.mosti-domino.is-walking-back img{animation-name:mosti-moonwalk-rock}
 .mosti-domino.is-winking img{animation:mosti-wink .16s ease-out}
 .mosti-domino.is-waving img{animation:mosti-wave .24s ease-in-out 3 alternate}
 @keyframes mosti-wink{from{transform:scaleX(-1) scaleY(1)}to{transform:scaleX(-1) scaleY(.985)}}
@@ -248,7 +249,7 @@
 @keyframes mosti-gulp{from{transform:scaleX(-1) rotate(0deg) translateY(0)}to{transform:scaleX(-1) rotate(-5deg) translateY(-3px)}}
 
 @media(prefers-reduced-motion:reduce){.mosti-domino.is-winking img,.mosti-domino.is-waving img{animation:none}}
-@media(prefers-reduced-motion:reduce) and (min-width:600px){.mosti-domino{cursor:default}.mosti-domino.is-walking img{animation:none}}
+@media(prefers-reduced-motion:reduce) and (min-width:600px){.mosti-domino{cursor:default}.mosti-domino.is-moonwalking,.mosti-domino.is-moonwalking img{animation:none}}
 
 
 /* Mobile: Logo und Navigation bleiben auch bei 320px in einer Zeile bedienbar. */
@@ -436,3 +437,4 @@
 .vinegar-lineup-item.is-vinegar-held>button>img{visibility:hidden}
 .offer-carousel:has(.vinegar-lineup-frame.is-active){min-height:340px}
 @media(max-width:599px){.offer-carousel:has(.vinegar-lineup-frame.is-active){min-height:650px}}
+

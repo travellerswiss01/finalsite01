@@ -225,6 +225,7 @@ if(offerCarousel){
   currentMostiPose=pose;
   stopMostiWalk();
   mostiButton?.classList.toggle('is-walking',pose==='walk');
+  mostiButton?.classList.toggle('is-moonwalking',pose==='walk');
   mostiButton?.classList.toggle('is-walking-back',pose==='walk'&&direction==='back');
   mostiButton?.classList.toggle('is-bracing',pose==='push');
   mostiButton?.classList.toggle('is-winking',pose==='wink');
@@ -406,27 +407,33 @@ if(offerCarousel){
  const playSway=(origin,direction=1)=>{
   if(swayRunning||!bottles[origin]?.closest('[data-offer-image]').classList.contains('is-active'))return;
   if(motion.matches){openVinegar();return;}
-  const duration=1500,delay=130;
+  // A domino fall needs a broad lean and enough time for each bottle to hit its neighbour.
+  const duration=2800,delay=180,fallAngle=72;
+  resetSway();
   swayRunning=true;stop();
   bottles.forEach((button,index)=>{
    const bottle=button.closest('.vinegar-lineup-item');
    bottle.style.setProperty('--bottle-delay',Math.abs(index-origin)*delay+'ms');
    bottle.style.setProperty('--bottle-duration',duration+'ms');
-   bottle.style.setProperty('--bottle-angle',(direction>0?24:-24)+'deg');
+   bottle.style.setProperty('--bottle-angle',(direction>0?fallAngle:-fallAngle)+'deg');
    const imageRect=button.querySelector?.('img')?.getBoundingClientRect?.();
    const stage=mostiFrame?.getBoundingClientRect?.();
    if(imageRect&&stage){
-    const radians=(direction>0?24:-24)*Math.PI/180;
+    const radians=(direction>0?fallAngle:-fallAngle)*Math.PI/180;
     const corners=[[0,0],[1,0],[0,1],[1,1]];
     const xs=corners.map(([x,y])=>imageRect.left+imageRect.width*.5+(x-.5)*imageRect.width*Math.cos(radians)-(y-.94)*imageRect.height*Math.sin(radians));
-    const minX=Math.min(...xs),maxX=Math.max(...xs);
-    const shift=minX<stage.left+10?stage.left+10-minX:maxX>stage.right-10?stage.right-10-maxX:0;
-    bottle.style.setProperty('--bottle-shift',shift+'px');
+    const ys=corners.map(([x,y])=>imageRect.top+imageRect.height*.94+(x-.5)*imageRect.width*Math.sin(radians)+(y-.94)*imageRect.height*Math.cos(radians));
+    const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+    const shiftX=minX<stage.left+10?stage.left+10-minX:maxX>stage.right-10?stage.right-10-maxX:0;
+    const shiftY=minY<stage.top+10?stage.top+10-minY:maxY>stage.bottom-10?stage.bottom-10-maxY:0;
+    bottle.style.setProperty('--bottle-shift',shiftX+'px');
+    bottle.style.setProperty('--bottle-shift-y',shiftY+'px');
    }
 
    bottle.classList.add('is-vinegar-sway');
   });
-  swayTimer=window.setTimeout(()=>{bottles.forEach(button=>button.closest('.vinegar-lineup-item').classList.remove('is-vinegar-sway'));swayRunning=false;swayTimer=null;start();},duration+Math.max(origin,bottles.length-1-origin)*delay+180);
+  // Keep the bottles lying together until the slide changes or the user starts another fall.
+  swayTimer=window.setTimeout(()=>{swayRunning=false;swayTimer=null;start();},duration+Math.max(origin,bottles.length-1-origin)*delay+180);
  };
  // Mosti pushes the bottles one by one; product taps still open their details.
  const scheduleMostiAuto=(delay=1400)=>{
@@ -586,4 +593,5 @@ if(offerCarousel){
  offerCarousel.querySelector('[data-offer-controls]').hidden=false;
  show(3);updateToggle();start();
 }
+
 
