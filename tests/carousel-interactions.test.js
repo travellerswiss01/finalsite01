@@ -13,7 +13,7 @@ test('all seven bottle cutouts use a close-fitting viewBox so the throw does not
  }
 });
 test('Mosti has separate transparent walk frames and a wink-and-wave pose',()=>{
- for(const name of ['mosti-walk-a.webp','mosti-walk-b.webp','mosti-wink-wave.webp']){
+ for(const name of ['mosti-walk-a.webp','mosti-walk-b.webp','mosti-moonwalk-a.webp','mosti-moonwalk-b.webp','mosti-wink-wave.webp']){
   const image=readFileSync(new URL('../public/assets/'+name,import.meta.url));
   assert.ok(image.length>10000,name);
   assert.equal(image.toString('ascii',0,4),'RIFF',name);
@@ -24,12 +24,12 @@ function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=
  const animations=[];let mostiButton,mostiSprite;
  const element=()=>({
   children:[],remove(){this.removed=true;},append(child){this.children.push(child);},handlers:{},attrs:{},inert:false,hidden:true,textContent:'',
-  style:{values:{},setProperty(name,value){this.values[name]=value;}},
+  style:{values:{},zIndex:'',setProperty(name,value){this.values[name]=value;},removeProperty(name){if(name==='z-index')this.zIndex='';else delete this.values[name];}},
   classList:{values:new Set(),add(...names){names.forEach(name=>this.values.add(name));},remove(...names){names.forEach(name=>this.values.delete(name));},contains(name){return this.values.has(name);},toggle(name,value){if(value)this.add(name);else this.remove(name);}},
   addEventListener(type,fn){this.handlers[type]=fn;},matches(selector){return selector===':focus-visible'&&this.focusVisible===true;},setAttribute(name,value){this.attrs[name]=value;},removeAttribute(name){delete this.attrs[name];},animate(frames,options){const animation={frames,options,cancelled:false,cancel(){this.cancelled=true;}};animations.push(animation);return animation;}
  });
- const slides=Array.from({length:5},element),images=Array.from({length:5},element);
- const figures=Array.from({length:7},element),bottles=figures.map((figure,index)=>{const button=element();button.closest=selector=>selector==='[data-offer-image]'?images[3]:figure;button.getBoundingClientRect=()=>({left:index*100,width:80});figure.querySelector=()=>({src:'/assets/essig-birnen-cutout.svg',getBoundingClientRect:()=>({left:index*100,width:160,top:0,height:160}),animate:(frames,options)=>{const animation={frames,options,cancelled:false,cancel(){this.cancelled=true;}};animations.push(animation);return animation;}});figure.getBoundingClientRect=()=>({left:index*100,width:80,top:0,height:160});return button;});
+ const slides=Array.from({length:5},element),images=Array.from({length:5},element);images[3].getBoundingClientRect=()=>({left:0,top:0,right:700,bottom:300,width:700,height:300});
+ const figures=Array.from({length:7},element),bottles=figures.map((figure,index)=>{const button=element();button.closest=selector=>selector==='[data-offer-image]'?images[3]:figure;button.getBoundingClientRect=()=>({left:index*100,width:80});const bottleImage=element();bottleImage.src='/assets/essig-birnen-cutout.svg';bottleImage.getBoundingClientRect=()=>({left:20+index*90,width:90,top:25,height:240});figure.querySelector=()=>bottleImage;figure.getBoundingClientRect=()=>({left:index*100,width:80,top:0,height:160});button.querySelector=()=>bottleImage;return button;});
  const controls=Object.fromEntries(['prev','next','toggle','controls'].map(name=>['[data-offer-'+name+']',element()]));
  controls['[data-vinegar-open]']=element();
  controls['[data-vinegar-sound]']=element();
@@ -47,7 +47,6 @@ function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=
   images[3].querySelector=()=>lineup;
   const mostiRect={left:500,top:0,width:128,height:142};
   images[3].append=button=>{mostiButton=button;button.getBoundingClientRect=()=>mostiRect;};
-  bottles.forEach(button=>{button.querySelector=()=>element();});
  }
  const document=element();
  document.createElement=tag=>{const el=element();el.offsetWidth=128;el.append=sprite=>{el.children.push(sprite);if(tag==='button')mostiSprite=sprite;};el.querySelector=()=>element();el.querySelectorAll=()=>[];el.showModal=()=>{el.open=true;};el.close=()=>{el.open=false;el.handlers.close?.();};return el;};
@@ -67,7 +66,7 @@ function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=
  return {mostiButton,mostiSprite,animations,bottles,figures,images,controls,carousel,dialog,detailGrid,detailHeading,detailPhotos,document,motion,timeouts,audio,
   next(){controls['[data-offer-next]'].handlers.click();},running:()=>interval!==null,
   finish(){const [key,timeout]=timeouts.entries().next().value;timeouts.delete(key);timeout.fn();}
- ,finishAt(ms){const entry=[...timeouts.entries()].find(([,timeout])=>timeout.ms===ms);assert.ok(entry,'Scheduled stage '+ms+' exists');const [key,timeout]=entry;timeouts.delete(key);timeout.fn();},
+ ,finishAt(ms){const entry=[...timeouts.entries()].filter(([,timeout])=>timeout.ms===ms).at(-1);assert.ok(entry,'Scheduled stage '+ms+' exists');const [key,timeout]=entry;timeouts.delete(key);timeout.fn();},
  finishLast(){const [key,timeout]=[...timeouts.entries()].at(-1);timeouts.delete(key);timeout.fn();}
  };
 }
@@ -79,6 +78,20 @@ test('bottles topple like dominoes in a staggered wave and stay down until the s
  assert.deepEqual(env.figures.map(figure=>figure.style.values['--bottle-delay']),['360ms','180ms','0ms','180ms','360ms','540ms','720ms']);
  assert.ok(env.figures.every(figure=>figure.style.values['--bottle-duration']==='2800ms'));
  assert.ok(env.figures.every(figure=>figure.style.values['--bottle-angle']==='72deg'));
+ assert.equal(env.figures[0].style.zIndex,'7');assert.equal(env.figures[6].style.zIndex,'1');
+ assert.ok(env.figures.every(figure=>figure.style.values['--bottle-shift-y']!==undefined));
+ for(const [index,figure] of env.figures.entries()){
+  const left=20+index*90,width=90,top=25,height=240,angle=72*Math.PI/180;
+  const sx=Number.parseFloat(figure.style.values['--bottle-shift']),sy=Number.parseFloat(figure.style.values['--bottle-shift-y']);
+  const points=[[0,0],[1,0],[0,1],[1,1]].map(([x,y])=>({
+   x:left+width*.5+(x-.5)*width*Math.cos(angle)-(y-.94)*height*Math.sin(angle)+sx,
+   y:top+height*.94+(x-.5)*width*Math.sin(angle)+(y-.94)*height*Math.cos(angle)+sy
+  }));
+  assert.ok(Math.min(...points.map(point=>point.x))>=9.99,`bottle ${index} stays inside left edge`);
+  assert.ok(Math.max(...points.map(point=>point.x))<=690.01,`bottle ${index} stays inside right edge`);
+  assert.ok(Math.min(...points.map(point=>point.y))>=9.99,`bottle ${index} stays inside top edge`);
+  assert.ok(Math.max(...points.map(point=>point.y))<=290.01,`bottle ${index} stays inside bottom edge`);
+ }
  assert.equal([...env.timeouts.values()][0].ms,3700);
  env.bottles[4].handlers.pointerenter({pointerType:'mouse'});assert.equal(env.timeouts.size,1);
  env.carousel.handlers.mouseleave();assert.equal(env.running(),false);
@@ -89,6 +102,7 @@ test('entering a bottle from its right makes the whole row fall left',()=>{
  const env=setup();
  env.bottles[2].handlers.pointerenter({pointerType:'mouse',clientX:270});
  assert.ok(env.figures.every(figure=>figure.style.values['--bottle-angle']==='-72deg'));
+ assert.equal(env.figures[0].style.zIndex,'1');assert.equal(env.figures[6].style.zIndex,'7');
 });
 test('hover and the motion control trigger a full fall on the active bottle slide',()=>{
  const env=setup();env.bottles[0].handlers.pointerenter({pointerType:'mouse'});assert.equal(env.timeouts.size,1);
@@ -125,24 +139,18 @@ test('reduced motion keeps bottles still while allowing direct access to origina
  const env=setup(true);
  env.bottles[0].handlers.pointerenter({pointerType:'mouse'});
  assert.equal(env.timeouts.size,0);assert.equal(env.dialog.open,false);
- env.bottles[0].handlers.click();assert.equal(env.dialog.open,true);assert.equal(env.timeouts.size,0);
+ env.controls['[data-vinegar-open]'].handlers.click();assert.equal(env.dialog.open,true);assert.equal(env.timeouts.size,0);
  const normal=setup();normal.bottles[0].handlers.pointerenter({pointerType:'mouse'});
  normal.motion.matches=true;normal.motion.handlers.change({matches:true});
  assert.equal(normal.timeouts.size,0);assert.equal(normal.running(),false);
 });
 
-test('glass sound is silent by default and plays only on a bottle click after opting in',async()=>{
+test('the label overview remains available separately from direct product links',()=>{
  const env=setup();
- const sound=env.controls['[data-vinegar-sound]'];
- assert.equal(sound.hidden,false);assert.equal(env.audio.contexts,0);
- env.bottles[0].handlers.click();assert.equal(env.audio.notes,0);env.dialog.close();
- await sound.handlers.click();
- assert.equal(sound.attrs['aria-pressed'],'true');assert.equal(env.audio.contexts,1);assert.equal(env.audio.notes,0);
- env.bottles[0].handlers.pointerenter({pointerType:'mouse'});
- assert.equal(env.audio.notes,0);
- env.bottles[0].handlers.click();assert.equal(env.audio.notes,3);assert.equal(env.dialog.open,true);
- await sound.handlers.click();assert.equal(sound.attrs['aria-pressed'],'false');env.dialog.close();
- env.bottles[0].handlers.click();assert.equal(env.audio.notes,3);
+ env.controls['[data-vinegar-open]'].handlers.click();
+ assert.equal(env.dialog.open,true);
+ assert.ok(env.detailPhotos.every(photo=>!photo.hidden));
+ assert.equal(env.detailHeading.textContent,'Alle Originaletiketten');
 });
 test('devices without Web Audio keep the sound button hidden and label viewing functional',()=>{
  const env=setup(false,false);
@@ -150,18 +158,6 @@ test('devices without Web Audio keep the sound button hidden and label viewing f
  env.controls['[data-vinegar-motion]'].handlers.click();assert.equal(env.timeouts.size,1);
  env.controls['[data-vinegar-open]'].handlers.click();assert.equal(env.dialog.open,true);assert.equal(env.audio.contexts,0);
 });
-
-test('each bottle opens its own original photo, and the label overview restores every photo',()=>{
- const env=setup();
- env.bottles[4].handlers.click();
- assert.equal(env.dialog.open,true);assert.equal(env.detailHeading.textContent,'Sorte 4 – Originaletikett');
- assert.deepEqual(env.detailPhotos.map(photo=>photo.hidden),[true,true,true,true,false,true,true]);
- assert.equal(env.detailGrid.classList.contains('is-single'),true);
- env.dialog.close();env.controls['[data-vinegar-open]'].handlers.click();
- assert.ok(env.detailPhotos.every(photo=>!photo.hidden));assert.equal(env.detailHeading.textContent,'Alle Originaletiketten');
- assert.equal(env.detailGrid.classList.contains('is-single'),false);
-});
-
 
 test('Mosti pauses rotation and cancels every animation when an original label is opened',()=>{
  const env=setup(false,true,true);env.mostiSprite.handlers.load();
@@ -172,7 +168,7 @@ test('Mosti pauses rotation and cancels every animation when an original label i
  assert.ok(env.animations.every(animation=>animation.options.duration>=1200));
  assert.equal(env.mostiButton.attrs['aria-busy'],'true');
  env.mostiButton.handlers.click();assert.equal(env.animations.length,1);
- env.bottles[2].handlers.click();
+ env.controls['[data-vinegar-open]'].handlers.click();
  assert.equal(env.dialog.open,true);assert.ok(env.animations.every(a=>a.cancelled));
  assert.equal(env.mostiButton.attrs['aria-busy'],undefined);
 });
@@ -185,7 +181,7 @@ test('Mosti respects reduced motion and finishes upright before rotation resumes
  env.mostiButton.handlers.click();env.next();assert.ok(env.animations.every(a=>a.cancelled));
 });
 
-test('Mosti winks on mouse attention, waves on click, and alternates a walking gait',()=>{
+test('Mosti winks on mouse attention, moonwalks on click, and alternates a walking gait',()=>{
  const env=setup(false,true,true);env.mostiButton.hidden=false;
  env.mostiButton.handlers.pointerenter({pointerType:'mouse'});
  assert.match(env.mostiSprite.src,/mosti-wink-wave\.webp$/);
@@ -193,14 +189,16 @@ test('Mosti winks on mouse attention, waves on click, and alternates a walking g
  env.mostiButton.handlers.pointerleave();
  assert.match(env.mostiSprite.src,/mosti-domino\.webp$/);
  env.mostiButton.handlers.click();
- assert.match(env.mostiSprite.src,/mosti-wink-wave\.webp$/);
- env.finishAt(540);
+ assert.match(env.mostiSprite.src,/mosti-moonwalk-a\.webp$/);
+ assert.ok(env.mostiButton.classList.contains('is-moonwalking'));
+ assert.ok(env.audio.notes>30,'the original moonwalk music is synthesized on click');
+ env.finishAt(280);assert.match(env.mostiSprite.src,/mosti-moonwalk-b\.webp$/);
+ env.finishAt(2200);
  assert.match(env.mostiSprite.src,/mosti-walk-a\.webp$/);
  assert.ok(env.mostiButton.classList.contains('is-walking'));
- assert.ok(env.mostiButton.classList.contains('is-moonwalking'));
- env.finishAt(260);
+ env.finishAt(280);
  assert.match(env.mostiSprite.src,/mosti-walk-b\.webp$/);
- env.bottles[0].handlers.click();
+ env.controls['[data-vinegar-open]'].handlers.click();
  assert.match(env.mostiSprite.src,/mosti-domino\.webp$/);
  assert.ok(!env.mostiButton.classList.contains('is-walking'));
 });
@@ -208,21 +206,21 @@ test('Mosti winks on mouse attention, waves on click, and alternates a walking g
 // The carry stage must attach the bottle to the mascot, with two grips, and clean up on interruption.
 test('the bottle and both gripping hands share Mosti’s parent during the whole carry',()=>{
  const env=setup(false,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
- env.mostiButton.handlers.click();env.finishAt(1450);
+ env.mostiButton.handlers.click();env.finishAt(2200+1450);
  const rig=env.mostiButton.children.find(child=>child.className==='mosti-carry');
  assert.ok(rig);const held=rig.children.find(child=>child.className==='mosti-held-object');assert.ok(held);
  assert.equal(held.children.filter(child=>child.className?.startsWith('mosti-grip ')).length,2);
  assert.ok(env.figures[0].classList.contains('is-vinegar-held'));
- env.finishAt(1450+700+650); // Travel moves the shared parent rather than the bottle independently.
+ env.finishAt(2200+1450+700+650); // Travel moves the shared parent rather than the bottle independently.
  assert.equal(env.animations.at(-1).options.duration,2200);
- env.bottles[1].handlers.click();assert.ok(rig.removed);
+ env.controls['[data-vinegar-open]'].handlers.click();assert.ok(rig.removed);
  assert.ok(!env.figures[0].classList.contains('is-vinegar-held'));
  assert.ok(env.animations.every(animation=>animation.cancelled));
 });
 
 test('pausing an attached bottle restores its original and cancels both gripping layers',()=>{
  const env=setup(false,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
- env.mostiButton.handlers.click();env.finishAt(1450);
+ env.mostiButton.handlers.click();env.finishAt(2200+1450);
  assert.ok(env.figures[0].classList.contains('is-vinegar-held'));
  env.controls['[data-offer-toggle]'].handlers.click();
  assert.ok(!env.figures[0].classList.contains('is-vinegar-held'));
@@ -231,7 +229,7 @@ test('pausing an attached bottle restores its original and cancels both gripping
 test('the last bottle tilts with its two hands and attaches its cap to the mouth',()=>{
  const env=setup(false,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
  for(let i=0;i<6;i++){env.mostiButton.handlers.click();env.finishLast();}
- env.mostiButton.handlers.click();env.finishAt(1450);env.finishAt(5000);
+ env.mostiButton.handlers.click();env.finishAt(2200+1450);env.finishAt(2200+1450+700+650+2200);
  const sip=env.animations.at(-1);assert.equal(sip.options.duration,3000);
  const match=sip.frames[1].transform.match(/translate\(([-\d.]+)px,([-\d.]+)px\) rotate\(58deg\)/);assert.ok(match);
  const angle=58*Math.PI/180,bh=142*.76,handX=128*.5,handY=142*.56;
@@ -245,7 +243,7 @@ test('the last bottle tilts with its two hands and attaches its cap to the mouth
 test('the last bottle visibly empties while Mosti drinks without covering its label',()=>{
  const env=setup(false,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
  for(let i=0;i<6;i++){env.mostiButton.handlers.click();env.finishLast();}
- env.mostiButton.handlers.click();env.finishAt(1450);env.finishAt(5000);
+ env.mostiButton.handlers.click();env.finishAt(2200+1450);env.finishAt(2200+1450+700+650+2200);
  const rig=env.mostiButton.children.filter(child=>child.className==='mosti-carry').at(-1);
  const held=rig.children.find(child=>child.className==='mosti-held-object');
  const empty=held.children.find(child=>child.className==='mosti-empty-glass');
@@ -253,4 +251,3 @@ test('the last bottle visibly empties while Mosti drinks without covering its la
  assert.match(empty.innerHTML,/M378 449H566V570H378Z/);
  assert.ok(env.animations.some(a=>a.options.duration===1550&&a.frames[0].clipPath==='inset(100% 0 0 0)'));
 });
-
