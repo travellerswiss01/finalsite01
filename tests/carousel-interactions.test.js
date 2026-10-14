@@ -29,7 +29,7 @@ test('Mosti has separate transparent walk frames and a wink-and-wave pose',()=>{
 function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=true){
  const animations=[];let mostiButton,mostiSprite;
  const element=()=>({
-  children:[],remove(){this.removed=true;},blur(){this.blurred=true;},append(child){this.children.push(child);},handlers:{},attrs:{},inert:false,hidden:true,textContent:'',
+  children:[],remove(){this.removed=true;},blur(){this.blurred=true;},append(child){this.children.push(child);},getBoundingClientRect(){return {left:0,top:0,right:236,bottom:208,width:236,height:208};},handlers:{},attrs:{},inert:false,hidden:true,textContent:'',
   style:{values:{},zIndex:'',setProperty(name,value){this.values[name]=value;},removeProperty(name){if(name==='z-index')this.zIndex='';else delete this.values[name];}},
   classList:{values:new Set(),add(...names){names.forEach(name=>this.values.add(name));},remove(...names){names.forEach(name=>this.values.delete(name));},contains(name){return this.values.has(name);},toggle(name,value){if(value)this.add(name);else this.remove(name);}},
   addEventListener(type,fn){this.handlers[type]=fn;},matches(selector){return selector===':focus-visible'&&this.focusVisible===true;},setAttribute(name,value){this.attrs[name]=value;},removeAttribute(name){delete this.attrs[name];},animate(frames,options){const animation={target:this,frames,options,cancelled:false,cancel(){this.cancelled=true;}};animations.push(animation);return animation;}
@@ -171,7 +171,7 @@ test('Mosti walks to each bottle before the original image moves, then restores 
  assert.ok(footerStage&&!footerStage.hidden,'the final bottle and Mosti move into the footer scene');
  assert.ok(footerStage.children.includes(env.mostiButton));
  assert.ok(footerStage.children.includes(env.bottles[6].querySelector('img')));
- env.finishAt(550);env.finishAt(3900);
+ env.finishAt(600);env.finishAt(1250);env.finishAt(550);env.finishAt(5300);
  assert.equal(footerStage.hidden,true,'the temporary finale is hidden after the drink');
  assert.equal(env.lineup.classList.contains('is-mosti-sequence'),false,'the original lineup remains unchanged');
  assert.ok(env.running(),'the carousel resumes after the performance');
