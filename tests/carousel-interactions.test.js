@@ -146,12 +146,12 @@ test('Mosti throws each original bottle image in a high arc and returns it to it
  for(const stage of [1100,2220,3340,4460,5580,6700,7820])env.finishAt(stage);
  assert.equal(env.animations.length,7,'each of the seven original images receives a throw animation');
  for(const [index,animation] of env.animations.entries()){
-  assert.equal(animation.options.duration,index===6?1650:1450);
+  assert.equal(animation.options.duration,8370-index*1120);
   assert.ok(animation.frames.some(frame=>String(frame.transform).includes('rotate(235deg)')),'the bottle rotates through the arc');
  }
  assert.ok(env.bottles.every(button=>button.handlers.click===undefined),'the original product anchors are not replaced by animation copies');
  assert.ok(env.images[3].classList.contains('is-mosti-playing'));
- env.finishAt(9670);
+ env.finishAt(9620);
  const footerStage=env.carousel.children.find(child=>child.className==='mosti-footer-stage');
  assert.ok(footerStage&&!footerStage.hidden,'the seventh original bottle and Mosti move into the footer scene');
  assert.ok(footerStage.children.includes(env.mostiButton));
