@@ -78,18 +78,27 @@ function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=
  finishLast(){const [key,timeout]=[...timeouts.entries()].at(-1);timeouts.delete(key);timeout.fn();}
  };
 }
-test('bottle hover never starts movement and leaves product links untouched',()=>{
- const env=setup(false,false,false);
- assert.equal(env.bottles[2].handlers.pointerenter,undefined);
- assert.equal(env.animations.length,0);
- assert.equal(env.bottles[2].attrs['aria-disabled'],undefined);
+test('desktop hover topples the bottle row independently and keeps links intact',()=>{
+ const env=setup(false,false,false);env.images[3].classList.add('is-active');
+ env.bottles[2].handlers.pointerenter({pointerType:'touch'});assert.equal(env.timeouts.size,0);
+ env.bottles[2].handlers.pointerenter({pointerType:'mouse',clientX:230});
+ assert.equal(env.running(),false);
+ assert.ok(env.figures.every(figure=>figure.classList.contains('is-vinegar-sway')));
+ assert.deepEqual(env.figures.map(figure=>figure.style.values['--bottle-delay']),['360ms','180ms','0ms','180ms','360ms','540ms','720ms']);
+ assert.ok(env.figures.every(figure=>figure.style.values['--bottle-duration']==='2800ms'));
+ assert.ok(env.figures.every(figure=>figure.style.values['--bottle-angle']==='72deg'));
+ assert.equal(env.figures[0].style.zIndex,'7');assert.equal(env.figures[6].style.zIndex,'1');
+ assert.equal([...env.timeouts.values()][0].ms,3700);
+ env.finish();assert.ok(env.running());
+ assert.ok(env.bottles.every(button=>button.handlers.click===undefined));
 });
-test('the old bottle-motion control stays unavailable outside Mosti performance',()=>{
- const env=setup(false,false,false);
- assert.equal(env.controls['[data-vinegar-motion]'].hidden,true);
- assert.equal(env.controls['[data-vinegar-motion]'].disabled,true);
- assert.equal(env.controls['[data-vinegar-motion]'].handlers.click,undefined);
- assert.equal(env.animations.length,0);
+test('the explicit topple control remains independent of Mosti and works without audio',()=>{
+ const env=setup(false,false,false);env.images[3].classList.add('is-active');
+ assert.equal(env.controls['[data-vinegar-motion]'].hidden,false);
+ assert.equal(env.controls['[data-vinegar-motion]'].disabled,false);
+ env.controls['[data-vinegar-motion]'].handlers.click();
+ assert.ok(env.figures.every(figure=>figure.classList.contains('is-vinegar-sway')));
+ assert.equal(env.audio.contexts,0);
 });
 test('reduced-motion users can explicitly start the carousel',()=>{
  const env=setup(true);assert.equal(env.running(),false);
@@ -108,16 +117,13 @@ test('keyboard focus pauses rotation and blur resumes it',()=>{
  next.focusVisible=false;env.document.activeElement=null;
  env.carousel.handlers.focusout({relatedTarget:null});env.finish();assert.equal(env.running(),true);
 });
-test('reduced motion keeps bottles stationary and preserves label access',()=>{
- const env=setup(true);
- assert.equal(env.bottles[0].handlers.pointerenter,undefined);
+test('reduced motion keeps hover bottles stationary and preserves label access',()=>{
+ const env=setup(true);env.images[3].classList.add('is-active');
+ env.bottles[0].handlers.pointerenter({pointerType:'mouse'});
+ assert.ok(env.figures.every(figure=>!figure.classList.contains('is-vinegar-sway')));
  assert.equal(env.timeouts.size,0);assert.equal(env.dialog.open,false);
  env.controls['[data-vinegar-open]'].handlers.click();assert.equal(env.dialog.open,true);assert.equal(env.timeouts.size,0);
- const normal=setup();assert.equal(normal.bottles[0].handlers.pointerenter,undefined);
- normal.motion.matches=true;normal.motion.handlers.change({matches:true});
- assert.equal(normal.timeouts.size,0);assert.equal(normal.running(),false);
 });
-
 test('the label overview remains available separately from direct product links',()=>{
  const env=setup();
  env.controls['[data-vinegar-open]'].handlers.click();
@@ -128,8 +134,8 @@ test('the label overview remains available separately from direct product links'
 test('devices without Web Audio keep the sound button hidden and label viewing functional',()=>{
  const env=setup(false,false);
  assert.equal(env.controls['[data-vinegar-sound]'].hidden,true);
- assert.equal(env.controls['[data-vinegar-motion]'].hidden,true);
- assert.equal(env.controls['[data-vinegar-motion]'].handlers.click,undefined);
+ assert.equal(env.controls['[data-vinegar-motion]'].hidden,false);
+ assert.equal(typeof env.controls['[data-vinegar-motion]'].handlers.click,'function');
  env.controls['[data-vinegar-open]'].handlers.click();assert.equal(env.dialog.open,true);assert.equal(env.audio.contexts,0);
 });
 
