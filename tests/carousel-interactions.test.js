@@ -126,7 +126,8 @@ test('the label overview remains available separately from direct product links'
 test('devices without Web Audio keep the sound button hidden and label viewing functional',()=>{
  const env=setup(false,false);
  assert.equal(env.controls['[data-vinegar-sound]'].hidden,true);
- env.controls['[data-vinegar-motion]'].handlers.click();assert.equal(env.timeouts.size,1);
+ assert.equal(env.controls['[data-vinegar-motion]'].hidden,true);
+ assert.equal(env.controls['[data-vinegar-motion]'].handlers.click,undefined);
  env.controls['[data-vinegar-open]'].handlers.click();assert.equal(env.dialog.open,true);assert.equal(env.audio.contexts,0);
 });
 
