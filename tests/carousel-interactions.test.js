@@ -145,13 +145,19 @@ test('Mosti throws each original bottle image in a high arc and returns it to it
  assert.equal(env.animations.length,0);
  for(const stage of [1100,2220,3340,4460,5580,6700,7820])env.finishAt(stage);
  assert.equal(env.animations.length,7,'each of the seven original images receives a throw animation');
- for(const animation of env.animations){
-  assert.equal(animation.options.duration,1450);
+ for(const [index,animation] of env.animations.entries()){
+  assert.equal(animation.options.duration,index===6?1650:1450);
   assert.ok(animation.frames.some(frame=>String(frame.transform).includes('rotate(235deg)')),'the bottle rotates through the arc');
  }
  assert.ok(env.bottles.every(button=>button.handlers.click===undefined),'the original product anchors are not replaced by animation copies');
  assert.ok(env.images[3].classList.contains('is-mosti-playing'));
- env.finishAt(9670);env.finishAt(550);env.finishAt(3900);
+ env.finishAt(9670);
+ const footerStage=env.carousel.children.find(child=>child.className==='mosti-footer-stage');
+ assert.ok(footerStage&&!footerStage.hidden,'the seventh original bottle and Mosti move into the footer scene');
+ assert.ok(footerStage.children.includes(env.mostiButton));
+ assert.ok(footerStage.children.includes(env.bottles[6].querySelector('img')));
+ env.finishAt(550);env.finishAt(3900);
+ assert.equal(footerStage.hidden,true,'the temporary scene is hidden after the drink');
  assert.ok(env.running(),'the carousel resumes after the performance');
 });
 test('Mosti waves without motion or audio when reduced motion is requested',()=>{
