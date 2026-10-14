@@ -544,14 +544,14 @@ if(offerCarousel){
  };
  const playFooterFinale=()=>{
   const lastLink=bottles.at(-1),lastItem=lastLink?.closest('.vinegar-lineup-item'),lastImage=lastItem?.querySelector('img');
-  if(!mostiFooterStage||!mostiButton||!lastLink||!lastImage){swayRunning=false;stopMostiMusic();setMostiPose('idle');mostiFrame.classList.remove('is-mosti-playing');mostiFrame.querySelector('.vinegar-lineup')?.classList.remove('is-mosti-sequence');start();return;}
+  if(!mostiFooterStage||!mostiButton||!lastLink||!lastImage){swayRunning=false;stopMostiMusic();setMostiPose('idle');mostiFrame.classList.remove('is-mosti-playing');start();return;}
+  const startRect=mostiButton.getBoundingClientRect();
   finaleBottleImage=lastImage;finaleBottleLink=lastImage.parentNode||lastLink;
   finaleScrollY=window.scrollY||0;
   mostiFooterStage.hidden=false;mostiFooterStage.classList.add('is-playing');
   mostiFooterStage.append(mostiButton);mostiFooterStage.append(lastImage);
   lastImage.classList.add('mosti-footer-bottle');
   setMostiPose('leap');
-  const startRect=mostiButton.getBoundingClientRect();
   mostiButton.style.position='fixed';mostiButton.style.left=startRect.left+'px';mostiButton.style.top=startRect.top+'px';mostiButton.style.right='auto';mostiButton.style.bottom='auto';mostiButton.style.width=startRect.width+'px';mostiButton.style.height=startRect.height+'px';mostiButton.style.zIndex='1000';mostiButton.style.transform='translate(0px,0px)';
   mostiOffsetX=0;mostiOffsetY=0;
   mostiFooterStage.scrollIntoView?.({behavior:'smooth',block:'center'});
@@ -580,24 +580,26 @@ if(offerCarousel){
      finaleSipTimer=null;
      if(!swayRunning||!finaleBottleImage)return;
      setMostiPose('sipping');
-   try{
-    const drink=lastImage.animate([
-     {transform:'rotate(0deg) translateY(-10px)'},
-     {transform:'rotate(-22deg) translateY(0px)',offset:.32},
-     {transform:'rotate(-30deg) translateY(2px)',offset:.52},
-     {transform:'rotate(-18deg) translateY(0px)',offset:.72},
-     {transform:'rotate(-28deg) translateY(2px)',offset:.9},
-     {transform:'rotate(0deg) translateY(0px)'}
-    ],{duration:2200,easing:'ease-in-out'});
-    activeBottleAnimations.push(drink);
+     try{
+      const drink=lastImage.animate([
+       {transform:'rotate(0deg) translateY(-10px)'},
+       {transform:'rotate(-22deg) translateY(0px)',offset:.32},
+       {transform:'rotate(-30deg) translateY(2px)',offset:.52},
+       {transform:'rotate(-18deg) translateY(0px)',offset:.72},
+       {transform:'rotate(-28deg) translateY(2px)',offset:.9},
+       {transform:'rotate(0deg) translateY(0px)'}
+      ],{duration:2200,easing:'ease-in-out'});
+      activeBottleAnimations.push(drink);
+     }catch{}
     },550);
    },1250);
   },600);
   swayTimer=window.setTimeout(()=>{
    restoreFooterScene();swayTimer=null;swayRunning=false;stopMostiMusic();setMostiPose('idle');
-   mostiFrame.classList.remove('is-mosti-playing');mostiFrame.querySelector('.vinegar-lineup')?.classList.remove('is-mosti-sequence');start();
+   mostiFrame.classList.remove('is-mosti-playing');start();
   },5300);
  };
+
  // The real image nodes are thrown in sequence; the seventh continues into the footer drinking scene.
  const playMosti=()=>{
   if(!mostiButton||swayRunning||!mostiFrame?.classList.contains('is-active'))return;
