@@ -171,7 +171,16 @@ test('Mosti walks to each bottle before the original image moves, then restores 
  assert.ok(footerStage&&!footerStage.hidden,'the final bottle and Mosti move into the footer scene');
  assert.ok(footerStage.children.includes(env.mostiButton));
  assert.ok(footerStage.children.includes(env.bottles[6].querySelector('img')));
- env.finishAt(600);env.finishAt(1250);env.finishAt(550);env.finishAt(5300);
+ env.finishAt(600);
+ const lastBottleImage=env.bottles[6].querySelector('img');
+ const finaleFlights=env.animations.slice(-2);
+ assert.deepEqual(finaleFlights.map(animation=>animation.target),[env.mostiButton,lastBottleImage],'Mosti and the same seventh product image fly to the footer together');
+ assert.equal(finaleFlights[1].options.duration,1850,'the real bottle stays in flight through its full arc');
+ assert.ok(finaleFlights[1].frames.some(frame=>String(frame.transform).includes('rotate(165deg)')),'the falling bottle rotates visibly in midair');
+ assert.equal(lastBottleImage.classList.contains('mosti-footer-bottle'),false,'the product image only enters footer layout after landing');
+ env.finishAt(1850);
+ assert.equal(lastBottleImage.classList.contains('mosti-footer-bottle'),true,'the original bottle is placed beside Mosti after flight');
+ env.finishAt(550);env.finishAt(6500);
  assert.equal(footerStage.hidden,true,'the temporary finale is hidden after the drink');
  assert.equal(env.lineup.classList.contains('is-mosti-sequence'),false,'the original lineup remains unchanged');
  assert.ok(env.running(),'the carousel resumes after the performance');
