@@ -258,7 +258,9 @@ if(offerCarousel){
   push:mostiImage('/assets/mosti-push-v2.webp'),
   carry:mostiImage('/assets/mosti-carry-body.svg'),
   reach:mostiImage('/assets/mosti-reach.webp'),
-  juggle:mostiImage('/assets/mosti-juggle.webp')
+  juggle:mostiImage('/assets/mosti-juggle.webp'),
+  leap:mostiImage('/assets/mosti-leap.webp'),
+  sipping:mostiImage('/assets/mosti-sit-drink.webp')
  };
  const mostiWalkFrames=[mostiImage('/assets/mosti-walk-a.webp'),mostiImage('/assets/mosti-walk-b.webp')];
  const mostiMoonwalkFrames=[mostiImage('/assets/mosti-moonwalk-a.webp'),mostiImage('/assets/mosti-moonwalk-b.webp')];
