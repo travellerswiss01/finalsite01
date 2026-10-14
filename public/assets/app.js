@@ -524,14 +524,7 @@ if(offerCarousel){
  mostiButton?.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!swayRunning&&currentMostiPose==='idle')setMostiPose('wink');});
  mostiButton?.addEventListener('pointerleave',()=>{if(currentMostiPose==='wink'&&!swayRunning)setMostiPose('idle');});
  mostiButton?.addEventListener('click',event=>{playMosti();if((event?.detail||0)>0)mostiButton.blur();});
- bottles.forEach((button,index)=>{
-  button.addEventListener('pointerenter',event=>{
-   if(event.pointerType!=='mouse'||motion.matches)return;
-   const rect=button.getBoundingClientRect();
-   const direction=Number.isFinite(event.clientX)&&rect.width?event.clientX<rect.left+rect.width/2?1:-1:1;
-   playSway(index,direction);
-  });
- });
+ // Normal pointer hover and clicks never shift the product bottles. Only the explicit motion control may trigger the separate sway effect.
  if(motionToggle){
   motionToggle.hidden=false;motionToggle.disabled=motion.matches;
   motionToggle.addEventListener('click',()=>{if(!motion.matches)playSway(Math.floor(bottles.length/2));});
