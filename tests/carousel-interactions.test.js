@@ -76,53 +76,18 @@ function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=
  finishLast(){const [key,timeout]=[...timeouts.entries()].at(-1);timeouts.delete(key);timeout.fn();}
  };
 }
-test('bottles topple like dominoes in a staggered wave and stay down until the slide resets',()=>{
- const env=setup();
- env.bottles[2].handlers.pointerenter({pointerType:'touch'});assert.equal(env.timeouts.size,0);
- env.bottles[2].handlers.pointerenter({pointerType:'mouse',clientX:230});assert.equal(env.running(),false);
- assert.ok(env.figures.every(figure=>figure.classList.contains('is-vinegar-sway')));
- assert.deepEqual(env.figures.map(figure=>figure.style.values['--bottle-delay']),['360ms','180ms','0ms','180ms','360ms','540ms','720ms']);
- assert.ok(env.figures.every(figure=>figure.style.values['--bottle-duration']==='2800ms'));
- assert.ok(env.figures.every(figure=>figure.style.values['--bottle-angle']==='72deg'));
- assert.equal(env.figures[0].style.zIndex,'7');assert.equal(env.figures[6].style.zIndex,'1');
- assert.ok(env.figures.every(figure=>figure.style.values['--bottle-shift-y']!==undefined));
- for(const [index,figure] of env.figures.entries()){
-  const left=20+index*90,width=90,top=25,height=240,angle=72*Math.PI/180;
-  const sx=Number.parseFloat(figure.style.values['--bottle-shift']),sy=Number.parseFloat(figure.style.values['--bottle-shift-y']);
-  const points=[[0,0],[1,0],[0,1],[1,1]].map(([x,y])=>({
-   x:left+width*.5+(x-.5)*width*Math.cos(angle)-(y-.94)*height*Math.sin(angle)+sx,
-   y:top+height*.94+(x-.5)*width*Math.sin(angle)+(y-.94)*height*Math.cos(angle)+sy
-  }));
-  assert.ok(Math.min(...points.map(point=>point.x))>=9.99,`bottle ${index} stays inside left edge`);
-  assert.ok(Math.max(...points.map(point=>point.x))<=690.01,`bottle ${index} stays inside right edge`);
-  assert.ok(Math.min(...points.map(point=>point.y))>=9.99,`bottle ${index} stays inside top edge`);
-  assert.ok(Math.max(...points.map(point=>point.y))<=290.01,`bottle ${index} stays inside bottom edge`);
- }
- assert.equal([...env.timeouts.values()][0].ms,3700);
- env.bottles[4].handlers.pointerenter({pointerType:'mouse'});assert.equal(env.timeouts.size,1);
- env.carousel.handlers.mouseleave();assert.equal(env.running(),false);
- env.finish();assert.ok(env.figures.every(figure=>figure.classList.contains('is-vinegar-sway')));assert.equal(env.running(),true);
- env.next();assert.ok(env.figures.every(figure=>!figure.classList.contains('is-vinegar-sway')));
+test('bottle hover never starts movement and leaves product links untouched',()=>{
+ const env=setup(false,false,false);
+ assert.equal(env.bottles[2].handlers.pointerenter,undefined);
+ assert.equal(env.animations.length,0);
+ assert.equal(env.bottles[2].attrs['aria-disabled'],undefined);
 });
-test('entering a bottle from its right makes the whole row fall left',()=>{
- const env=setup();
- env.bottles[2].handlers.pointerenter({pointerType:'mouse',clientX:270});
- assert.ok(env.figures.every(figure=>figure.style.values['--bottle-angle']==='-72deg'));
- assert.equal(env.figures[0].style.zIndex,'1');assert.equal(env.figures[6].style.zIndex,'7');
-});
-test('hover and the motion control trigger a full fall on the active bottle slide',()=>{
- const env=setup();env.bottles[0].handlers.pointerenter({pointerType:'mouse'});assert.equal(env.timeouts.size,1);
- env.controls['[data-vinegar-motion]'].handlers.click();assert.equal(env.timeouts.size,1);
- env.next();assert.equal(env.timeouts.size,0);assert.ok(env.figures.every(figure=>!figure.classList.contains('is-vinegar-sway')));
-});
-test('the motion control starts the fall; opening labels or hiding the page resets it',()=>{
- const env=setup();
- env.controls['[data-vinegar-motion]'].handlers.click();assert.equal(env.timeouts.size,1);
- env.controls['[data-vinegar-open]'].handlers.click();
- assert.equal(env.timeouts.size,0);assert.equal(env.dialog.open,true);assert.equal(env.running(),false);
- env.dialog.close();assert.equal(env.running(),true);
- env.bottles[0].handlers.pointerenter({pointerType:'mouse'});env.document.hidden=true;env.document.handlers.visibilitychange();
- assert.equal(env.timeouts.size,0);assert.equal(env.running(),false);
+test('the old bottle-motion control stays unavailable outside Mosti performance',()=>{
+ const env=setup(false,false,false);
+ assert.equal(env.controls['[data-vinegar-motion]'].hidden,true);
+ assert.equal(env.controls['[data-vinegar-motion]'].disabled,true);
+ assert.equal(env.controls['[data-vinegar-motion]'].handlers.click,undefined);
+ assert.equal(env.animations.length,0);
 });
 test('reduced-motion users can explicitly start the carousel',()=>{
  const env=setup(true);assert.equal(env.running(),false);
@@ -173,27 +138,21 @@ test('Mosti releases pointer focus after a tap but keeps keyboard focus',()=>{
  keyboard.mostiButton.handlers.click({detail:0});
  assert.equal(keyboard.mostiButton.blurred,undefined);
 });
-test('Mosti performs individual bottle tricks and a tiny sip in the circus routine',()=>{
+test('Mosti throws each original bottle image in a high arc and returns it to its product link',()=>{
  const env=setup(false,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
  env.mostiButton.handlers.click();
- assert.match(env.mostiSprite.src,/mosti-wink-wave\.webp$/);
- assert.ok(env.mostiButton.classList.contains('is-winking'),'the routine opens with a wink');
- assert.ok(env.audio.notes>30,'music starts from the user gesture');
- assert.ok(env.audio.gainTargets.includes(14),'music master gain is raised');
- assert.equal(env.audio.compressors,1,'output limiter protects against clipping');
- env.finishAt(420);
- assert.ok(env.mostiButton.classList.contains('is-waving'),'the wink continues into the wave');
- env.finishAt(850);
- assert.match(env.mostiSprite.src,/mosti-moonwalk-a\.webp$/);
- assert.ok(env.mostiButton.classList.contains('is-moonwalking'));
- for(const stage of [1500,2350,3200,4050,4900,5750,6600])env.finishAt(stage);
- assert.equal(env.animations.length,7,'every bottle gets its own animated trick');
- const finalBottle=env.animations.at(-1);
- assert.ok(finalBottle.frames.some(frame=>String(frame.transform).includes('rotate(-28deg)')),'the cherry-pear bottle moves toward Mosti for a sip');
- assert.ok(env.mostiButton.classList.contains('is-sipping'),'Mosti reacts while taking the tiny sip');
- assert.ok(env.figures[6].classList.contains('is-vinegar-impact'),'the last trick gets a comic sparkle');
- env.finishAt(8450);
- assert.ok(env.running(),'the normal carousel resumes after the act');
+ assert.match(env.mostiSprite.src,/mosti-walk-a\.webp$/);
+ assert.equal(env.animations.length,0);
+ for(const stage of [1100,2220,3340,4460,5580,6700,7820])env.finishAt(stage);
+ assert.equal(env.animations.length,7,'each of the seven original images receives a throw animation');
+ for(const animation of env.animations){
+  assert.equal(animation.options.duration,1450);
+  assert.ok(animation.frames.some(frame=>String(frame.transform).includes('rotate(235deg)')),'the bottle rotates through the arc');
+ }
+ assert.ok(env.bottles.every(button=>button.handlers.click===undefined),'the original product anchors are not replaced by animation copies');
+ assert.ok(env.mostiButton.classList.contains('is-mosti-playing'));
+ env.finishAt(9470);
+ assert.ok(env.running(),'the carousel resumes after the performance');
 });
 test('Mosti waves without motion or audio when reduced motion is requested',()=>{
  const env=setup(true,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
