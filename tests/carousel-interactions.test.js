@@ -34,7 +34,7 @@ function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=
   addEventListener(type,fn){this.handlers[type]=fn;},matches(selector){return selector===':focus-visible'&&this.focusVisible===true;},setAttribute(name,value){this.attrs[name]=value;},removeAttribute(name){delete this.attrs[name];},animate(frames,options){const animation={frames,options,cancelled:false,cancel(){this.cancelled=true;}};animations.push(animation);return animation;}
  });
  const slides=Array.from({length:5},element),images=Array.from({length:5},element);images[3].getBoundingClientRect=()=>({left:0,top:0,right:700,bottom:300,width:700,height:300});
- const figures=Array.from({length:7},element),bottles=figures.map((figure,index)=>{const button=element();button.closest=selector=>selector==='[data-offer-image]'?images[3]:figure;button.getBoundingClientRect=()=>({left:index*100,width:80});const bottleImage=element();bottleImage.src='/assets/essig-birnen-cutout.svg';bottleImage.getBoundingClientRect=()=>({left:20+index*90,width:90,top:25,height:240});figure.querySelector=()=>bottleImage;figure.getBoundingClientRect=()=>({left:index*100,width:80,top:0,height:160});button.querySelector=()=>bottleImage;return button;});
+ const bottleNames=['Apfelessig mit 33 Sorten','Himbeeressig','Birnenessig','Holunderblütenessig','Birnen-Balsamico','Kirschessig','Kirschen-Birnen-Essig'];const figures=Array.from({length:7},(_,index)=>{const figure=element(),caption=element();caption.textContent=bottleNames[index];figure.querySelector=selector=>selector==='figcaption'?caption:bottleImage;return figure;}),bottles=figures.map((figure,index)=>{const button=element();button.closest=selector=>selector==='[data-offer-image]'?images[3]:figure;button.getBoundingClientRect=()=>({left:index*100,width:80});const bottleImage=element();bottleImage.src='/assets/essig-birnen-cutout.svg';bottleImage.getBoundingClientRect=()=>({left:20+index*90,width:90,top:25,height:240});figure.querySelector=selector=>selector==='figcaption'?figure._caption:bottleImage;figure._caption={textContent:bottleNames[index]};figure.getBoundingClientRect=()=>({left:index*100,width:80,top:0,height:160});button.querySelector=()=>bottleImage;return button;});
  const controls=Object.fromEntries(['prev','next','toggle','controls'].map(name=>['[data-offer-'+name+']',element()]));
  controls['[data-vinegar-open]']=element();
  controls['[data-vinegar-sound]']=element();
@@ -173,26 +173,27 @@ test('Mosti releases pointer focus after a tap but keeps keyboard focus',()=>{
  keyboard.mostiButton.handlers.click({detail:0});
  assert.equal(keyboard.mostiButton.blurred,undefined);
 });
-test('Mosti waves on tap, then moonwalks with music without moving bottles',()=>{
+test('Mosti performs individual bottle tricks and a tiny sip in the circus routine',()=>{
  const env=setup(false,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
  env.mostiButton.handlers.click();
  assert.match(env.mostiSprite.src,/mosti-wink-wave\.webp$/);
- assert.ok(env.mostiButton.classList.contains('is-winking'),'tap starts with the familiar wink');
+ assert.ok(env.mostiButton.classList.contains('is-winking'),'the routine opens with a wink');
  assert.ok(env.audio.notes>30,'music starts from the user gesture');
  assert.ok(env.audio.gainTargets.includes(14),'music master gain is raised');
  assert.equal(env.audio.compressors,1,'output limiter protects against clipping');
- env.finishAt(450);
+ env.finishAt(420);
  assert.ok(env.mostiButton.classList.contains('is-waving'),'the wink continues into the wave');
- assert.equal(env.figures.some(item=>item.classList.contains('is-vinegar-carried')),false);
- env.finishAt(900);
+ env.finishAt(850);
  assert.match(env.mostiSprite.src,/mosti-moonwalk-a\.webp$/);
  assert.ok(env.mostiButton.classList.contains('is-moonwalking'));
- env.finishAt(3000);
- assert.match(env.mostiSprite.src,/mosti-walk-a\.webp$/);
- assert.ok(env.mostiButton.classList.contains('is-walking'));
- env.finishAt(4500);
- assert.match(env.mostiSprite.src,/mosti-domino\.webp$/);
- assert.ok(env.running());
+ for(const stage of [1500,2350,3200,4050,4900,5750,6600])env.finishAt(stage);
+ assert.equal(env.animations.length,7,'every bottle gets its own animated trick');
+ const finalBottle=env.animations.at(-1);
+ assert.ok(finalBottle.frames.some(frame=>String(frame.transform).includes('translate(-100px')),'the cherry-pear bottle moves toward Mosti for a sip');
+ assert.ok(env.mostiButton.classList.contains('is-sipping'),'Mosti reacts while taking the tiny sip');
+ assert.ok(env.figures[6].classList.contains('is-vinegar-impact'),'the last trick gets a comic sparkle');
+ env.finishLast();
+ assert.ok(env.running(),'the normal carousel resumes after the act');
 });
 test('Mosti waves without motion or audio when reduced motion is requested',()=>{
  const env=setup(true,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
