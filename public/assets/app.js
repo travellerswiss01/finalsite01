@@ -517,10 +517,7 @@ if(offerCarousel){
  mostiButton?.addEventListener('pointerleave',()=>{if(currentMostiPose==='wink'&&!swayRunning)setMostiPose('idle');});
  mostiButton?.addEventListener('click',event=>{playMosti();if((event?.detail||0)>0)mostiButton.blur();});
  // Normal pointer hover and clicks never shift the product bottles. Only the explicit motion control may trigger the separate sway effect.
- if(motionToggle){
-  motionToggle.hidden=false;motionToggle.disabled=motion.matches;
-  motionToggle.addEventListener('click',()=>{if(!motion.matches)playSway(Math.floor(bottles.length/2));});
- }
+ if(motionToggle){motionToggle.hidden=true;motionToggle.disabled=true;}
  offerCarousel.querySelector('[data-vinegar-open]')?.addEventListener('click',openVinegar);
  vinegarDialog?.querySelector('[data-vinegar-close]')?.addEventListener('click',()=>vinegarDialog.close());
  vinegarDialog?.addEventListener('close',()=>start());
