@@ -435,3 +435,5 @@
 .vinegar-lineup-item.is-vinegar-sipping img{transform-origin:50% 50%}
 .vinegar-lineup-item.is-vinegar-impact{z-index:8!important}
 @media(max-width:899px) and (min-width:600px){.vinegar-lineup.is-mosti-sequence{inset:38px 124px 8px 10px}.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item img{height:min(88cqh,150cqw)}}
+
+@media(max-width:599px){.vinegar-lineup.is-mosti-sequence{inset:auto 8px 100px;height:440px;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));overflow:visible}}
