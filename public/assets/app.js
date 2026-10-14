@@ -483,7 +483,6 @@ if(offerCarousel){
   const base='translate(-50%,-50%)';
   const pose=index===0?'reach':'juggle';
   item.style.zIndex=String(20+index);
-  item.classList.add('is-vinegar-impact');
   setMostiPose(pose);
   const frames=[
    {transform:base+' translate(0px,0px) rotate(0deg) scale(1)',offset:0},
@@ -496,9 +495,9 @@ if(offerCarousel){
   try{
    const animation=image.animate(frames,{duration,easing:'cubic-bezier(.38,.04,.24,1)',fill:'both'});
    activeBottleAnimations.push(animation);
-   animation.finished.then(()=>{const i=activeBottleAnimations.indexOf(animation);if(i>=0)activeBottleAnimations.splice(i,1);animation.cancel();item.classList.remove('is-vinegar-impact');item.style.removeProperty('z-index');}).catch(()=>{});
+   animation.finished.then(()=>{const i=activeBottleAnimations.indexOf(animation);if(i>=0)activeBottleAnimations.splice(i,1);animation.cancel();item.style.removeProperty('z-index');}).catch(()=>{});
   }catch{item.classList.remove('is-vinegar-impact');item.style.removeProperty('z-index');}
-  scheduleMostiAct(duration,()=>{item.classList.remove('is-vinegar-impact');item.style.removeProperty('z-index');setMostiPose(index%2?'juggle':'reach');});
+  scheduleMostiAct(duration,()=>{item.style.removeProperty('z-index');setMostiPose(index%2?'juggle':'reach');});
  };
  // Animate each existing bottle image itself on a high, curved throw and return it to its original clickable position.
  const playMosti=()=>{
