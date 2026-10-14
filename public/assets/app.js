@@ -241,8 +241,8 @@ if(offerCarousel){
  if(mostiFrame&&typeof document.createElement==='function'){
   mostiButton=document.createElement('button');
   mostiButton.type='button';mostiButton.className='mosti-domino';mostiButton.hidden=true;
-  mostiButton.setAttribute('aria-label','Mosti winkt und tanzt mit Musik');
-  mostiButton.title='Mosti winkt und tanzt mit Musik';
+  mostiButton.setAttribute('aria-label','Mosti führt eine Zirkusnummer mit den Essigflaschen auf');
+  mostiButton.title='Mosti führt eine Zirkusnummer mit den Essigflaschen auf';
   mostiSprite=document.createElement('img');
   mostiSprite.alt='Mosti, unser Apfelmaskottchen';mostiSprite.width=420;mostiSprite.height=432;
   mostiSprite.addEventListener('load',()=>{mostiFrame.classList.add('has-mosti');mostiButton.hidden=false;});
@@ -271,6 +271,8 @@ if(offerCarousel){
   mostiButton?.classList.toggle('is-bracing',pose==='push');
   mostiButton?.classList.toggle('is-winking',pose==='wink');
   mostiButton?.classList.toggle('is-waving',pose==='wave');
+  mostiButton?.classList.toggle('is-hugging',pose==='carry');
+  mostiButton?.classList.toggle('is-sipping',pose==='sipping');
   if(pose==='walk'||pose==='moonwalk'){
    mostiWalkFrame=0;
    const step=()=>{
@@ -290,6 +292,7 @@ if(offerCarousel){
   stopMostiWalk();
   mostiPoseTimers.splice(0).forEach(id=>window.clearTimeout(id));
   mostiFrame?.classList.remove('is-mosti-playing');
+  mostiFrame?.querySelector('.vinegar-lineup')?.classList.remove('is-mosti-sequence');
   if(mostiButton)mostiButton.removeAttribute('aria-busy');
  };
  let current=0,timer=null,swayTimer=null,swayRunning=false,paused=motion.matches,hovered=false;
@@ -369,14 +372,16 @@ if(offerCarousel){
    if(mostDialog.open){add.disabled=!mostVariant?.availableForSale;add.textContent=mostVariant?.availableForSale?'In den Warenkorb':'Derzeit nicht verfügbar';}
   }
  });
+ const activeBottleAnimations=[];
  const resetSway=()=>{
+  activeBottleAnimations.splice(0).forEach(animation=>{try{animation.cancel();}catch{}});
   stopMostiMusic();
   mostiPoseTimers.splice(0).forEach(id=>window.clearTimeout(id));
   resetMosti();
   if(swayTimer!==null){window.clearTimeout(swayTimer);swayTimer=null;}
   swayRunning=false;
   setMostiPose('idle');
-  bottles.forEach(button=>button.closest('.vinegar-lineup-item').classList.remove('is-vinegar-sway','is-vinegar-impact','is-vinegar-hugging','is-vinegar-sip'));mostiButton?.classList.remove('is-bracing','is-hugging','is-sipping');
+  bottles.forEach(button=>button.closest('.vinegar-lineup-item').classList.remove('is-vinegar-sway','is-vinegar-impact','is-vinegar-hugging','is-vinegar-sip','is-vinegar-sipping'));mostiButton?.classList.remove('is-bracing','is-hugging','is-sipping');
   bottles.forEach(button=>{const item=button.closest('.vinegar-lineup-item');item.style.removeProperty('z-index');item.style.removeProperty('--bottle-shift');item.style.removeProperty('--bottle-shift-y');});
  };
  const loadOfferImage=index=>{
@@ -460,25 +465,61 @@ if(offerCarousel){
   swayTimer=window.setTimeout(()=>{swayRunning=false;swayTimer=null;start();},duration+Math.max(origin,bottles.length-1-origin)*delay+180);
  };
  // Mosti pushes the bottles one by one; bottle links open their matching product pages.
+ const scheduleMostiAct=(delay,callback)=>{
+  const id=window.setTimeout(()=>{const index=mostiPoseTimers.indexOf(id);if(index>=0)mostiPoseTimers.splice(index,1);if(swayRunning)callback();},delay);
+  mostiPoseTimers.push(id);
+ };
+ const playBottleTrick=(button,index)=>{
+  const item=button.closest('.vinegar-lineup-item'),image=item?.querySelector('img');
+  if(!item||!image)return;
+  const label=item.querySelector('figcaption')?.textContent?.toLocaleLowerCase('de')||'';
+  let trick='balance';
+  if(/kirschen.?birnen/.test(label))trick='sip';
+  else if(/himbeer|kirsch/.test(label))trick='toss';
+  else if(/birne/.test(label))trick='bow';
+  else if(/holunder|balsamico/.test(label))trick='wobble';
+  item.style.zIndex=String(8-index);
+  const base='translate(-50%,-50%)';
+  let frames;
+  if(trick==='toss')frames=[{transform:base+' rotate(0) translateY(0)'},{transform:base+' rotate(-18deg) translateY(-20px)',offset:.3},{transform:base+' rotate(24deg) translateY(-38px)',offset:.62},{transform:base+' rotate(-8deg) translateY(-12px)',offset:.83},{transform:base+' rotate(0) translateY(0)'}];
+  else if(trick==='bow')frames=[{transform:base+' rotate(0)'},{transform:base+' rotate(-22deg)',offset:.4},{transform:base+' rotate(4deg)',offset:.68},{transform:base+' rotate(0)'}];
+  else if(trick==='wobble')frames=[{transform:base+' rotate(0)'},{transform:base+' rotate(12deg)',offset:.24},{transform:base+' rotate(-11deg)',offset:.5},{transform:base+' rotate(7deg)',offset:.74},{transform:base+' rotate(0)'}];
+  else if(trick==='sip'){
+   const from=image.getBoundingClientRect(),to=mostiButton?.getBoundingClientRect();
+   const dx=to?Math.max(-100,Math.min(100,to.left+to.width*.42-(from.left+from.width/2))):0;
+   const dy=to?Math.max(-85,Math.min(60,to.top+to.height*.35-(from.top+from.height/2))):0;
+   frames=[{transform:base+' translate(0,0) rotate(0)'},{transform:base+` translate(${dx*.55}px,${dy*.55}px) rotate(-18deg)`,offset:.42},{transform:base+` translate(${dx}px,${dy}px) rotate(-28deg)`,offset:.64},{transform:base+` translate(${dx*.8}px,${dy*.8}px) rotate(-22deg)`,offset:.8},{transform:base+' translate(0,0) rotate(0)'}];
+  } else frames=[{transform:base+' rotate(0) translateY(0)'},{transform:base+' rotate(10deg) translateY(-15px)',offset:.3},{transform:base+' rotate(-9deg) translateY(-25px)',offset:.58},{transform:base+' rotate(5deg) translateY(-10px)',offset:.82},{transform:base+' rotate(0) translateY(0)'}];
+  const duration=trick==='sip'?1050:760;
+  if(trick==='sip'){item.classList.add('is-vinegar-sipping');setMostiPose('sipping');}
+  else{setMostiPose('carry');}
+  try{
+   const animation=image.animate(frames,{duration,easing:'cubic-bezier(.2,.7,.25,1)',fill:'both'});
+   activeBottleAnimations.push(animation);
+   animation.finished.then(()=>{const i=activeBottleAnimations.indexOf(animation);if(i>=0)activeBottleAnimations.splice(i,1);animation.cancel();item.classList.remove('is-vinegar-sipping');}).catch(()=>{});
+  }catch{}
+  if(trick==='bow'||trick==='toss'||trick==='sip')item.classList.add('is-vinegar-impact');
+  scheduleMostiAct(duration,()=>{item.classList.remove('is-vinegar-impact','is-vinegar-sipping');item.style.removeProperty('z-index');});
+  if(trick==='sip')scheduleMostiAct(780,()=>{setMostiPose('push');});
+  else scheduleMostiAct(420,()=>{setMostiPose(index%2?'wave':'wink');});
+ };
+ // A compact circus revue: every original bottle gets its own trick, then Mosti takes a tiny sip from the cherry-pear vinegar.
  const playMosti=()=>{
   if(!mostiButton||swayRunning||!mostiFrame?.classList.contains('is-active'))return;
-  resetSway();stop();swayRunning=true;
-  mostiFrame.classList.add('is-mosti-playing');
+  resetSway();stop();swayRunning=true;mostiFrame.classList.add('is-mosti-playing');
   if(reducedMostiMotion()){
    setMostiPose('wink');
    swayTimer=window.setTimeout(()=>{swayTimer=null;swayRunning=false;setMostiPose('idle');mostiFrame.classList.remove('is-mosti-playing');start();},950);
    return;
   }
-  // Wake with the familiar quick wink, then continue into the wave and dance.
-  playMoonwalkMusic();
-  setMostiPose('wink');
-  mostiPoseTimers.push(window.setTimeout(()=>{if(swayRunning)setMostiPose('wave');},450));
-  mostiPoseTimers.push(window.setTimeout(()=>{if(swayRunning)setMostiPose('moonwalk');},900));
-  mostiPoseTimers.push(window.setTimeout(()=>{if(swayRunning)setMostiPose('walk');},3000));
-  swayTimer=window.setTimeout(()=>{
-   swayTimer=null;swayRunning=false;
-   stopMostiMusic();setMostiPose('idle');mostiFrame.classList.remove('is-mosti-playing');start();
-  },4500);
+  mostiFrame.querySelector('.vinegar-lineup')?.classList.add('is-mosti-sequence');
+  playMoonwalkMusic();setMostiPose('wink');
+  scheduleMostiAct(420,()=>setMostiPose('wave'));
+  scheduleMostiAct(850,()=>setMostiPose('moonwalk'));
+  bottles.forEach((button,index)=>scheduleMostiAct(1500+index*850,()=>playBottleTrick(button,index)));
+  const endAt=1500+Math.max(0,bottles.length-1)*850+1850;
+  scheduleMostiAct(endAt-900,()=>{setMostiPose('push');});
+  swayTimer=window.setTimeout(()=>{swayTimer=null;swayRunning=false;stopMostiMusic();setMostiPose('idle');mostiFrame.classList.remove('is-mosti-playing');mostiFrame.querySelector('.vinegar-lineup')?.classList.remove('is-mosti-sequence');start();},endAt);
  };
  mostiButton?.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!swayRunning&&currentMostiPose==='idle')setMostiPose('wink');});
  mostiButton?.addEventListener('pointerleave',()=>{if(currentMostiPose==='wink'&&!swayRunning)setMostiPose('idle');});

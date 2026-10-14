@@ -426,3 +426,14 @@
 /* The original bottle image flies; it is never replaced by a scaled duplicate. */
 .offer-carousel:has(.vinegar-lineup-frame.is-active){min-height:340px}
 @media(max-width:599px){.offer-carousel:has(.vinegar-lineup-frame.is-active){min-height:650px}}
+
+/* The circus sequence reflows the original bottle photos into a legible, compact stage. */
+.vinegar-lineup.is-mosti-sequence{inset:42px 176px 8px 18px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:4px;overflow:visible}
+.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item{width:auto;height:100%;min-width:0;min-height:0;flex:none}
+.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item img{top:43%;height:min(88cqh,174cqw);transform-origin:50% 94%}
+.vinegar-lineup-item.is-vinegar-sipping{z-index:7!important}
+.vinegar-lineup-item.is-vinegar-sipping img{transform-origin:50% 50%}
+.vinegar-lineup-item.is-vinegar-impact{z-index:8!important}
+@media(max-width:899px) and (min-width:600px){.vinegar-lineup.is-mosti-sequence{inset:38px 124px 8px 10px}.vinegar-lineup.is-mosti-sequence .vinegar-lineup-item img{height:min(88cqh,150cqw)}}
+
+@media(max-width:599px){.vinegar-lineup.is-mosti-sequence{inset:auto 8px 100px;height:440px;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));overflow:visible}}
