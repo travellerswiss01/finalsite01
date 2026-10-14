@@ -203,7 +203,7 @@ if(offerCarousel){
    if(audioContext.state==='suspended')await audioContext.resume();
    stopMostiMusic();
    const context=audioContext,master=context.createGain(),start=context.currentTime+.04,beat=.56;
-   master.gain.setValueAtTime(.0001,start);master.gain.linearRampToValueAtTime(.075,start+.08);master.connect(context.destination);moonwalkMusicMaster=master;
+   master.gain.setValueAtTime(.0001,start);master.gain.linearRampToValueAtTime(.16,start+.08);master.connect(context.destination);moonwalkMusicMaster=master;
    const tone=(frequency,time,duration,wave,volume)=>{
     const oscillator=context.createOscillator(),envelope=context.createGain();
     oscillator.type=wave;oscillator.frequency.setValueAtTime(frequency,time);
