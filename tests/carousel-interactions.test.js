@@ -12,6 +12,11 @@ test('all seven bottle cutouts use a close-fitting viewBox so the throw does not
   const [, ,width,height]=viewBox[1].split(/\s+/).map(Number);assert.ok(width/height<.55,name);
  }
 });
+test('Mosti hides pointer focus chrome while keeping a visible keyboard focus ring',()=>{
+ const css=readFileSync(new URL('../public/assets/sections.css',import.meta.url),'utf8');
+ assert.match(css,/\.mosti-domino:focus:not\(:focus-visible\)\{outline:none!important;box-shadow:none!important;background:transparent\}/);
+ assert.match(css,/\.mosti-domino:focus-visible\{outline:2px solid #9c792b/);
+});
 test('Mosti has separate transparent walk frames and a wink-and-wave pose',()=>{
  for(const name of ['mosti-walk-a.webp','mosti-walk-b.webp','mosti-moonwalk-a.webp','mosti-moonwalk-b.webp','mosti-wink-wave.webp']){
   const image=readFileSync(new URL('../public/assets/'+name,import.meta.url));
@@ -166,7 +171,7 @@ test('Mosti waves on tap, then moonwalks with music without moving bottles',()=>
  assert.match(env.mostiSprite.src,/mosti-wink-wave\.webp$/);
  assert.ok(env.mostiButton.classList.contains('is-winking'),'tap starts with the familiar wink');
  assert.ok(env.audio.notes>30,'music starts from the user gesture');
- assert.ok(env.audio.gainTargets.includes(8),'music master gain is raised');
+ assert.ok(env.audio.gainTargets.includes(14),'music master gain is raised');
  assert.equal(env.audio.compressors,1,'output limiter protects against clipping');
  env.finishAt(450);
  assert.ok(env.mostiButton.classList.contains('is-waving'),'the wink continues into the wave');
