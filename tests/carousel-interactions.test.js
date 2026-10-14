@@ -54,11 +54,12 @@ function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=
  const motion=element();motion.matches=reduced;
  let interval=null,id=0;const timeouts=new Map();
  const window={matchMedia:query=>query==='(prefers-reduced-motion: reduce)'?motion:{matches:hoverSupported},setInterval(fn){interval=fn;return 1;},clearInterval(){interval=null;},setTimeout(fn,ms){timeouts.set(++id,{fn,ms});return id;},clearTimeout(key){timeouts.delete(key);}};
- const audio={contexts:0,notes:0};
+ const audio={contexts:0,notes:0,compressors:0,gainTargets:[]};
  class FakeAudioContext{
   constructor(){audio.contexts++;this.state='running';this.currentTime=0;this.destination={};}
   createOscillator(){return {frequency:{setValueAtTime(){}},connect(){},disconnect(){},start(){audio.notes++;},stop(){this.onended?.();}};}
-  createGain(){return {gain:{setValueAtTime(){},linearRampToValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){},disconnect(){}};}
+  createGain(){return {gain:{setValueAtTime(){},linearRampToValueAtTime(value){audio.gainTargets.push(value);},exponentialRampToValueAtTime(){}},connect(){},disconnect(){}};}
+  createDynamicsCompressor(){audio.compressors++;const parameter={setValueAtTime(){}};return {threshold:parameter,knee:parameter,ratio:parameter,attack:parameter,release:parameter,connect(){},disconnect(){}};}
  }
  if(audioSupported)window.AudioContext=FakeAudioContext;
  const Image=class{constructor(){this.complete=false;this.naturalWidth=0;this.src='';this.handlers={};}addEventListener(type,fn){this.handlers[type]=fn;}};
@@ -165,6 +166,8 @@ test('Mosti waves on tap, then moonwalks with music without moving bottles',()=>
  assert.match(env.mostiSprite.src,/mosti-wink-wave\.webp$/);
  assert.ok(env.mostiButton.classList.contains('is-winking'),'tap starts with the familiar wink');
  assert.ok(env.audio.notes>30,'music starts from the user gesture');
+ assert.ok(env.audio.gainTargets.includes(8),'music master gain is raised');
+ assert.equal(env.audio.compressors,1,'output limiter protects against clipping');
  env.finishAt(450);
  assert.ok(env.mostiButton.classList.contains('is-waving'),'the wink continues into the wave');
  assert.equal(env.figures.some(item=>item.classList.contains('is-vinegar-carried')),false);
