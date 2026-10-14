@@ -514,12 +514,13 @@ if(offerCarousel){
    const grabX=handX-(bottleRect.left+bottleRect.width/2);
    const grabY=handY-(bottleRect.top+bottleRect.height/2);
    const side=index%2?1:-1;
+   const arc=Math.min(220,Math.max(150,bottleRect.height*.85));
    try{
     const toss=image.animate([
      {translate:'0px 0px',rotate:'0deg',offset:0},
      {translate:`${grabX}px ${grabY-18}px`,rotate:'-9deg',offset:.12},
-     {translate:`${grabX+side*28}px ${grabY-112}px`,rotate:'145deg',offset:.38},
-     {translate:`${grabX-side*20}px ${grabY-78}px`,rotate:'315deg',offset:.68},
+     {translate:`${grabX+side*28}px ${grabY-arc}px`,rotate:'145deg',offset:.38},
+     {translate:`${grabX-side*20}px ${grabY-arc*.7}px`,rotate:'315deg',offset:.68},
      {translate:`${grabX}px ${grabY-16}px`,rotate:'351deg',offset:.88},
      {translate:`${grabX}px ${grabY}px`,rotate:'360deg',offset:1}
     ],{duration:1380,easing:'cubic-bezier(.35,.05,.2,1)',fill:'forwards'});
