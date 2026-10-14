@@ -189,10 +189,10 @@ test('Mosti performs individual bottle tricks and a tiny sip in the circus routi
  for(const stage of [1500,2350,3200,4050,4900,5750,6600])env.finishAt(stage);
  assert.equal(env.animations.length,7,'every bottle gets its own animated trick');
  const finalBottle=env.animations.at(-1);
- assert.ok(finalBottle.frames.some(frame=>String(frame.transform).includes('translate(-100px')),'the cherry-pear bottle moves toward Mosti for a sip');
+ assert.ok(finalBottle.frames.some(frame=>String(frame.transform).includes('rotate(-28deg)')),'the cherry-pear bottle moves toward Mosti for a sip');
  assert.ok(env.mostiButton.classList.contains('is-sipping'),'Mosti reacts while taking the tiny sip');
  assert.ok(env.figures[6].classList.contains('is-vinegar-impact'),'the last trick gets a comic sparkle');
- env.finishLast();
+ env.finishAt(8450);
  assert.ok(env.running(),'the normal carousel resumes after the act');
 });
 test('Mosti waves without motion or audio when reduced motion is requested',()=>{
