@@ -384,12 +384,18 @@ if(offerCarousel){
    if(mostDialog.open){add.disabled=!mostVariant?.availableForSale;add.textContent=mostVariant?.availableForSale?'In den Warenkorb':'Derzeit nicht verfügbar';}
   }
  });
- const activeBottleAnimations=[];let mostiOffsetX=0,mostiOffsetY=0;
+ const activeBottleAnimations=[],activeBottleFlights=[];let mostiOffsetX=0,mostiOffsetY=0;
+ const bottleFlightStyleProps=['position','left','top','right','bottom','width','height','max-width','margin','z-index','transform','translate','transform-origin','pointer-events'];
+ const restoreBottleFlight=({image,parent})=>{
+  if(parent&&image.parentNode!==parent)parent.append(image);
+  bottleFlightStyleProps.forEach(property=>image.style.removeProperty(property));
+ };
  const resetSway=()=>{
   if(finaleSipTimer!==null){window.clearTimeout(finaleSipTimer);finaleSipTimer=null;}
   if(finaleFlightTimer!==null){window.clearTimeout(finaleFlightTimer);finaleFlightTimer=null;}
   restoreFooterScene();
   activeBottleAnimations.splice(0).forEach(animation=>{try{animation.cancel();}catch{}});
+  activeBottleFlights.splice(0).forEach(restoreBottleFlight);
   mostiOffsetX=0;mostiOffsetY=0;if(mostiButton){mostiButton.style.transform='';mostiButton.style.zIndex='';}
   stopMostiMusic();
   mostiPoseTimers.splice(0).forEach(id=>window.clearTimeout(id));
@@ -485,7 +491,7 @@ if(offerCarousel){
   const id=window.setTimeout(()=>{const index=mostiPoseTimers.indexOf(id);if(index>=0)mostiPoseTimers.splice(index,1);if(swayRunning)callback();},delay);
   mostiPoseTimers.push(id);
  };
- const playBottleTrick=(button,index)=>{
+ const playBottleTrick=button=>{
   const item=button.closest('.vinegar-lineup-item'),image=item?.querySelector('img');
   if(!item||!image||!mostiButton)return;
   const bottleRect=image.getBoundingClientRect(),mascotRect=mostiButton.getBoundingClientRect();
@@ -514,28 +520,35 @@ if(offerCarousel){
    const handY=targetTop+mascotRect.height*.82;
    const grabX=handX-(bottleRect.left+bottleRect.width/2);
    const grabY=handY-(bottleRect.top+bottleRect.height/2);
-   const lift=Math.min(210,Math.max(155,bottleRect.height*1.05));
+   const lift=Math.min(bottleRect.height*2,Math.max(0,handY-bottleRect.height/2-4));
+   const originalParent=image.parentNode;
+   // Move the same product image into a viewport layer so the high throw
+   // stays visible beyond the hero's clipped edges.
+   Object.assign(image.style,{position:'fixed',left:bottleRect.left+'px',top:bottleRect.top+'px',right:'auto',bottom:'auto',width:bottleRect.width+'px',height:bottleRect.height+'px',maxWidth:'none',margin:'0',zIndex:'1200',transform:'none',translate:'0px 0px',transformOrigin:'50% 50%',pointerEvents:'none'});
+   document.body.append(image);
+   activeBottleFlights.push({image,parent:originalParent});
    try{
     const toss=image.animate([
      {translate:'0px 0px',rotate:'0deg',offset:0},
-     {translate:`${grabX}px ${grabY}px`,rotate:'0deg',offset:.14},
-     {translate:`${grabX}px ${grabY}px`,rotate:'0deg',offset:.22},
-     {translate:`${grabX}px ${grabY-lift}px`,rotate:'-7deg',offset:.46},
-     {translate:`${grabX}px ${grabY-lift}px`,rotate:'2deg',offset:.56},
+     {translate:`${grabX}px ${grabY}px`,rotate:'0deg',offset:.12},
+     {translate:`${grabX}px ${grabY}px`,rotate:'0deg',offset:.2},
+     {translate:`${grabX}px ${grabY-lift}px`,rotate:'-5deg',offset:.45},
+     {translate:`${grabX}px ${grabY-lift}px`,rotate:'2deg',offset:.55},
      {translate:`${grabX}px ${grabY}px`,rotate:'0deg',offset:.82},
      {translate:`${grabX}px ${grabY}px`,rotate:'0deg',offset:.9},
      {translate:'0px 0px',rotate:'0deg',offset:1}
-    ],{duration:1580,easing:'cubic-bezier(.28,.04,.24,1)',fill:'forwards'});
+    ],{duration:1600,easing:'cubic-bezier(.28,.04,.24,1)',fill:'forwards'});
     activeBottleAnimations.push(toss);
     toss.finished.then(()=>{
      const i=activeBottleAnimations.indexOf(toss);if(i>=0)activeBottleAnimations.splice(i,1);
-     toss.cancel();item.style.removeProperty('z-index');item.style.removeProperty('pointer-events');
+     const flightIndex=activeBottleFlights.findIndex(flight=>flight.image===image);if(flightIndex>=0)activeBottleFlights.splice(flightIndex,1);
+     toss.cancel();restoreBottleFlight({image,parent:originalParent});item.style.removeProperty('z-index');item.style.removeProperty('pointer-events');
     }).catch(()=>{});
-   }catch{item.style.removeProperty('z-index');item.style.removeProperty('pointer-events');}
-   scheduleMostiAct(220,()=>setMostiPose('carry'));
-   scheduleMostiAct(420,()=>setMostiPose('juggle'));
-   scheduleMostiAct(1300,()=>setMostiPose('carry'));
-   scheduleMostiAct(1580,()=>setMostiPose('idle'));
+   }catch{const flightIndex=activeBottleFlights.findIndex(flight=>flight.image===image);if(flightIndex>=0)activeBottleFlights.splice(flightIndex,1);restoreBottleFlight({image,parent:originalParent});item.style.removeProperty('z-index');item.style.removeProperty('pointer-events');}
+   scheduleMostiAct(200,()=>setMostiPose('carry'));
+   scheduleMostiAct(360,()=>setMostiPose('juggle'));
+   scheduleMostiAct(1310,()=>setMostiPose('carry'));
+   scheduleMostiAct(1600,()=>setMostiPose('idle'));
   });
  };
  const restoreFooterScene=()=>{
@@ -637,7 +650,7 @@ if(offerCarousel){
   }
   playMoonwalkMusic();setMostiPose('walk');
   bottles.forEach((button,index)=>scheduleMostiAct(1100+index*2600,()=>playBottleTrick(button,index)));
-  const endAt=1100+Math.max(0,bottles.length-1)*2600+2400;
+  const endAt=1100+Math.max(0,bottles.length-1)*2600+2500;
   swayTimer=window.setTimeout(()=>{swayTimer=null;playFooterFinale();},endAt);
  };
  mostiButton?.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!swayRunning&&currentMostiPose==='idle')setMostiPose('wink');});

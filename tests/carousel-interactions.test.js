@@ -35,7 +35,7 @@ function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=
   addEventListener(type,fn){this.handlers[type]=fn;},matches(selector){return selector===':focus-visible'&&this.focusVisible===true;},setAttribute(name,value){this.attrs[name]=value;},removeAttribute(name){delete this.attrs[name];},animate(frames,options){const animation={target:this,frames,options,cancelled:false,cancel(){this.cancelled=true;}};animations.push(animation);return animation;}
  });
  const slides=Array.from({length:5},element),images=Array.from({length:5},element);images[3].getBoundingClientRect=()=>({left:0,top:0,right:700,bottom:300,width:700,height:300});
- const bottleNames=['Apfelessig mit 33 Sorten','Himbeeressig','Birnenessig','Holunderblütenessig','Birnen-Balsamico','Kirschessig','Kirschen-Birnen-Essig'];const figures=Array.from({length:7},(_,index)=>{const figure=element(),caption=element();caption.textContent=bottleNames[index];figure.querySelector=selector=>selector==='figcaption'?caption:bottleImage;return figure;}),bottles=figures.map((figure,index)=>{const button=element();button.closest=selector=>selector==='[data-offer-image]'?images[3]:figure;button.getBoundingClientRect=()=>({left:index*100,width:80});const bottleImage=element();bottleImage.src='/assets/essig-birnen-cutout.svg';bottleImage.getBoundingClientRect=()=>({left:20+index*90,width:90,top:25,height:240});figure.querySelector=selector=>selector==='figcaption'?figure._caption:bottleImage;figure._caption={textContent:bottleNames[index]};figure.getBoundingClientRect=()=>({left:index*100,width:80,top:0,height:160});button.querySelector=()=>bottleImage;return button;});
+ const bottleNames=['Apfelessig mit 33 Sorten','Himbeeressig','Birnenessig','Holunderblütenessig','Birnen-Balsamico','Kirschessig','Kirschen-Birnen-Essig'];const figures=Array.from({length:7},(_,index)=>{const figure=element(),caption=element();caption.textContent=bottleNames[index];figure.querySelector=selector=>selector==='figcaption'?caption:bottleImage;return figure;}),bottles=figures.map((figure,index)=>{const button=element();button.closest=selector=>selector==='[data-offer-image]'?images[3]:figure;button.getBoundingClientRect=()=>({left:index*100,width:80});const bottleImage=element();bottleImage.src='/assets/essig-birnen-cutout.svg';bottleImage.getBoundingClientRect=()=>({left:20+index*90,width:90,top:250,height:160});figure.querySelector=selector=>selector==='figcaption'?figure._caption:bottleImage;figure._caption={textContent:bottleNames[index]};figure.getBoundingClientRect=()=>({left:index*100,width:80,top:0,height:160});button.querySelector=()=>bottleImage;return button;});
  const controls=Object.fromEntries(['prev','next','toggle','controls'].map(name=>['[data-offer-'+name+']',element()]));
  controls['[data-vinegar-open]']=element();
  controls['[data-vinegar-sound]']=element();
@@ -160,20 +160,20 @@ test('Mosti walks to each bottle before the original image moves, then restores 
  assert.equal(env.animations.length,2,'the original bottle moves only after Mosti reaches it');
  assert.equal(env.animations[1].target,env.figures[0].querySelector('img'));
  const firstToss=env.animations[1];
- assert.equal(firstToss.options.duration,1580,'the bottle is caught, tossed, and lowered in one continuous movement');
+ assert.equal(firstToss.options.duration,1600,'the bottle is caught, tossed, and lowered in one continuous movement');
  const handPosition=firstToss.frames[1].translate.split(' ').map(value=>parseFloat(value));
  const apexPosition=firstToss.frames[3].translate.split(' ').map(value=>parseFloat(value));
- assert.ok(apexPosition[1]<=handPosition[1]-155,'the bottle rises clearly above Mosti');
+ assert.ok(apexPosition[1]<=handPosition[1]-240,'the bottle rises at least one and a half bottle heights above Mosti');
  assert.equal(apexPosition[0],handPosition[0],'the bottle travels straight up without a sideways circle');
- assert.ok(firstToss.frames.every(frame=>Math.abs(parseFloat(frame.rotate)||0)<=7),'the bottle stays upright instead of spinning in a circle');
+ assert.ok(firstToss.frames.every(frame=>Math.abs(parseFloat(frame.rotate)||0)<=5),'the bottle stays upright instead of spinning in a circle');
  assert.equal(firstToss.frames.at(-1).translate,'0px 0px','the bottle returns to its exact original position');
  for(const stage of [3700,6300,8900,11500,14100,16700]){
-  env.finishAt(stage);env.finishAt(820);env.finishAt(1580);
+  env.finishAt(stage);env.finishAt(820);env.finishAt(1600);
  }
  assert.equal(env.animations.filter(animation=>animation.target===env.mostiButton).length,7,'Mosti approaches every original bottle');
  assert.equal(env.animations.filter(animation=>animation.target!==env.mostiButton).length,7,'each original bottle gets a separate toss after the approach');
  assert.ok(env.bottles.every(button=>button.handlers.click===undefined),'the original product links remain in place');
- env.finishAt(19100);
+ env.finishAt(19200);
  const footerStage=env.carousel.children.find(child=>child.className==='mosti-footer-stage');
  assert.ok(footerStage&&!footerStage.hidden,'the final bottle and Mosti move into the footer scene');
  assert.ok(footerStage.children.includes(env.mostiButton));
