@@ -482,7 +482,7 @@ if(offerCarousel){
  };
  mostiButton?.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!swayRunning&&currentMostiPose==='idle')setMostiPose('wink');});
  mostiButton?.addEventListener('pointerleave',()=>{if(currentMostiPose==='wink'&&!swayRunning)setMostiPose('idle');});
- mostiButton?.addEventListener('click',event=>{playMosti();if(event.detail>0)mostiButton.blur();});
+ mostiButton?.addEventListener('click',event=>{playMosti();if((event?.detail||0)>0)mostiButton.blur();});
  bottles.forEach((button,index)=>{
   button.addEventListener('pointerenter',event=>{
    if(event.pointerType!=='mouse'||motion.matches)return;
