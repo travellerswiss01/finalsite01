@@ -462,13 +462,14 @@ if(offerCarousel){
   resetSway();stop();swayRunning=true;
   mostiFrame.classList.add('is-mosti-playing');
   if(reducedMostiMotion()){
-   setMostiPose('wave');
+   setMostiPose('wink');
    swayTimer=window.setTimeout(()=>{swayTimer=null;swayRunning=false;setMostiPose('idle');mostiFrame.classList.remove('is-mosti-playing');start();},950);
    return;
   }
-  // Start sound directly from the user's tap, then wave and dance in place.
+  // Wake with the familiar quick wink, then continue into the wave and dance.
   playMoonwalkMusic();
-  setMostiPose('wave');
+  setMostiPose('wink');
+  mostiPoseTimers.push(window.setTimeout(()=>{if(swayRunning)setMostiPose('wave');},450));
   mostiPoseTimers.push(window.setTimeout(()=>{if(swayRunning)setMostiPose('moonwalk');},900));
   mostiPoseTimers.push(window.setTimeout(()=>{if(swayRunning)setMostiPose('walk');},3000));
   swayTimer=window.setTimeout(()=>{
