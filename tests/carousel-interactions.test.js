@@ -145,7 +145,7 @@ test('Mosti walks to each bottle before the original image moves, then restores 
  const env=setup(false,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
  env.mostiButton.handlers.click();
  assert.equal(env.lineup.classList.contains('is-mosti-sequence'),false,'the lineup does not reflow when the performance starts');
- assert.match(env.mostiSprite.src,/mosti-walk-a\\.webp$/);
+ assert.match(env.mostiSprite.src,/mosti-walk-a\.webp$/);
  env.finishAt(1100);
  assert.equal(env.animations.length,1,'only Mosti moves during the approach');
  assert.equal(env.animations[0].target,env.mostiButton);
