@@ -615,8 +615,19 @@ if(offerCarousel){
  mostiButton?.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!swayRunning&&currentMostiPose==='idle')setMostiPose('wink');});
  mostiButton?.addEventListener('pointerleave',()=>{if(currentMostiPose==='wink'&&!swayRunning)setMostiPose('idle');});
  mostiButton?.addEventListener('click',event=>{playMosti();if((event?.detail||0)>0)mostiButton.blur();});
- // Normal pointer hover and clicks never shift the product bottles. Only the explicit motion control may trigger the separate sway effect.
- if(motionToggle){motionToggle.hidden=true;motionToggle.disabled=true;}
+ // Hover-topple remains a separate interaction; Mosti's circus act starts only from his own button.
+ bottles.forEach((button,index)=>{
+  button.addEventListener('pointerenter',event=>{
+   if(event.pointerType!=='mouse'||motion.matches||swayRunning)return;
+   const rect=button.getBoundingClientRect();
+   const direction=Number.isFinite(event.clientX)&&rect.width?event.clientX<rect.left+rect.width/2?1:-1:1;
+   playSway(index,direction);
+  });
+ });
+ if(motionToggle){
+  motionToggle.hidden=false;motionToggle.disabled=motion.matches;
+  motionToggle.addEventListener('click',()=>{if(!motion.matches&&!swayRunning)playSway(Math.floor(bottles.length/2));});
+ }
  offerCarousel.querySelector('[data-vinegar-open]')?.addEventListener('click',openVinegar);
  vinegarDialog?.querySelector('[data-vinegar-close]')?.addEventListener('click',()=>vinegarDialog.close());
  vinegarDialog?.addEventListener('close',()=>start());
