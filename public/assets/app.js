@@ -496,14 +496,25 @@ if(offerCarousel){
   item.style.zIndex=String(20+index);
   setMostiPose(pose);
   const isLast=index===bottles.length-1;
-  const frames=[
-   {transform:base+' translate(0px,0px) rotate(0deg) scale(1)',offset:0},
-   {transform:base+` translate(${dx*.22}px,${dy*.2-arc*.72}px) rotate(105deg) scale(1.045)`,offset:.28},
-   {transform:base+` translate(${dx*.62}px,${dy*.68-arc}px) rotate(235deg) scale(1.045)`,offset:.56},
-   {transform:base+` translate(${dx}px,${dy-arc*.25}px) rotate(355deg) scale(1.01)`,offset:.77},
-   {transform:base+` translate(${isLast?dx+240:0}px,${isLast?window.innerHeight+dy+260:0}px) rotate(${isLast?720:360}deg) scale(1)`,offset:1}
-  ];
-  const duration=isLast?1650:1450;
+  const actStart=1100+index*1120;
+  const actEnd=1100+Math.max(0,bottles.length-1)*1120+1650;
+  const duration=actEnd-actStart;
+  const frames=[{transform:base+' translate(0px,0px) rotate(0deg) scale(1)',offset:0}];
+  const cycles=Math.max(1,Math.floor((duration-500)/1300));
+  const cycleSpan=.82/cycles;
+  for(let cycle=0;cycle<cycles;cycle++){
+   const start=.08+cycle*cycleSpan;
+   const rotation=cycle*360;
+   const side=(index%2?1:-1)*(18+(index%3)*8);
+   frames.push(
+    {transform:base+` translate(${dx*.28+side}px,${dy*.25-arc*.72}px) rotate(${rotation+105}deg) scale(1.045)`,offset:start},
+    {transform:base+` translate(${dx*.62-side*.35}px,${dy*.62-arc}px) rotate(${rotation+235}deg) scale(1.045)`,offset:start+cycleSpan*.46},
+    {transform:base+` translate(${dx+side}px,${dy-arc*.2}px) rotate(${rotation+355}deg) scale(1.01)`,offset:Math.min(.94,start+cycleSpan*.9)}
+   );
+  }
+  frames.push(isLast
+   ?{transform:base+` translate(${dx+220}px,${Math.max(700,window.innerHeight||800)+dy+240}px) rotate(760deg) scale(.92)`,offset:1}
+   :{transform:base+' translate(0px,0px) rotate(360deg) scale(1)',offset:1});
   try{
    const animation=image.animate(frames,{duration,easing:'cubic-bezier(.38,.04,.24,1)',fill:'both'});
    activeBottleAnimations.push(animation);
@@ -564,7 +575,7 @@ if(offerCarousel){
   }
   playMoonwalkMusic();setMostiPose('walk');
   bottles.forEach((button,index)=>scheduleMostiAct(1100+index*1120,()=>playBottleTrick(button,index)));
-  const endAt=1100+Math.max(0,bottles.length-1)*1120+1850;
+  const endAt=1100+Math.max(0,bottles.length-1)*1120+1800;
   swayTimer=window.setTimeout(()=>{swayTimer=null;playFooterFinale();},endAt);
  };
  mostiButton?.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!swayRunning&&currentMostiPose==='idle')setMostiPose('wink');});
