@@ -384,11 +384,12 @@ if(offerCarousel){
    if(mostDialog.open){add.disabled=!mostVariant?.availableForSale;add.textContent=mostVariant?.availableForSale?'In den Warenkorb':'Derzeit nicht verfügbar';}
   }
  });
- const activeBottleAnimations=[];
+ const activeBottleAnimations=[];let mostiOffsetX=0,mostiOffsetY=0;
  const resetSway=()=>{
   if(finaleSipTimer!==null){window.clearTimeout(finaleSipTimer);finaleSipTimer=null;}
   restoreFooterScene();
   activeBottleAnimations.splice(0).forEach(animation=>{try{animation.cancel();}catch{}});
+  mostiOffsetX=0;mostiOffsetY=0;if(mostiButton){mostiButton.style.transform='';mostiButton.style.zIndex='';}
   stopMostiMusic();
   mostiPoseTimers.splice(0).forEach(id=>window.clearTimeout(id));
   resetMosti();
@@ -485,52 +486,56 @@ if(offerCarousel){
  };
  const playBottleTrick=(button,index)=>{
   const item=button.closest('.vinegar-lineup-item'),image=item?.querySelector('img');
-  if(!item||!image)return;
-  const from=image.getBoundingClientRect(),to=mostiButton?.getBoundingClientRect();
-  if(!from?.width||!from?.height)return;
-  const towardX=to?to.left+to.width*.46-(from.left+from.width/2):0;
-  const dx=Math.max(-Math.min(250,window.innerWidth*.28),Math.min(Math.min(250,window.innerWidth*.28),towardX));
-  const dy=to?to.top+to.height*.28-(from.top+from.height/2):-100;
-  const arc=Math.max(115,Math.min(210,from.height*.72));
-  const base='translate(-50%,-50%)';
-  const pose=index===0?'reach':'juggle';
-  item.style.zIndex=String(20+index);
-  setMostiPose(pose);
-  const isLast=index===bottles.length-1;
-  const actStart=1100+index*1120;
-  const actEnd=1100+Math.max(0,bottles.length-1)*1120+1650;
-  const duration=actEnd-actStart;
-  const frames=[{transform:base+' translate(0px,0px) rotate(0deg) scale(1)',offset:0}];
-  const cycles=Math.max(1,Math.floor((duration-500)/1300));
-  const cycleSpan=.82/cycles;
-  for(let cycle=0;cycle<cycles;cycle++){
-   const start=.08+cycle*cycleSpan;
-   const rotation=cycle*360;
-   const side=(index%2?1:-1)*(18+(index%3)*8);
-   frames.push(
-    {transform:base+` translate(${dx*.28+side}px,${dy*.25-arc*.72}px) rotate(${rotation+105}deg) scale(1.045)`,offset:start},
-    {transform:base+` translate(${dx*.62-side*.35}px,${dy*.62-arc}px) rotate(${rotation+235}deg) scale(1.045)`,offset:start+cycleSpan*.46},
-    {transform:base+` translate(${dx+side}px,${dy-arc*.2}px) rotate(${rotation+355}deg) scale(1.01)`,offset:Math.min(.94,start+cycleSpan*.9)}
-   );
-  }
-  frames.push(isLast
-   ?{transform:base+` translate(${dx+220}px,${Math.max(700,window.innerHeight||800)+dy+240}px) rotate(760deg) scale(.92)`,offset:1}
-   :{transform:base+' translate(0px,0px) rotate(360deg) scale(1)',offset:1});
+  if(!item||!image||!mostiButton)return;
+  const bottleRect=image.getBoundingClientRect(),mascotRect=mostiButton.getBoundingClientRect();
+  if(!bottleRect.width||!bottleRect.height||!mascotRect.width||!mascotRect.height)return;
+  const targetLeft=bottleRect.left+bottleRect.width/2-mascotRect.width*.12;
+  const targetTop=bottleRect.top+bottleRect.height/2-mascotRect.height*.82;
+  const walkX=targetLeft-mascotRect.left,walkY=targetTop-mascotRect.top;
+  const startX=mostiOffsetX,startY=mostiOffsetY,endX=startX+walkX,endY=startY+walkY;
+  item.style.zIndex='20';item.style.pointerEvents='none';mostiButton.style.zIndex='30';
+  setMostiPose('walk','back');
   try{
-   const animation=image.animate(frames,{duration,easing:'cubic-bezier(.38,.04,.24,1)',fill:'both'});
-   activeBottleAnimations.push(animation);
-   animation.finished.then(()=>{const i=activeBottleAnimations.indexOf(animation);if(i>=0)activeBottleAnimations.splice(i,1);animation.cancel();item.style.removeProperty('z-index');}).catch(()=>{});
-  }catch{item.classList.remove('is-vinegar-impact');item.style.removeProperty('z-index');}
-  scheduleMostiAct(duration,()=>{
-   item.style.removeProperty('z-index');
-   if(isLast)setMostiPose('leap');
-   else setMostiPose(index%2?'juggle':'reach');
+   const walk=mostiButton.animate([
+    {transform:`translate(${startX}px,${startY}px)`},
+    {transform:`translate(${endX}px,${endY}px)`}
+   ],{duration:820,easing:'cubic-bezier(.35,.05,.2,1)',fill:'forwards'});
+   activeBottleAnimations.push(walk);
+   walk.finished.then(()=>{
+    const i=activeBottleAnimations.indexOf(walk);if(i>=0)activeBottleAnimations.splice(i,1);
+    mostiOffsetX=endX;mostiOffsetY=endY;mostiButton.style.transform=`translate(${endX}px,${endY}px)`;walk.cancel();
+   }).catch(()=>{});
+  }catch{}
+  scheduleMostiAct(820,()=>{
+   setMostiPose('reach');
+   const handX=targetLeft+mascotRect.width*.12;
+   const handY=targetTop+mascotRect.height*.82;
+   const grabX=handX-(bottleRect.left+bottleRect.width/2);
+   const grabY=handY-(bottleRect.top+bottleRect.height/2);
+   const side=index%2?1:-1;
+   try{
+    const toss=image.animate([
+     {translate:'0px 0px',rotate:'0deg',offset:0},
+     {translate:`${grabX}px ${grabY-18}px`,rotate:'-9deg',offset:.12},
+     {translate:`${grabX+side*28}px ${grabY-112}px`,rotate:'145deg',offset:.38},
+     {translate:`${grabX-side*20}px ${grabY-78}px`,rotate:'315deg',offset:.68},
+     {translate:`${grabX}px ${grabY-16}px`,rotate:'351deg',offset:.88},
+     {translate:`${grabX}px ${grabY}px`,rotate:'360deg',offset:1}
+    ],{duration:1380,easing:'cubic-bezier(.35,.05,.2,1)',fill:'forwards'});
+    activeBottleAnimations.push(toss);
+    toss.finished.then(()=>{
+     const i=activeBottleAnimations.indexOf(toss);if(i>=0)activeBottleAnimations.splice(i,1);
+     toss.cancel();item.style.removeProperty('z-index');item.style.removeProperty('pointer-events');
+    }).catch(()=>{});
+   }catch{item.style.removeProperty('z-index');item.style.removeProperty('pointer-events');}
+   scheduleMostiAct(1380,()=>setMostiPose('juggle'));
   });
  };
  const restoreFooterScene=()=>{
   if(finaleBottleImage){finaleBottleImage.classList.remove('mosti-footer-bottle');if(finaleBottleLink)finaleBottleLink.append(finaleBottleImage);}
   finaleBottleImage=null;finaleBottleLink=null;
   if(mostiButton&&mostiFrame&&!mostiFrame.contains?.(mostiButton))mostiFrame.append(mostiButton);
+  if(mostiButton){mostiButton.style.transform='';mostiButton.style.zIndex='';}mostiOffsetX=0;mostiOffsetY=0;
   mostiFooterStage?.classList.remove('is-playing');
   if(mostiFooterStage)mostiFooterStage.hidden=true;
   if(finaleScrollY!==null&&finaleScrollY!==undefined)window.scrollTo?.({top:finaleScrollY,behavior:'smooth'});
@@ -545,6 +550,7 @@ if(offerCarousel){
   mostiFooterStage.append(mostiButton);mostiFooterStage.append(lastImage);
   lastImage.classList.add('mosti-footer-bottle');
   setMostiPose('leap');
+  mostiButton.style.transform='';mostiButton.style.zIndex='';mostiOffsetX=0;mostiOffsetY=0;
   mostiFooterStage.scrollIntoView?.({behavior:'smooth',block:'center'});
   finaleSipTimer=window.setTimeout(()=>{
    finaleSipTimer=null;
@@ -576,10 +582,9 @@ if(offerCarousel){
    swayTimer=window.setTimeout(()=>{swayTimer=null;swayRunning=false;setMostiPose('idle');mostiFrame.classList.remove('is-mosti-playing');mostiFrame.querySelector('.vinegar-lineup')?.classList.remove('is-mosti-sequence');start();},950);
    return;
   }
-  mostiFrame.querySelector('.vinegar-lineup')?.classList.add('is-mosti-sequence');
   playMoonwalkMusic();setMostiPose('walk');
-  bottles.forEach((button,index)=>scheduleMostiAct(1100+index*1120,()=>playBottleTrick(button,index)));
-  const endAt=1100+Math.max(0,bottles.length-1)*1120+1800;
+  bottles.forEach((button,index)=>scheduleMostiAct(1100+index*2600,()=>playBottleTrick(button,index)));
+  const endAt=1100+Math.max(0,bottles.length-1)*2600+2400;
   swayTimer=window.setTimeout(()=>{swayTimer=null;playFooterFinale();},endAt);
  };
  mostiButton?.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!swayRunning&&currentMostiPose==='idle')setMostiPose('wink');});
