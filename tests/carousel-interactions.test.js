@@ -28,7 +28,7 @@ test('Mosti has separate transparent walk frames and a wink-and-wave pose',()=>{
 function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=true){
  const animations=[];let mostiButton,mostiSprite;
  const element=()=>({
-  children:[],remove(){this.removed=true;},append(child){this.children.push(child);},handlers:{},attrs:{},inert:false,hidden:true,textContent:'',
+  children:[],remove(){this.removed=true;},blur(){this.blurred=true;},append(child){this.children.push(child);},handlers:{},attrs:{},inert:false,hidden:true,textContent:'',
   style:{values:{},zIndex:'',setProperty(name,value){this.values[name]=value;},removeProperty(name){if(name==='z-index')this.zIndex='';else delete this.values[name];}},
   classList:{values:new Set(),add(...names){names.forEach(name=>this.values.add(name));},remove(...names){names.forEach(name=>this.values.delete(name));},contains(name){return this.values.has(name);},toggle(name,value){if(value)this.add(name);else this.remove(name);}},
   addEventListener(type,fn){this.handlers[type]=fn;},matches(selector){return selector===':focus-visible'&&this.focusVisible===true;},setAttribute(name,value){this.attrs[name]=value;},removeAttribute(name){delete this.attrs[name];},animate(frames,options){const animation={frames,options,cancelled:false,cancel(){this.cancelled=true;}};animations.push(animation);return animation;}
@@ -165,6 +165,14 @@ test('devices without Web Audio keep the sound button hidden and label viewing f
  env.controls['[data-vinegar-open]'].handlers.click();assert.equal(env.dialog.open,true);assert.equal(env.audio.contexts,0);
 });
 
+test('Mosti releases pointer focus after a tap but keeps keyboard focus',()=>{
+ const pointer=setup(false,true,true);pointer.mostiSprite.handlers.load();pointer.mostiButton.hidden=false;
+ pointer.mostiButton.handlers.click({detail:1});
+ assert.equal(pointer.mostiButton.blurred,true);
+ const keyboard=setup(false,true,true);keyboard.mostiSprite.handlers.load();keyboard.mostiButton.hidden=false;
+ keyboard.mostiButton.handlers.click({detail:0});
+ assert.equal(keyboard.mostiButton.blurred,undefined);
+});
 test('Mosti waves on tap, then moonwalks with music without moving bottles',()=>{
  const env=setup(false,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
  env.mostiButton.handlers.click();
