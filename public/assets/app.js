@@ -241,8 +241,8 @@ if(offerCarousel){
  if(mostiFrame&&typeof document.createElement==='function'){
   mostiButton=document.createElement('button');
   mostiButton.type='button';mostiButton.className='mosti-domino';mostiButton.hidden=true;
-  mostiButton.setAttribute('aria-label','Mosti winkt und tanzt mit Musik');
-  mostiButton.title='Mosti winkt und tanzt mit Musik';
+  mostiButton.setAttribute('aria-label','Mosti führt eine Zirkusnummer mit den Essigflaschen auf');
+  mostiButton.title='Mosti führt eine Zirkusnummer mit den Essigflaschen auf';
   mostiSprite=document.createElement('img');
   mostiSprite.alt='Mosti, unser Apfelmaskottchen';mostiSprite.width=420;mostiSprite.height=432;
   mostiSprite.addEventListener('load',()=>{mostiFrame.classList.add('has-mosti');mostiButton.hidden=false;});
@@ -381,7 +381,7 @@ if(offerCarousel){
   if(swayTimer!==null){window.clearTimeout(swayTimer);swayTimer=null;}
   swayRunning=false;
   setMostiPose('idle');
-  bottles.forEach(button=>button.closest('.vinegar-lineup-item').classList.remove('is-vinegar-sway','is-vinegar-impact','is-vinegar-hugging','is-vinegar-sip'));mostiButton?.classList.remove('is-bracing','is-hugging','is-sipping');
+  bottles.forEach(button=>button.closest('.vinegar-lineup-item').classList.remove('is-vinegar-sway','is-vinegar-impact','is-vinegar-hugging','is-vinegar-sip','is-vinegar-sipping'));mostiButton?.classList.remove('is-bracing','is-hugging','is-sipping');
   bottles.forEach(button=>{const item=button.closest('.vinegar-lineup-item');item.style.removeProperty('z-index');item.style.removeProperty('--bottle-shift');item.style.removeProperty('--bottle-shift-y');});
  };
  const loadOfferImage=index=>{
