@@ -150,7 +150,7 @@ test('Mosti throws each original bottle image in a high arc and returns it to it
   assert.ok(animation.frames.some(frame=>String(frame.transform).includes('rotate(235deg)')),'the bottle rotates through the arc');
  }
  assert.ok(env.bottles.every(button=>button.handlers.click===undefined),'the original product anchors are not replaced by animation copies');
- assert.ok(env.mostiButton.classList.contains('is-mosti-playing'));
+ assert.ok(env.images[3].classList.contains('is-mosti-playing'));
  env.finishAt(9470);
  assert.ok(env.running(),'the carousel resumes after the performance');
 });
