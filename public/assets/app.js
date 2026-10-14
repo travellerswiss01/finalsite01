@@ -203,7 +203,7 @@ if(offerCarousel){
    if(audioContext.state==='suspended')await audioContext.resume();
    stopMostiMusic();
    const context=audioContext,master=context.createGain(),start=context.currentTime+.04,beat=.56;
-   master.gain.setValueAtTime(.0001,start);master.gain.linearRampToValueAtTime(8,start+.08);
+   master.gain.setValueAtTime(.0001,start);master.gain.linearRampToValueAtTime(14,start+.08);
    const limiter=context.createDynamicsCompressor();
    limiter.threshold.setValueAtTime(-4,start);limiter.knee.setValueAtTime(0,start);limiter.ratio.setValueAtTime(20,start);limiter.attack.setValueAtTime(.003,start);limiter.release.setValueAtTime(.12,start);
    master.connect(limiter);limiter.connect(context.destination);moonwalkMusicMaster=master;
