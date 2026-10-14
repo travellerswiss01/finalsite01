@@ -106,12 +106,12 @@ test('keyboard focus pauses rotation and blur resumes it',()=>{
  next.focusVisible=false;env.document.activeElement=null;
  env.carousel.handlers.focusout({relatedTarget:null});env.finish();assert.equal(env.running(),true);
 });
-test('reduced motion keeps bottles still while allowing direct access to original labels',()=>{
+test('reduced motion keeps bottles stationary and preserves label access',()=>{
  const env=setup(true);
- env.bottles[0].handlers.pointerenter({pointerType:'mouse'});
+ assert.equal(env.bottles[0].handlers.pointerenter,undefined);
  assert.equal(env.timeouts.size,0);assert.equal(env.dialog.open,false);
  env.controls['[data-vinegar-open]'].handlers.click();assert.equal(env.dialog.open,true);assert.equal(env.timeouts.size,0);
- const normal=setup();normal.bottles[0].handlers.pointerenter({pointerType:'mouse'});
+ const normal=setup();assert.equal(normal.bottles[0].handlers.pointerenter,undefined);
  normal.motion.matches=true;normal.motion.handlers.change({matches:true});
  assert.equal(normal.timeouts.size,0);assert.equal(normal.running(),false);
 });
