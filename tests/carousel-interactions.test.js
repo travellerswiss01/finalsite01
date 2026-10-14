@@ -16,6 +16,7 @@ test('Mosti hides pointer focus chrome while keeping a visible keyboard focus ri
  const css=readFileSync(new URL('../public/assets/sections.css',import.meta.url),'utf8');
  assert.match(css,/\.mosti-domino:focus:not\(:focus-visible\)\{outline:none!important;box-shadow:none!important;background:transparent\}/);
  assert.match(css,/\.mosti-domino:focus-visible\{outline:2px solid #9c792b/);
+ assert.match(css,/\.footer \.mosti-footer-stage \.mosti-domino\{[^}]*right:calc\(50% - 82px\);bottom:0\}/,'footer pose overrides the mobile lineup positioning');
 });
 test('Mosti has separate transparent walk frames and a wink-and-wave pose',()=>{
  for(const name of ['mosti-walk-a.webp','mosti-walk-b.webp','mosti-moonwalk-a.webp','mosti-moonwalk-b.webp','mosti-wink-wave.webp']){
@@ -46,9 +47,10 @@ function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=
  const carousel=element();carousel.contains=el=>bottles.includes(el)||Object.values(controls).includes(el);
  carousel.querySelectorAll=selector=>selector==='[data-offer-image]'?images:selector==='[data-vinegar-bottle]'?bottles:slides;
  carousel.querySelector=selector=>controls[selector];
+ let lineup=null;
  if(withMosti){
   images[3].classList.add('vinegar-lineup-frame');images[3].clientWidth=700;
-  const lineup=element();lineup.clientWidth=450;lineup.querySelectorAll=()=>figures;
+  lineup=element();lineup.clientWidth=450;lineup.querySelectorAll=()=>figures;
   images[3].querySelector=()=>lineup;
   const mostiRect={left:500,top:0,width:128,height:142};
   images[3].append=button=>{mostiButton=button;button.getBoundingClientRect=()=>mostiRect;};
@@ -69,7 +71,7 @@ function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=
  if(audioSupported)window.AudioContext=FakeAudioContext;
  const Image=class{constructor(){this.complete=false;this.naturalWidth=0;this.src='';this.handlers={};}addEventListener(type,fn){this.handlers[type]=fn;}};
  vm.runInNewContext(carouselScript,{document,window,Image});
- return {mostiButton,mostiSprite,animations,bottles,figures,images,controls,carousel,dialog,detailGrid,detailHeading,detailPhotos,document,motion,timeouts,audio,
+ return {mostiButton,mostiSprite,animations,bottles,figures,images,lineup,controls,carousel,dialog,detailGrid,detailHeading,detailPhotos,document,motion,timeouts,audio,
   next(){controls['[data-offer-next]'].handlers.click();},running:()=>interval!==null,
   finish(){const [key,timeout]=timeouts.entries().next().value;timeouts.delete(key);timeout.fn();}
  ,finishAt(ms){const entry=[...timeouts.entries()].filter(([,timeout])=>timeout.ms===ms).at(-1);assert.ok(entry,'Scheduled stage '+ms+' exists');const [key,timeout]=entry;timeouts.delete(key);timeout.fn();},
@@ -142,6 +144,7 @@ test('Mosti releases pointer focus after a tap but keeps keyboard focus',()=>{
 test('Mosti throws each original bottle image in a high arc and returns it to its product link',()=>{
  const env=setup(false,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
  env.mostiButton.handlers.click();
+ assert.ok(env.lineup.classList.contains('is-mosti-sequence'),'the animation layout is activated before the first throw');
  assert.match(env.mostiSprite.src,/mosti-walk-a\.webp$/);
  assert.equal(env.animations.length,0);
  for(const stage of [1100,2220,3340,4460,5580,6700,7820])env.finishAt(stage);
@@ -159,12 +162,14 @@ test('Mosti throws each original bottle image in a high arc and returns it to it
  assert.ok(footerStage.children.includes(env.bottles[6].querySelector('img')));
  env.finishAt(550);env.finishAt(3900);
  assert.equal(footerStage.hidden,true,'the temporary scene is hidden after the drink');
+ assert.equal(env.lineup.classList.contains('is-mosti-sequence'),false,'the original lineup layout is restored after the routine');
  assert.ok(env.running(),'the carousel resumes after the performance');
 });
 test('Mosti waves without motion or audio when reduced motion is requested',()=>{
  const env=setup(true,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
  env.mostiButton.handlers.click();
  assert.match(env.mostiSprite.src,/mosti-wink-wave\.webp$/);
+ assert.equal(env.lineup.classList.contains('is-mosti-sequence'),false,'reduced motion does not rearrange the lineup');
  assert.ok(env.mostiButton.classList.contains('is-winking'));
  assert.equal(env.audio.notes,0);
  env.finishAt(950);
