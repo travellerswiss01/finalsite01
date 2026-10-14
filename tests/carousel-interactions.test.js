@@ -163,7 +163,10 @@ test('Mosti waves on tap, then moonwalks with music without moving bottles',()=>
  const env=setup(false,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
  env.mostiButton.handlers.click();
  assert.match(env.mostiSprite.src,/mosti-wink-wave\.webp$/);
+ assert.ok(env.mostiButton.classList.contains('is-winking'),'tap starts with the familiar wink');
  assert.ok(env.audio.notes>30,'music starts from the user gesture');
+ env.finishAt(450);
+ assert.ok(env.mostiButton.classList.contains('is-waving'),'the wink continues into the wave');
  assert.equal(env.figures.some(item=>item.classList.contains('is-vinegar-carried')),false);
  env.finishAt(900);
  assert.match(env.mostiSprite.src,/mosti-moonwalk-a\.webp$/);
@@ -179,6 +182,7 @@ test('Mosti waves without motion or audio when reduced motion is requested',()=>
  const env=setup(true,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
  env.mostiButton.handlers.click();
  assert.match(env.mostiSprite.src,/mosti-wink-wave\.webp$/);
+ assert.ok(env.mostiButton.classList.contains('is-winking'));
  assert.equal(env.audio.notes,0);
  env.finishAt(950);
  assert.match(env.mostiSprite.src,/mosti-domino\.webp$/);
