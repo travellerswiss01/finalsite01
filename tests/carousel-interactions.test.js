@@ -32,7 +32,7 @@ function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=
   children:[],remove(){this.removed=true;},blur(){this.blurred=true;},append(child){this.children.push(child);},handlers:{},attrs:{},inert:false,hidden:true,textContent:'',
   style:{values:{},zIndex:'',setProperty(name,value){this.values[name]=value;},removeProperty(name){if(name==='z-index')this.zIndex='';else delete this.values[name];}},
   classList:{values:new Set(),add(...names){names.forEach(name=>this.values.add(name));},remove(...names){names.forEach(name=>this.values.delete(name));},contains(name){return this.values.has(name);},toggle(name,value){if(value)this.add(name);else this.remove(name);}},
-  addEventListener(type,fn){this.handlers[type]=fn;},matches(selector){return selector===':focus-visible'&&this.focusVisible===true;},setAttribute(name,value){this.attrs[name]=value;},removeAttribute(name){delete this.attrs[name];},animate(frames,options){const animation={frames,options,cancelled:false,cancel(){this.cancelled=true;}};animations.push(animation);return animation;}
+  addEventListener(type,fn){this.handlers[type]=fn;},matches(selector){return selector===':focus-visible'&&this.focusVisible===true;},setAttribute(name,value){this.attrs[name]=value;},removeAttribute(name){delete this.attrs[name];},animate(frames,options){const animation={target:this,frames,options,cancelled:false,cancel(){this.cancelled=true;}};animations.push(animation);return animation;}
  });
  const slides=Array.from({length:5},element),images=Array.from({length:5},element);images[3].getBoundingClientRect=()=>({left:0,top:0,right:700,bottom:300,width:700,height:300});
  const bottleNames=['Apfelessig mit 33 Sorten','Himbeeressig','Birnenessig','Holunderblütenessig','Birnen-Balsamico','Kirschessig','Kirschen-Birnen-Essig'];const figures=Array.from({length:7},(_,index)=>{const figure=element(),caption=element();caption.textContent=bottleNames[index];figure.querySelector=selector=>selector==='figcaption'?caption:bottleImage;return figure;}),bottles=figures.map((figure,index)=>{const button=element();button.closest=selector=>selector==='[data-offer-image]'?images[3]:figure;button.getBoundingClientRect=()=>({left:index*100,width:80});const bottleImage=element();bottleImage.src='/assets/essig-birnen-cutout.svg';bottleImage.getBoundingClientRect=()=>({left:20+index*90,width:90,top:25,height:240});figure.querySelector=selector=>selector==='figcaption'?figure._caption:bottleImage;figure._caption={textContent:bottleNames[index]};figure.getBoundingClientRect=()=>({left:index*100,width:80,top:0,height:160});button.querySelector=()=>bottleImage;return button;});
@@ -141,28 +141,33 @@ test('Mosti releases pointer focus after a tap but keeps keyboard focus',()=>{
  keyboard.mostiButton.handlers.click({detail:0});
  assert.equal(keyboard.mostiButton.blurred,undefined);
 });
-test('Mosti throws each original bottle image in a high arc and returns it to its product link',()=>{
+test('Mosti walks to each bottle before the original image moves, then restores its position',()=>{
  const env=setup(false,true,true);env.mostiSprite.handlers.load();env.mostiButton.hidden=false;
  env.mostiButton.handlers.click();
- assert.ok(env.lineup.classList.contains('is-mosti-sequence'),'the animation layout is activated before the first throw');
- assert.match(env.mostiSprite.src,/mosti-walk-a\.webp$/);
- assert.equal(env.animations.length,0);
- for(const stage of [1100,2220,3340,4460,5580,6700,7820])env.finishAt(stage);
- assert.equal(env.animations.length,7,'each of the seven original images receives a throw animation');
- for(const [index,animation] of env.animations.entries()){
-  assert.equal(animation.options.duration,8370-index*1120);
-  assert.ok(animation.frames.some(frame=>String(frame.transform).includes('rotate(235deg)')),'the bottle rotates through the arc');
+ assert.equal(env.lineup.classList.contains('is-mosti-sequence'),false,'the lineup does not reflow when the performance starts');
+ assert.match(env.mostiSprite.src,/mosti-walk-a\\.webp$/);
+ env.finishAt(1100);
+ assert.equal(env.animations.length,1,'only Mosti moves during the approach');
+ assert.equal(env.animations[0].target,env.mostiButton);
+ assert.equal(env.animations[0].options.duration,820);
+ env.finishAt(820);
+ assert.equal(env.animations.length,2,'the original bottle moves only after Mosti reaches it');
+ assert.equal(env.animations[1].target,env.figures[0].querySelector('img'));
+ assert.ok(env.animations[1].frames.some(frame=>String(frame.rotate)==='145deg'),'the bottle is tossed after contact');
+ for(const stage of [3700,6300,8900,11500,14100,16700]){
+  env.finishAt(stage);env.finishAt(820);env.finishAt(1380);
  }
- assert.ok(env.bottles.every(button=>button.handlers.click===undefined),'the original product anchors are not replaced by animation copies');
- assert.ok(env.images[3].classList.contains('is-mosti-playing'));
- env.finishAt(9620);
+ assert.equal(env.animations.filter(animation=>animation.target===env.mostiButton).length,7,'Mosti approaches every original bottle');
+ assert.equal(env.animations.filter(animation=>animation.target!==env.mostiButton).length,7,'each original bottle gets a separate toss after the approach');
+ assert.ok(env.bottles.every(button=>button.handlers.click===undefined),'the original product links remain in place');
+ env.finishAt(19100);
  const footerStage=env.carousel.children.find(child=>child.className==='mosti-footer-stage');
- assert.ok(footerStage&&!footerStage.hidden,'the seventh original bottle and Mosti move into the footer scene');
+ assert.ok(footerStage&&!footerStage.hidden,'the final bottle and Mosti move into the footer scene');
  assert.ok(footerStage.children.includes(env.mostiButton));
  assert.ok(footerStage.children.includes(env.bottles[6].querySelector('img')));
  env.finishAt(550);env.finishAt(3900);
- assert.equal(footerStage.hidden,true,'the temporary scene is hidden after the drink');
- assert.equal(env.lineup.classList.contains('is-mosti-sequence'),false,'the original lineup layout is restored after the routine');
+ assert.equal(footerStage.hidden,true,'the temporary finale is hidden after the drink');
+ assert.equal(env.lineup.classList.contains('is-mosti-sequence'),false,'the original lineup remains unchanged');
  assert.ok(env.running(),'the carousel resumes after the performance');
 });
 test('Mosti waves without motion or audio when reduced motion is requested',()=>{
