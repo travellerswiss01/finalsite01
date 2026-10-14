@@ -509,28 +509,33 @@ if(offerCarousel){
   }catch{}
   scheduleMostiAct(820,()=>{
    setMostiPose('reach');
-   const handX=targetLeft+mascotRect.width*.12;
+   // The lower hand in the reach pose is the grip point (the sprite is mirrored).
+   const handX=targetLeft+mascotRect.width*.15;
    const handY=targetTop+mascotRect.height*.82;
    const grabX=handX-(bottleRect.left+bottleRect.width/2);
    const grabY=handY-(bottleRect.top+bottleRect.height/2);
-   const side=index%2?1:-1;
-   const arc=Math.min(220,Math.max(150,bottleRect.height*.85));
+   const lift=Math.min(210,Math.max(155,bottleRect.height*1.05));
    try{
     const toss=image.animate([
      {translate:'0px 0px',rotate:'0deg',offset:0},
-     {translate:`${grabX}px ${grabY-18}px`,rotate:'-9deg',offset:.12},
-     {translate:`${grabX+side*28}px ${grabY-arc}px`,rotate:'145deg',offset:.38},
-     {translate:`${grabX-side*20}px ${grabY-arc*.7}px`,rotate:'315deg',offset:.68},
-     {translate:`${grabX}px ${grabY-16}px`,rotate:'351deg',offset:.88},
-     {translate:`${grabX}px ${grabY}px`,rotate:'360deg',offset:1}
-    ],{duration:1380,easing:'cubic-bezier(.35,.05,.2,1)',fill:'forwards'});
+     {translate:`${grabX}px ${grabY}px`,rotate:'0deg',offset:.14},
+     {translate:`${grabX}px ${grabY}px`,rotate:'0deg',offset:.22},
+     {translate:`${grabX}px ${grabY-lift}px`,rotate:'-7deg',offset:.46},
+     {translate:`${grabX}px ${grabY-lift}px`,rotate:'2deg',offset:.56},
+     {translate:`${grabX}px ${grabY}px`,rotate:'0deg',offset:.82},
+     {translate:`${grabX}px ${grabY}px`,rotate:'0deg',offset:.9},
+     {translate:'0px 0px',rotate:'0deg',offset:1}
+    ],{duration:1580,easing:'cubic-bezier(.28,.04,.24,1)',fill:'forwards'});
     activeBottleAnimations.push(toss);
     toss.finished.then(()=>{
      const i=activeBottleAnimations.indexOf(toss);if(i>=0)activeBottleAnimations.splice(i,1);
      toss.cancel();item.style.removeProperty('z-index');item.style.removeProperty('pointer-events');
     }).catch(()=>{});
    }catch{item.style.removeProperty('z-index');item.style.removeProperty('pointer-events');}
-   scheduleMostiAct(1380,()=>setMostiPose('juggle'));
+   scheduleMostiAct(220,()=>setMostiPose('carry'));
+   scheduleMostiAct(420,()=>setMostiPose('juggle'));
+   scheduleMostiAct(1300,()=>setMostiPose('carry'));
+   scheduleMostiAct(1580,()=>setMostiPose('idle'));
   });
  };
  const restoreFooterScene=()=>{

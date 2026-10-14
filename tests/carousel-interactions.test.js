@@ -159,9 +159,16 @@ test('Mosti walks to each bottle before the original image moves, then restores 
  env.finishAt(820);
  assert.equal(env.animations.length,2,'the original bottle moves only after Mosti reaches it');
  assert.equal(env.animations[1].target,env.figures[0].querySelector('img'));
- assert.ok(env.animations[1].frames.some(frame=>String(frame.rotate)==='145deg'),'the bottle is tossed after contact');
+ const firstToss=env.animations[1];
+ assert.equal(firstToss.options.duration,1580,'the bottle is caught, tossed, and lowered in one continuous movement');
+ const handPosition=firstToss.frames[1].translate.split(' ').map(value=>parseFloat(value));
+ const apexPosition=firstToss.frames[3].translate.split(' ').map(value=>parseFloat(value));
+ assert.ok(apexPosition[1]<=handPosition[1]-155,'the bottle rises clearly above Mosti');
+ assert.equal(apexPosition[0],handPosition[0],'the bottle travels straight up without a sideways circle');
+ assert.ok(firstToss.frames.every(frame=>Math.abs(parseFloat(frame.rotate)||0)<=7),'the bottle stays upright instead of spinning in a circle');
+ assert.equal(firstToss.frames.at(-1).translate,'0px 0px','the bottle returns to its exact original position');
  for(const stage of [3700,6300,8900,11500,14100,16700]){
-  env.finishAt(stage);env.finishAt(820);env.finishAt(1380);
+  env.finishAt(stage);env.finishAt(820);env.finishAt(1580);
  }
  assert.equal(env.animations.filter(animation=>animation.target===env.mostiButton).length,7,'Mosti approaches every original bottle');
  assert.equal(env.animations.filter(animation=>animation.target!==env.mostiButton).length,7,'each original bottle gets a separate toss after the approach');
