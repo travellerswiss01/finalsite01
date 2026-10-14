@@ -516,7 +516,7 @@ if(offerCarousel){
   });
  };
  const restoreFooterScene=()=>{
-  if(finaleBottleImage&&finaleBottleLink)finaleBottleLink.append(finaleBottleImage);
+  if(finaleBottleImage){finaleBottleImage.classList.remove('mosti-footer-bottle');if(finaleBottleLink)finaleBottleLink.append(finaleBottleImage);}
   finaleBottleImage=null;finaleBottleLink=null;
   if(mostiButton&&mostiFrame&&!mostiFrame.contains?.(mostiButton))mostiFrame.append(mostiButton);
   mostiFooterStage?.classList.remove('is-playing');
@@ -526,7 +526,7 @@ if(offerCarousel){
  };
  const playFooterFinale=()=>{
   const lastLink=bottles.at(-1),lastItem=lastLink?.closest('.vinegar-lineup-item'),lastImage=lastItem?.querySelector('img');
-  if(!mostiFooterStage||!mostiButton||!lastLink||!lastImage)return;
+  if(!mostiFooterStage||!mostiButton||!lastLink||!lastImage){swayRunning=false;stopMostiMusic();setMostiPose('idle');mostiFrame.classList.remove('is-mosti-playing');start();return;}
   finaleBottleImage=lastImage;finaleBottleLink=lastImage.parentNode||lastLink;
   finaleScrollY=window.scrollY||0;
   mostiFooterStage.hidden=false;mostiFooterStage.classList.add('is-playing');
