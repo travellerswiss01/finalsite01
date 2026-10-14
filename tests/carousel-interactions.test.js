@@ -151,7 +151,7 @@ test('Mosti throws each original bottle image in a high arc and returns it to it
  }
  assert.ok(env.bottles.every(button=>button.handlers.click===undefined),'the original product anchors are not replaced by animation copies');
  assert.ok(env.images[3].classList.contains('is-mosti-playing'));
- env.finishAt(9470);
+ env.finishAt(9670);env.finishAt(550);env.finishAt(3900);
  assert.ok(env.running(),'the carousel resumes after the performance');
 });
 test('Mosti waves without motion or audio when reduced motion is requested',()=>{
