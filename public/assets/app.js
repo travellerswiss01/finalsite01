@@ -462,7 +462,7 @@ if(offerCarousel){
   resetSway();stop();swayRunning=true;
   mostiFrame.classList.add('is-mosti-playing');
   if(reducedMostiMotion()){
-   setMostiPose('wave');
+   setMostiPose('wink');
    swayTimer=window.setTimeout(()=>{swayTimer=null;swayRunning=false;setMostiPose('idle');mostiFrame.classList.remove('is-mosti-playing');start();},950);
    return;
   }
