@@ -57,7 +57,7 @@ function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=
  }
  const document=element();
  document.createElement=tag=>{const el=element();el.offsetWidth=128;el.append=sprite=>{el.children.push(sprite);if(tag==='button')mostiSprite=sprite;};el.querySelector=()=>element();el.querySelectorAll=()=>[];el.showModal=()=>{el.open=true;};el.close=()=>{el.open=false;el.handlers.close?.();};return el;};
- document.body={append(){}};document.activeElement=null;document.hidden=false;document.querySelector=selector=>selector==='[data-vinegar-dialog]'?dialog:carousel;
+ document.body={children:[],append(child){this.children.push(child);}};document.activeElement=null;document.hidden=false;document.querySelector=selector=>selector==='[data-vinegar-dialog]'?dialog:carousel;
  const motion=element();motion.matches=reduced;
  let interval=null,id=0;const timeouts=new Map();
  const window={matchMedia:query=>query==='(prefers-reduced-motion: reduce)'?motion:{matches:hoverSupported},setInterval(fn){interval=fn;return 1;},clearInterval(){interval=null;},setTimeout(fn,ms){timeouts.set(++id,{fn,ms});return id;},clearTimeout(key){timeouts.delete(key);}};
@@ -69,7 +69,7 @@ function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=
   createDynamicsCompressor(){audio.compressors++;const parameter={setValueAtTime(){}};return {threshold:parameter,knee:parameter,ratio:parameter,attack:parameter,release:parameter,connect(){},disconnect(){}};}
  }
  if(audioSupported)window.AudioContext=FakeAudioContext;
- const Image=class{constructor(){this.complete=false;this.naturalWidth=0;this.src='';this.handlers={};}addEventListener(type,fn){this.handlers[type]=fn;}};
+ const Image=class{constructor(){this.complete=false;this.naturalWidth=0;this.src='';this.handlers={};this.style={};this.removed=false;}addEventListener(type,fn){this.handlers[type]=fn;}remove(){this.removed=true;}};
  vm.runInNewContext(carouselScript,{document,window,Image});
  return {mostiButton,mostiSprite,animations,bottles,figures,images,lineup,controls,carousel,dialog,detailGrid,detailHeading,detailPhotos,document,motion,timeouts,audio,
   next(){controls['[data-offer-next]'].handlers.click();},running:()=>interval!==null,
@@ -163,6 +163,10 @@ test('Mosti walks to each bottle before the original image moves, then restores 
  assert.match(env.mostiSprite.src,/mosti-reach\.webp$/,'Mosti reaches with his hand at the bottle');
  assert.equal(env.animations[1].target,env.figures[0].querySelector('img'));
  const firstToss=env.animations[1];
+ const gripHand=env.document.body.children.find(image=>image.style.clipPath);
+ assert.ok(gripHand,'a separate foreground glove visibly overlaps the bottle during contact');
+ assert.equal(gripHand.style.zIndex,'1201');
+ assert.equal(gripHand.style.clipPath,'inset(39% 68% 34% 3%)');
  const catchOffset=firstToss.frames[1].translate.split(' ').map(value=>parseFloat(value));
  assert.equal(catchOffset[0],0,'Mosti catches the bottle directly in front of his hand');
  assert.ok(catchOffset[1]>-8&&catchOffset[1]<-5,'the raised side hand grips the upper-middle of the bottle, not underneath it');
@@ -176,6 +180,8 @@ test('Mosti walks to each bottle before the original image moves, then restores 
  assert.equal(apexPosition[0],handPosition[0],'the bottle travels straight up without a sideways circle');
  assert.ok(firstToss.frames.every(frame=>Math.abs(parseFloat(frame.rotate)||0)<=5),'the bottle stays upright instead of spinning in a circle');
  assert.equal(firstToss.frames.at(-1).translate,'0px 0px','the bottle returns to its exact original position');
+ env.finishAt(700);
+ assert.equal(gripHand.removed,true,'the foreground glove leaves when the bottle is released');
  for(const stage of [3700,6300,8900,11500,14100,16700]){
   env.finishAt(stage);env.finishAt(820);env.finishAt(1600);
  }

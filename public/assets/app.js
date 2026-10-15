@@ -526,6 +526,11 @@ if(offerCarousel){
    const grabX=handX-(bottleRect.left+bottleRect.width/2);
    const grabY=handY-(bottleRect.top+bottleRect.height/2);
    const lift=Math.min(bottleRect.height*2,Math.max(0,handY-bottleRect.height/2-4));
+   // Bring only the reaching glove in front of the bottle during the grip.
+   // The mirrored sprite's raised glove is on the source image's left edge.
+   const gripHand=mostiImage(mostiPoseImages.reach.src);
+   Object.assign(gripHand.style,{position:'fixed',left:targetLeft+'px',top:targetTop+'px',width:mascotRect.width+'px',height:mascotRect.height+'px',maxWidth:'none',margin:'0',zIndex:'1201',objectFit:'contain',transform:'scaleX(-1)',clipPath:'inset(39% 68% 34% 3%)',pointerEvents:'none'});
+   document.body.append(gripHand);
    const originalParent=image.parentNode;
    // Move the same product image into a viewport layer so the high throw
    // stays visible beyond the hero's clipped edges.
@@ -553,7 +558,7 @@ if(offerCarousel){
    }catch{const flightIndex=activeBottleFlights.findIndex(flight=>flight.image===image);if(flightIndex>=0)activeBottleFlights.splice(flightIndex,1);restoreBottleFlight({image,parent:originalParent});item.style.removeProperty('z-index');item.style.removeProperty('pointer-events');}
    // Hold the reach pose through the actual hand-to-bottle contact; switch
    // to the juggling pose only after the bottle has left the hand.
-   scheduleMostiAct(700,()=>setMostiPose('juggle'));
+   scheduleMostiAct(700,()=>{gripHand.remove();setMostiPose('juggle');});
    scheduleMostiAct(1310,()=>setMostiPose('carry'));
    scheduleMostiAct(1600,()=>setMostiPose('idle'));
   });
