@@ -47,7 +47,7 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
     ? (forwardedProto === 'https' ? 'https' : 'http')
     : (req.socket.encrypted ? 'https' : 'http');
   const requestOrigin = `${protocol}://${req.headers.host}`;
-  const publicOrigin=origin||requestOrigin;
+  const publicOrigin=new URL(origin||requestOrigin).origin;
   const secure=requestOrigin.startsWith('https://');
   try {
    if(pathname.startsWith('/assets/')){
@@ -119,13 +119,27 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
    }
    if(req.method!=='GET'&&req.method!=='HEAD'){sendJson(res,405,{error:'Methode nicht erlaubt.'});return;}
    if(pathname==='/health'){sendJson(res,200,{status:'ok'});return;}
-   if(pathname==='/robots.txt'){res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8'});res.end(`User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /warenkorb\nDisallow: /suche\nSitemap: ${publicOrigin}/sitemap.xml\n`);return;}
+   if(pathname==='/robots.txt'){res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8'});res.end(`User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: ${publicOrigin}/sitemap.xml\n`);return;}
    if(pathname==='/sitemap.xml'){
     const products=await store.catalog();const routes=['/','/sortiment','/saisonales','/geschenkkoerbe','/geschenk-konfigurator','/kochservice','/garten','/ueber-uns','/kontakt',...products.map(view.productUrl)];
     res.writeHead(200,{'Content-Type':'application/xml; charset=utf-8'});res.end(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${routes.map(route=>`<url><loc>${view.escape(publicOrigin+route)}</loc></url>`).join('')}</urlset>`);return;
    }
    const shop=await store.shop();let content,title,description,product,status=200;
-   if(pathname==='/'){content=view.home(await store.catalog());title='Geschenke aus dem Thurgau';}
+   // Descriptions reflect existing page copy; they never change visible content.
+   const descriptions={
+    '/':'Regionale Spezialitäten und Geschenkharassen aus dem Thurgau bei Biottos Lädeli entdecken. Abholung in Guntershausen.',
+    '/sortiment':'Entdecke das Sortiment von Biottos Lädeli: Säfte, Essig und Balsamico, Spezialitäten, Dörrfrüchte, Backwaren und Geschenkharassen.',
+    '/saisonales':'Entdecke die saisonale Auswahl von Biottos Lädeli. Hier findest du die aktuell als saisonal gekennzeichneten Produkte aus unserem Sortiment.',
+    '/geschenkkoerbe':'Geschenkkörbe und Geschenkharassen aus dem Thurgau entdecken. Wähle ein Geschenk von Biottos Lädeli oder stelle es individuell zusammen.',
+    '/kontakt':'Fragen zu Geschenkharassen, Firmengeschenken oder Abholung in Guntershausen? Kontaktiere Biottos Lädeli per E-Mail für deine individuelle Anfrage.',
+    '/ueber-uns':'Lerne Biottos Lädeli kennen: Spezialitäten aus dem Thurgau, Säfte, Essig, Balsamico und Geschenkharassen. Entdecke unser Sortiment.',
+    '/suche':'Durchsuche das Sortiment von Biottos Lädeli nach Produkten und Kategorien.',
+    '/warenkorb':'Deine ausgewählten Produkte bei Biottos Lädeli prüfen und zur Bestellung weitergehen.'
+   };
+   description=descriptions[pathname];
+   const noindex=['/sortiment','/saisonales','/geschenkkoerbe'].includes(pathname)&&['q','kategorie'].some(key=>Boolean(url.searchParams.get(key)));
+
+   if(pathname==='/'){content=view.home(await store.catalog());title='Spezialitäten & Geschenkharassen aus dem Thurgau';}
    else if(pathname==='/geschenk-konfigurator'){content=view.giftConfigurator(await store.catalog());title='Geschenk zusammenstellen';description='Wähle Thurgauer Spezialitäten und stelle dein persönliches Geschenk zusammen.';}
    else if(pathname==='/garten'){content=view.gardenService();title='Garten & Obstbäume mit Otto';description='Otto, gelernter Baumschulist mit 40 Jahren Erfahrung: Obstbaumschnitt, Sortenberatung und Veredelung. Direkt anrufen: 079 935 00 64.';}
    else if(pathname==='/kochservice'){content=view.cookingService();title='Kochen mit Lucia im Thurgau';description='Kochservice bei dir zu Hause für private Anlässe, Geburtstage und Familienfeiern bis 20 Personen im Kanton Thurgau.';}
@@ -134,18 +148,18 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
     const seasonal=pathname==='/saisonales';content=view.listing(await store.catalog(),{q,category,gifts:pathname==='/geschenkkoerbe',search:pathname==='/suche',seasonal});title=seasonal?'Saisonales':pathname==='/geschenkkoerbe'?'Geschenkkörbe aus dem Thurgau':pathname==='/suche'?'Produkte suchen':'Sortiment';
    }else if(pathname.startsWith('/produkte/')){
     const handle=decodeURIComponent(pathname.slice('/produkte/'.length));product=(await store.catalog()).find(p=>p.handle===handle);
-    if(product){content=view.productPage(product);title=product.title;description=product.description.slice(0,160);}
+    if(product){content=view.productPage(product);title=product.title;description=(product.description.trim()||product.title).replace(/\s+/g,' ').slice(0,160);}
    }else if(pathname==='/kontakt'){content=view.contact();title='Kontakt & individuelle Geschenke';}
    else if(pathname==='/ueber-uns'){content=view.about();title='Über Biottos Lädeli';}
    else if(pathname==='/warenkorb'){content=view.cartPage();title='Warenkorb';}
-   else if(pathname.startsWith('/rechtliches/')){const result=view.legal(shop,pathname.split('/').pop());if(result){content=result.content;title=result.title;}}
+   else if(pathname.startsWith('/rechtliches/')){const result=view.legal(shop,pathname.split('/').pop());if(result){content=result.content;title=result.title;description=`${result.title} – Informationen von Biottos Lädeli.`;}}
    if(!content){status=404;title='Seite nicht gefunden';content='<section class="container page-content service-error"><h1>Diese Seite wurde nicht gefunden.</h1><p>Entdecke unsere aktuellen Produkte im Sortiment.</p><a class="button" href="/sortiment">Zum Sortiment</a></section>';}
-   res.writeHead(status,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end(req.method==='HEAD'?undefined:view.shell(content,{path:pathname,title,description,product,shop,origin:publicOrigin,status}));
+   res.writeHead(status,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end(req.method==='HEAD'?undefined:view.shell(content,{path:pathname,title,description,product,shop,origin:publicOrigin,status,noindex}));
   }catch(err){
     const status=err instanceof StorefrontError?err.status:500;
     const error=err instanceof StorefrontError?err.message:'Die Anfrage konnte nicht abgeschlossen werden. Bitte versuche es später erneut.';
     if(pathname.startsWith('/api/'))sendJson(res,status,{error});
-    else {res.writeHead(status,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end(view.shell(`<section class="container page-content service-error"><h1>Momentan nicht verfügbar</h1><p>${view.escape(error)}</p><a class="button" href="${view.escape(pathname)}">Erneut versuchen</a><p>Bei Fragen: <a href="mailto:${view.EMAIL}">${view.EMAIL}</a></p></section>`,{path:pathname,title:'Momentan nicht verfügbar',origin:requestOrigin,status}));}
+    else {res.writeHead(status,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end(view.shell(`<section class="container page-content service-error"><h1>Momentan nicht verfügbar</h1><p>${view.escape(error)}</p><a class="button" href="${view.escape(pathname)}">Erneut versuchen</a><p>Bei Fragen: <a href="mailto:${view.EMAIL}">${view.EMAIL}</a></p></section>`,{path:pathname,title:'Momentan nicht verfügbar',origin:publicOrigin,status}));}
   }
  });
 }
