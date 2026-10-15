@@ -496,10 +496,11 @@ if(offerCarousel){
   if(!item||!image||!mostiButton)return;
   const bottleRect=image.getBoundingClientRect(),mascotRect=mostiButton.getBoundingClientRect();
   if(!bottleRect.width||!bottleRect.height||!mascotRect.width||!mascotRect.height)return;
+  const captionTop=item.querySelector('figcaption')?.getBoundingClientRect?.().top;
   // Walk down to the name-card row: Mosti's reaching hand lines up with
   // the bottle base while his feet stay just above the vinegar captions.
   const targetLeft=bottleRect.left+bottleRect.width/2-mascotRect.width*.15;
-  const targetTop=(bottleRect.bottom??bottleRect.top+bottleRect.height)-mascotRect.height*.8;
+  const targetTop=Number.isFinite(captionTop)?captionTop-mascotRect.height*.92:(bottleRect.bottom??bottleRect.top+bottleRect.height)-mascotRect.height*.8;
   const walkX=targetLeft-mascotRect.left,walkY=targetTop-mascotRect.top;
   const startX=mostiOffsetX,startY=mostiOffsetY,endX=startX+walkX,endY=startY+walkY;
   item.style.zIndex='20';item.style.pointerEvents='none';mostiButton.style.zIndex='30';
