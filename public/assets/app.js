@@ -518,7 +518,8 @@ if(offerCarousel){
   }catch{}
   scheduleMostiAct(820,()=>{
    setMostiPose('reach');
-   // The lower hand in the reach pose is the grip point (the sprite is mirrored).
+   // The mirrored reach pose's lower glove sits at roughly 15% x / 82% y.
+   // Place the real bottle image there and hold it against the palm before release.
    const handX=targetLeft+mascotRect.width*.15;
    const handY=targetTop+mascotRect.height*.82;
    const grabX=handX-(bottleRect.left+bottleRect.width/2);
@@ -534,9 +535,10 @@ if(offerCarousel){
     const toss=image.animate([
      {translate:'0px 0px',rotate:'0deg',offset:0},
      {translate:`${grabX}px ${grabY}px`,rotate:'0deg',offset:.12},
-     {translate:`${grabX}px ${grabY}px`,rotate:'0deg',offset:.2},
-     {translate:`${grabX}px ${grabY-lift}px`,rotate:'-5deg',offset:.45},
-     {translate:`${grabX}px ${grabY-lift}px`,rotate:'2deg',offset:.55},
+     {translate:`${grabX}px ${grabY}px`,rotate:'0deg',offset:.38},
+     {translate:`${grabX}px ${grabY}px`,rotate:'0deg',offset:.43},
+     {translate:`${grabX}px ${grabY-lift}px`,rotate:'-5deg',offset:.55},
+     {translate:`${grabX}px ${grabY-lift}px`,rotate:'2deg',offset:.64},
      {translate:`${grabX}px ${grabY}px`,rotate:'0deg',offset:.82},
      {translate:`${grabX}px ${grabY}px`,rotate:'0deg',offset:.9},
      {translate:'0px 0px',rotate:'0deg',offset:1}
@@ -550,7 +552,7 @@ if(offerCarousel){
    }catch{const flightIndex=activeBottleFlights.findIndex(flight=>flight.image===image);if(flightIndex>=0)activeBottleFlights.splice(flightIndex,1);restoreBottleFlight({image,parent:originalParent});item.style.removeProperty('z-index');item.style.removeProperty('pointer-events');}
    // Hold the reach pose through the actual hand-to-bottle contact; switch
    // to the juggling pose only after the bottle has left the hand.
-   scheduleMostiAct(360,()=>setMostiPose('juggle'));
+   scheduleMostiAct(700,()=>setMostiPose('juggle'));
    scheduleMostiAct(1310,()=>setMostiPose('carry'));
    scheduleMostiAct(1600,()=>setMostiPose('idle'));
   });

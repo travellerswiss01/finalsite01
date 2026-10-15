@@ -166,9 +166,12 @@ test('Mosti walks to each bottle before the original image moves, then restores 
  const catchOffset=firstToss.frames[1].translate.split(' ').map(value=>parseFloat(value));
  assert.equal(catchOffset[0],0,'Mosti catches the bottle directly in front of his hand');
  assert.ok(catchOffset[1]>80&&catchOffset[1]<86,'the bottle center meets the lowered hand at the catch');
+ assert.equal(firstToss.frames[2].translate,firstToss.frames[1].translate,'the bottle visibly stays in Mosti’s hand after contact');
+ assert.equal(firstToss.frames[3].translate,firstToss.frames[1].translate,'the grip is held until the throw begins');
+ assert.equal(firstToss.frames[3].offset,.43,'the hand-to-bottle contact lasts long enough to read clearly');
  assert.equal(firstToss.options.duration,1600,'the bottle is caught, tossed, and lowered in one continuous movement');
  const handPosition=firstToss.frames[1].translate.split(' ').map(value=>parseFloat(value));
- const apexPosition=firstToss.frames[3].translate.split(' ').map(value=>parseFloat(value));
+ const apexPosition=firstToss.frames[4].translate.split(' ').map(value=>parseFloat(value));
  assert.ok(apexPosition[1]<=handPosition[1]-240,'the bottle rises at least one and a half bottle heights above Mosti');
  assert.equal(apexPosition[0],handPosition[0],'the bottle travels straight up without a sideways circle');
  assert.ok(firstToss.frames.every(frame=>Math.abs(parseFloat(frame.rotate)||0)<=5),'the bottle stays upright instead of spinning in a circle');
