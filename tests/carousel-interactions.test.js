@@ -27,6 +27,8 @@ test('Mosti has separate transparent walk frames and a wink-and-wave pose',()=>{
  }
  const grip=readFileSync(new URL('../public/assets/mosti-twohand-grip.png',import.meta.url));
  assert.equal(grip.readUInt32BE(0),0x89504e47);
+ const sip=readFileSync(new URL('../public/assets/mosti-sip-twohand.png',import.meta.url));
+ assert.equal(sip.readUInt32BE(0),0x89504e47);
 });
 function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=true){
  const animations=[];let mostiButton,mostiSprite;
@@ -207,13 +209,16 @@ test('Mosti walks to each bottle before the original image moves, then restores 
  env.finishAt(550);
  assert.ok(footerStage.classList.contains('is-drinking'),'the footer marks the real sipping phase');
  assert.equal(lastBottleImage.style.position,'absolute','the original bottle is placed in the footer scene rather than left beside Mosti');
- assert.equal(lastBottleImage.style.transformOrigin,'50% 60%','Mosti grips the bottle around its body while the neck points toward his mouth');
+ assert.equal(lastBottleImage.style.transformOrigin,'50% 42%','Mosti grips the bottle around its body while the neck points toward his mouth');
+ const sipHands=footerStage.children.filter(child=>child.className==='mosti-sip-hand');
+ assert.equal(sipHands.length,2,'both gloves are layered over the product image during the sip');
+ assert.ok(sipHands.every(hand=>hand.style.zIndex==='4'&&hand.style.clipPath),'both gloves visibly overlap the original product bottle');
  const drinking=env.animations.at(-1);
  assert.equal(drinking.target,lastBottleImage);
- assert.ok(drinking.frames.some(frame=>String(frame.transform).includes('rotate(-73deg)')),'the bottle stays tipped toward Mosti through the drinking motion');
+ assert.ok(drinking.frames.some(frame=>String(frame.transform).includes('rotate(-47deg)')),'the bottle neck points diagonally into Mosti’s mouth while he drinks');
  env.finishAt(2100);
  assert.ok(footerStage.classList.contains('is-empty'),'the bottle visibly enters its empty-bottle gag after the sip');
- assert.ok(env.animations.at(-1).frames.some(frame=>String(frame.transform).includes('rotate(112deg)')),'Mosti turns the empty bottle over for the last drop');
+ assert.ok(env.animations.at(-1).frames.some(frame=>String(frame.transform).includes('rotate(145deg)')),'Mosti turns the empty bottle over for the last drop');
  env.finishAt(6500);
  assert.equal(footerStage.hidden,true,'the temporary finale is hidden after the drink');
  assert.equal(env.lineup.classList.contains('is-mosti-sequence'),false,'the original lineup remains unchanged');

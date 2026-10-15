@@ -238,7 +238,7 @@ if(offerCarousel){
  // Mosti is one complete illustration. Only the intact sprite is animated.
  const mostiFrame=images.find(image=>image.classList.contains('vinegar-lineup-frame'));
  let mostiButton=null,mostiSprite=null,mostiFooterStage=null;
- let finaleBottleImage=null,finaleBottleLink=null,finaleScrollY=null,finaleSipTimer=null,finaleFlightTimer=null;
+let finaleBottleImage=null,finaleBottleLink=null,finaleScrollY=null,finaleSipTimer=null,finaleFlightTimer=null,finaleSipHands=[];
  const footer=document.querySelector('footer.footer');
  if(footer&&typeof document.createElement==='function'){
   mostiFooterStage=document.createElement('div');
@@ -269,7 +269,7 @@ if(offerCarousel){
   grip:mostiImage('/assets/mosti-twohand-grip.png'),
   juggle:mostiImage('/assets/mosti-juggle.webp'),
   leap:mostiImage('/assets/mosti-leap.webp'),
-  sipping:mostiImage('/assets/mosti-sit-drink.webp')
+  sipping:mostiImage('/assets/mosti-sip-twohand.png')
  };
  const mostiWalkFrames=[mostiImage('/assets/mosti-walk-a.webp'),mostiImage('/assets/mosti-walk-b.webp')];
  const mostiMoonwalkFrames=[mostiImage('/assets/mosti-moonwalk-a.webp'),mostiImage('/assets/mosti-moonwalk-b.webp')];
@@ -568,6 +568,7 @@ if(offerCarousel){
   });
  };
  const restoreFooterScene=()=>{
+  finaleSipHands.forEach(hand=>hand.remove());finaleSipHands=[];
   if(finaleBottleImage){finaleBottleImage.classList.remove('mosti-footer-bottle');['position','left','top','right','bottom','width','height','z-index','transform','transform-origin','pointer-events'].forEach(property=>finaleBottleImage.style.removeProperty(property));if(finaleBottleLink)finaleBottleLink.append(finaleBottleImage);}
   finaleBottleImage=null;finaleBottleLink=null;
   if(mostiButton&&mostiFrame&&!mostiFrame.contains?.(mostiButton))mostiFrame.append(mostiButton);
@@ -633,33 +634,45 @@ if(offerCarousel){
     mostiButton.style.position='absolute';mostiButton.style.left='auto';mostiButton.style.top='auto';mostiButton.style.right='34px';mostiButton.style.bottom='0';mostiButton.style.width='154px';mostiButton.style.height='166px';mostiButton.style.transform='';mostiButton.style.zIndex='1';
     const landedStageRect=mostiFooterStage.getBoundingClientRect();
     const bottleWidth=42,bottleHeight=bottleStartRect.height*bottleWidth/bottleStartRect.width;
-    const gripX=landedStageRect.width-34-154+154*.71;
-    const gripY=landedStageRect.height-166+166*.58;
-    Object.assign(lastImage.style,{position:'absolute',left:(gripX-bottleWidth/2)+'px',top:(gripY-bottleHeight*.6)+'px',right:'auto',bottom:'auto',width:bottleWidth+'px',height:'auto',zIndex:'2',transformOrigin:'50% 60%',pointerEvents:'none'});
+    const mobileStage=landedStageRect.width<400;
+    const mascotLeft=mobileStage?landedStageRect.width/2-72:landedStageRect.width-34-154;
+    const mascotTop=landedStageRect.height-166;
+    const gripX=mascotLeft+154*.6;
+    const gripY=mascotTop+166*.58;
+    Object.assign(lastImage.style,{position:'absolute',left:(gripX-bottleWidth/2)+'px',top:(gripY-bottleHeight*.42)+'px',right:'auto',bottom:'auto',width:bottleWidth+'px',height:'auto',zIndex:'2',transformOrigin:'50% 42%',pointerEvents:'none'});
     finaleSipTimer=window.setTimeout(()=>{
      finaleSipTimer=null;
      if(!swayRunning||!finaleBottleImage)return;
      setMostiPose('sipping');mostiFooterStage.classList.add('is-drinking');
+     finaleSipHands=[
+      {clip:'inset(41% 25% 23% 62%)'},
+      {clip:'inset(54% 32% 32% 48%)'}
+     ].map(({clip})=>{
+      const hand=mostiImage(mostiPoseImages.sipping.src);
+      hand.className='mosti-sip-hand';
+      Object.assign(hand.style,{position:'absolute',left:mascotLeft+'px',top:mascotTop+'px',width:'154px',height:'166px',maxWidth:'none',margin:'0',zIndex:'4',objectFit:'contain',clipPath:clip,pointerEvents:'none'});
+      mostiFooterStage.append(hand);return hand;
+     });
      try{
       const drink=lastImage.animate([
-       {transform:'rotate(-66deg) translateY(0px)'},
-       {transform:'rotate(-73deg) translateY(1px)',offset:.2},
-       {transform:'rotate(-68deg) translateY(-1px)',offset:.42},
-       {transform:'rotate(-74deg) translateY(1px)',offset:.64},
-       {transform:'rotate(-68deg) translateY(0px)',offset:.82},
-       {transform:'rotate(-72deg) translateY(0px)'}
+       {transform:'rotate(-42deg) translateY(0px)'},
+       {transform:'rotate(-47deg) translateY(1px)',offset:.2},
+       {transform:'rotate(-40deg) translateY(-1px)',offset:.42},
+       {transform:'rotate(-48deg) translateY(1px)',offset:.64},
+       {transform:'rotate(-40deg) translateY(0px)',offset:.82},
+       {transform:'rotate(-42deg) translateY(0px)'}
       ],{duration:2100,easing:'ease-in-out',fill:'forwards'});
       activeBottleAnimations.push(drink);
       window.setTimeout(()=>{
        if(!swayRunning||!finaleBottleImage)return;
        mostiFooterStage.classList.remove('is-drinking');mostiFooterStage.classList.add('is-empty');
        try{const emptyShake=lastImage.animate([
-        {transform:'rotate(-72deg)'},
-        {transform:'rotate(105deg) translateY(0px)',offset:.28},
-        {transform:'rotate(112deg) translateY(-3px)',offset:.44},
-        {transform:'rotate(106deg) translateY(2px)',offset:.6},
-        {transform:'rotate(112deg) translateY(-2px)',offset:.76},
-        {transform:'rotate(105deg)'}
+        {transform:'rotate(-42deg)'},
+        {transform:'rotate(138deg) translateY(0px)',offset:.28},
+        {transform:'rotate(145deg) translateY(-3px)',offset:.44},
+        {transform:'rotate(139deg) translateY(2px)',offset:.6},
+        {transform:'rotate(145deg) translateY(-2px)',offset:.76},
+        {transform:'rotate(138deg)'}
        ],{duration:650,easing:'ease-in-out',fill:'forwards'});activeBottleAnimations.push(emptyShake);}catch{}
       },2100);
      }catch{}
