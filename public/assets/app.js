@@ -637,8 +637,10 @@ let finaleBottleImage=null,finaleBottleLink=null,finaleScrollY=null,finaleSipTim
     const mobileStage=landedStageRect.width<400;
     const mascotLeft=mobileStage?landedStageRect.width/2-72:landedStageRect.width-34-154;
     const mascotTop=landedStageRect.height-166;
-    const gripX=mascotLeft+154*.6;
-    const gripY=mascotTop+166*.58;
+    // The sip sprite's mouth sits left and above both gloves. Place the
+    // bottle pivot down-right so its neck points back into the mouth.
+    const gripX=mascotLeft+154*.82;
+    const gripY=mascotTop+166*.64;
     Object.assign(lastImage.style,{position:'absolute',left:(gripX-bottleWidth/2)+'px',top:(gripY-bottleHeight*.42)+'px',right:'auto',bottom:'auto',width:bottleWidth+'px',height:'auto',zIndex:'2',transformOrigin:'50% 42%',pointerEvents:'none'});
     finaleSipTimer=window.setTimeout(()=>{
      finaleSipTimer=null;
