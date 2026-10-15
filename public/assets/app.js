@@ -266,6 +266,7 @@ if(offerCarousel){
   push:mostiImage('/assets/mosti-push-v2.webp'),
   carry:mostiImage('/assets/mosti-carry-body.svg'),
   reach:mostiImage('/assets/mosti-reach.webp'),
+  grip:mostiImage('/assets/mosti-twohand-grip.png'),
   juggle:mostiImage('/assets/mosti-juggle.webp'),
   leap:mostiImage('/assets/mosti-leap.webp'),
   sipping:mostiImage('/assets/mosti-sit-drink.webp')
@@ -497,12 +498,11 @@ if(offerCarousel){
   const bottleRect=image.getBoundingClientRect(),mascotRect=mostiButton.getBoundingClientRect();
   if(!bottleRect.width||!bottleRect.height||!mascotRect.width||!mascotRect.height)return;
   const captionTop=item.querySelector('figcaption')?.getBoundingClientRect?.().top;
-  // The mirrored reach sprite's raised glove is on Mosti's right at about
-  // 92% x / 50% y. Walk beside the bottle so that glove reaches its upper body.
-  const handX=bottleRect.left+bottleRect.width/2;
-  const handY=bottleRect.top+bottleRect.height*.46;
-  const targetLeft=handX-mascotRect.width*.92;
-  const targetTop=Math.min(handY-mascotRect.height*.5,Number.isFinite(captionTop)?captionTop-mascotRect.height:handY-mascotRect.height*.5);
+  // The two-hand grip sprite closes around the bottle at the center of Mosti's body.
+  const bottleCenterX=bottleRect.left+bottleRect.width/2;
+  const bottleCenterY=bottleRect.top+bottleRect.height/2;
+  const targetLeft=bottleCenterX-mascotRect.width*.5;
+  const targetTop=Math.min(bottleCenterY-mascotRect.height*.62,Number.isFinite(captionTop)?captionTop-mascotRect.height:bottleCenterY-mascotRect.height*.62);
   const walkX=targetLeft-mascotRect.left,walkY=targetTop-mascotRect.top;
   const startX=mostiOffsetX,startY=mostiOffsetY,endX=startX+walkX,endY=startY+walkY;
   item.style.zIndex='20';item.style.pointerEvents='none';mostiButton.style.zIndex='30';
@@ -519,18 +519,22 @@ if(offerCarousel){
    }).catch(()=>{});
   }catch{}
   scheduleMostiAct(820,()=>{
-   setMostiPose('reach');
-   // Keep the bottle at the raised glove's side-grip point, not under Mosti's feet.
-   const handX=targetLeft+mascotRect.width*.92;
-   const handY=targetTop+mascotRect.height*.5;
-   const grabX=handX-(bottleRect.left+bottleRect.width/2);
-   const grabY=handY-(bottleRect.top+bottleRect.height/2);
+   setMostiPose('grip');
+   // Center the original product bottle between both gloves at chest height.
+   const handX=targetLeft+mascotRect.width*.5;
+   const handY=targetTop+mascotRect.height*.62;
+   const grabX=handX-bottleCenterX;
+   const grabY=handY-bottleCenterY;
    const lift=Math.min(bottleRect.height*2,Math.max(0,handY-bottleRect.height/2-4));
-   // Bring only the reaching glove in front of the bottle during the grip.
-   // The mirrored sprite's raised glove is on the source image's left edge.
-   const gripHand=mostiImage(mostiPoseImages.reach.src);
-   Object.assign(gripHand.style,{position:'fixed',left:targetLeft+'px',top:targetTop+'px',width:mascotRect.width+'px',height:mascotRect.height+'px',maxWidth:'none',margin:'0',zIndex:'1201',objectFit:'contain',transform:'scaleX(-1)',clipPath:'inset(39% 68% 34% 3%)',pointerEvents:'none'});
-   document.body.append(gripHand);
+   // Overlay both gloves over the real bottle so the contact reads clearly.
+   const gripHands=[
+    {clip:'inset(49% 56% 27% 22%)'},
+    {clip:'inset(49% 22% 27% 56%)'}
+   ].map(({clip})=>{
+    const hand=mostiImage(mostiPoseImages.grip.src);
+    Object.assign(hand.style,{position:'fixed',left:targetLeft+'px',top:targetTop+'px',width:mascotRect.width+'px',height:mascotRect.height+'px',maxWidth:'none',margin:'0',zIndex:'1201',objectFit:'contain',transform:'scaleX(-1)',clipPath:clip,pointerEvents:'none'});
+    document.body.append(hand);return hand;
+   });
    const originalParent=image.parentNode;
    // Move the same product image into a viewport layer so the high throw
    // stays visible beyond the hero's clipped edges.
@@ -558,7 +562,7 @@ if(offerCarousel){
    }catch{const flightIndex=activeBottleFlights.findIndex(flight=>flight.image===image);if(flightIndex>=0)activeBottleFlights.splice(flightIndex,1);restoreBottleFlight({image,parent:originalParent});item.style.removeProperty('z-index');item.style.removeProperty('pointer-events');}
    // Hold the reach pose through the actual hand-to-bottle contact; switch
    // to the juggling pose only after the bottle has left the hand.
-   scheduleMostiAct(700,()=>{gripHand.remove();setMostiPose('juggle');});
+   scheduleMostiAct(700,()=>{gripHands.forEach(hand=>hand.remove());setMostiPose('juggle');});
    scheduleMostiAct(1310,()=>setMostiPose('carry'));
    scheduleMostiAct(1600,()=>setMostiPose('idle'));
   });

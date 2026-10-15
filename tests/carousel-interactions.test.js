@@ -25,6 +25,8 @@ test('Mosti has separate transparent walk frames and a wink-and-wave pose',()=>{
   assert.equal(image.toString('ascii',0,4),'RIFF',name);
   assert.equal(image.toString('ascii',8,12),'WEBP',name);
  }
+ const grip=readFileSync(new URL('../public/assets/mosti-twohand-grip.png',import.meta.url));
+ assert.equal(grip.readUInt32BE(0),0x89504e47);
 });
 function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=true){
  const animations=[];let mostiButton,mostiSprite;
@@ -160,16 +162,16 @@ test('Mosti walks to each bottle before the original image moves, then restores 
  assert.ok(targetTop>200&&targetTop+142<430,'Mosti reaches from beside the bottle while staying above its caption: '+JSON.stringify(env.animations[0].frames.at(-1)));
  env.finishAt(820);
  assert.equal(env.animations.length,2,'the original bottle moves only after Mosti reaches it');
- assert.match(env.mostiSprite.src,/mosti-reach\.webp$/,'Mosti reaches with his hand at the bottle');
+ assert.match(env.mostiSprite.src,/mosti-twohand-grip\.png$/,'Mosti uses the new two-handed bottle grip');
  assert.equal(env.animations[1].target,env.figures[0].querySelector('img'));
  const firstToss=env.animations[1];
- const gripHand=env.document.body.children.find(image=>image.style.clipPath);
- assert.ok(gripHand,'a separate foreground glove visibly overlaps the bottle during contact');
- assert.equal(gripHand.style.zIndex,'1201');
- assert.equal(gripHand.style.clipPath,'inset(39% 68% 34% 3%)');
+ const gripHands=env.document.body.children.filter(image=>image.style.clipPath);
+ assert.equal(gripHands.length,2,'both foreground gloves visibly overlap the bottle during contact');
+ assert.ok(gripHands.every(hand=>hand.style.zIndex==='1201'));
+ assert.deepEqual(gripHands.map(hand=>hand.style.clipPath),['inset(49% 56% 27% 22%)','inset(49% 22% 27% 56%)']);
  const catchOffset=firstToss.frames[1].translate.split(' ').map(value=>parseFloat(value));
  assert.equal(catchOffset[0],0,'Mosti catches the bottle directly in front of his hand');
- assert.ok(catchOffset[1]>-8&&catchOffset[1]<-5,'the raised side hand grips the upper-middle of the bottle, not underneath it');
+ assert.ok(Math.abs(catchOffset[1])<1,'the bottle center meets both hands at Mosti’s chest, not below his body');
  assert.equal(firstToss.frames[2].translate,firstToss.frames[1].translate,'the bottle visibly stays in Mosti’s hand after contact');
  assert.equal(firstToss.frames[3].translate,firstToss.frames[1].translate,'the grip is held until the throw begins');
  assert.equal(firstToss.frames[3].offset,.43,'the hand-to-bottle contact lasts long enough to read clearly');
@@ -181,7 +183,7 @@ test('Mosti walks to each bottle before the original image moves, then restores 
  assert.ok(firstToss.frames.every(frame=>Math.abs(parseFloat(frame.rotate)||0)<=5),'the bottle stays upright instead of spinning in a circle');
  assert.equal(firstToss.frames.at(-1).translate,'0px 0px','the bottle returns to its exact original position');
  env.finishAt(700);
- assert.equal(gripHand.removed,true,'the foreground glove leaves when the bottle is released');
+ assert.ok(gripHands.every(hand=>hand.removed),'both foreground gloves leave when the bottle is released');
  for(const stage of [3700,6300,8900,11500,14100,16700]){
   env.finishAt(stage);env.finishAt(820);env.finishAt(1600);
  }
