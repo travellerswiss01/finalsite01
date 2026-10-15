@@ -578,9 +578,19 @@ let finaleBottleImage=null,finaleBottleLink=null,finaleScrollY=null,finaleSipTim
   if(finaleScrollY!==null&&finaleScrollY!==undefined)window.scrollTo?.({top:finaleScrollY,behavior:'smooth'});
   finaleScrollY=null;
  };
- const playFooterFinale=()=>{
-  const lastLink=bottles.at(-1),lastItem=lastLink?.closest('.vinegar-lineup-item'),lastImage=lastItem?.querySelector('img');
+ const playFooterFinale=(lastImage)=>{
+  const lastLink=bottles.at(-1),lastItem=lastLink?.closest('.vinegar-lineup-item');
+  lastImage??=lastItem?.querySelector('img');
   if(!mostiFooterStage||!mostiButton||!lastLink||!lastImage){swayRunning=false;stopMostiMusic();setMostiPose('idle');mostiFrame.classList.remove('is-mosti-playing');start();return;}
+  // The seventh bottle may still be finishing its throw when the finale
+  // starts. Restore that same node before measuring and moving it again.
+  const pendingFlightIndex=activeBottleFlights.findIndex(flight=>flight.image===lastImage);
+  if(pendingFlightIndex>=0){
+   const [pendingFlight]=activeBottleFlights.splice(pendingFlightIndex,1);
+   activeBottleAnimations.filter(animation=>animation.target===lastImage).forEach(animation=>{try{animation.cancel();}catch{}});
+   activeBottleAnimations.splice(0,activeBottleAnimations.length,...activeBottleAnimations.filter(animation=>animation.target!==lastImage));
+   restoreBottleFlight(pendingFlight);
+  }
   const startRect=mostiButton.getBoundingClientRect(),bottleStartRect=lastImage.getBoundingClientRect();
   finaleBottleImage=lastImage;finaleBottleLink=lastImage.parentNode||lastLink;
   finaleScrollY=window.scrollY||0;
@@ -690,6 +700,7 @@ let finaleBottleImage=null,finaleBottleLink=null,finaleScrollY=null,finaleSipTim
  // The real image nodes are thrown in sequence; the seventh continues into the footer drinking scene.
  const playMosti=()=>{
   if(!mostiButton||swayRunning||!mostiFrame?.classList.contains('is-active'))return;
+  const finaleBottleImage=bottles.at(-1)?.closest('.vinegar-lineup-item')?.querySelector('img');
   resetSway();stop();swayRunning=true;mostiFrame.classList.add('is-mosti-playing');
   if(reducedMostiMotion()){
    setMostiPose('wink');
@@ -701,7 +712,7 @@ let finaleBottleImage=null,finaleBottleLink=null,finaleScrollY=null,finaleSipTim
   // Leave a small settling margin after the seventh bottle's 820 ms approach
   // and 1600 ms toss so its original image is back in the lineup before the finale reads it.
   const endAt=1100+Math.max(0,bottles.length-1)*2600+3000;
-  swayTimer=window.setTimeout(()=>{swayTimer=null;playFooterFinale();},endAt);
+  swayTimer=window.setTimeout(()=>{swayTimer=null;playFooterFinale(finaleBottleImage);},endAt);
  };
  mostiButton?.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!swayRunning&&currentMostiPose==='idle')setMostiPose('wink');});
  mostiButton?.addEventListener('pointerleave',()=>{if(currentMostiPose==='wink'&&!swayRunning)setMostiPose('idle');});
