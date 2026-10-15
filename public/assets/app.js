@@ -237,7 +237,15 @@ if(offerCarousel){
  const bottles=[...offerCarousel.querySelectorAll('[data-vinegar-bottle]')];
  // Mosti is one complete illustration. Only the intact sprite is animated.
  const mostiFrame=images.find(image=>image.classList.contains('vinegar-lineup-frame'));
- let mostiButton=null,mostiSprite=null;
+ let mostiButton=null,mostiSprite=null,mostiFooterStage=null;
+let finaleBottleImage=null,finaleBottleLink=null,finaleScrollY=null,finaleSipTimer=null,finaleFlightTimer=null,finaleSipHands=[];
+ const footer=document.querySelector('footer.footer');
+ if(footer&&typeof document.createElement==='function'){
+  mostiFooterStage=document.createElement('div');
+  mostiFooterStage.className='mosti-footer-stage';mostiFooterStage.hidden=true;
+  mostiFooterStage.setAttribute('aria-label','Mosti trinkt aus der letzten Essigflasche');
+  footer.append(mostiFooterStage);
+ }
  if(mostiFrame&&typeof document.createElement==='function'){
   mostiButton=document.createElement('button');
   mostiButton.type='button';mostiButton.className='mosti-domino';mostiButton.hidden=true;
@@ -256,7 +264,12 @@ if(offerCarousel){
   wink:mostiImage('/assets/mosti-wink-wave.webp'),
   wave:mostiImage('/assets/mosti-wink-wave.webp'),
   push:mostiImage('/assets/mosti-push-v2.webp'),
-  carry:mostiImage('/assets/mosti-carry-body.svg')
+  carry:mostiImage('/assets/mosti-carry-body.svg'),
+  reach:mostiImage('/assets/mosti-reach.webp'),
+  grip:mostiImage('/assets/mosti-twohand-grip.png'),
+  juggle:mostiImage('/assets/mosti-juggle.webp'),
+  leap:mostiImage('/assets/mosti-leap.webp'),
+  sipping:mostiImage('/assets/mosti-sip-twohand.png')
  };
  const mostiWalkFrames=[mostiImage('/assets/mosti-walk-a.webp'),mostiImage('/assets/mosti-walk-b.webp')];
  const mostiMoonwalkFrames=[mostiImage('/assets/mosti-moonwalk-a.webp'),mostiImage('/assets/mosti-moonwalk-b.webp')];
@@ -372,9 +385,19 @@ if(offerCarousel){
    if(mostDialog.open){add.disabled=!mostVariant?.availableForSale;add.textContent=mostVariant?.availableForSale?'In den Warenkorb':'Derzeit nicht verfügbar';}
   }
  });
- const activeBottleAnimations=[];
+ const activeBottleAnimations=[],activeBottleFlights=[];let mostiOffsetX=0,mostiOffsetY=0;
+ const bottleFlightStyleProps=['position','left','top','right','bottom','width','height','max-width','margin','z-index','transform','translate','transform-origin','pointer-events'];
+ const restoreBottleFlight=({image,parent})=>{
+  if(parent&&image.parentNode!==parent)parent.append(image);
+  bottleFlightStyleProps.forEach(property=>image.style.removeProperty(property));
+ };
  const resetSway=()=>{
+  if(finaleSipTimer!==null){window.clearTimeout(finaleSipTimer);finaleSipTimer=null;}
+  if(finaleFlightTimer!==null){window.clearTimeout(finaleFlightTimer);finaleFlightTimer=null;}
+  restoreFooterScene();
   activeBottleAnimations.splice(0).forEach(animation=>{try{animation.cancel();}catch{}});
+  activeBottleFlights.splice(0).forEach(restoreBottleFlight);
+  mostiOffsetX=0;mostiOffsetY=0;if(mostiButton){mostiButton.style.transform='';mostiButton.style.zIndex='';}
   stopMostiMusic();
   mostiPoseTimers.splice(0).forEach(id=>window.clearTimeout(id));
   resetMosti();
@@ -469,64 +492,235 @@ if(offerCarousel){
   const id=window.setTimeout(()=>{const index=mostiPoseTimers.indexOf(id);if(index>=0)mostiPoseTimers.splice(index,1);if(swayRunning)callback();},delay);
   mostiPoseTimers.push(id);
  };
- const playBottleTrick=(button,index)=>{
+ const playBottleTrick=button=>{
   const item=button.closest('.vinegar-lineup-item'),image=item?.querySelector('img');
-  if(!item||!image)return;
-  const label=item.querySelector('figcaption')?.textContent?.toLocaleLowerCase('de')||'';
-  let trick='balance';
-  if(/kirschen.?birnen/.test(label))trick='sip';
-  else if(/himbeer|kirsch/.test(label))trick='toss';
-  else if(/birne/.test(label))trick='bow';
-  else if(/holunder|balsamico/.test(label))trick='wobble';
-  item.style.zIndex=String(8-index);
-  const base='translate(-50%,-50%)';
-  let frames;
-  if(trick==='toss')frames=[{transform:base+' rotate(0) translateY(0)'},{transform:base+' rotate(-18deg) translateY(-20px)',offset:.3},{transform:base+' rotate(24deg) translateY(-38px)',offset:.62},{transform:base+' rotate(-8deg) translateY(-12px)',offset:.83},{transform:base+' rotate(0) translateY(0)'}];
-  else if(trick==='bow')frames=[{transform:base+' rotate(0)'},{transform:base+' rotate(-22deg)',offset:.4},{transform:base+' rotate(4deg)',offset:.68},{transform:base+' rotate(0)'}];
-  else if(trick==='wobble')frames=[{transform:base+' rotate(0)'},{transform:base+' rotate(12deg)',offset:.24},{transform:base+' rotate(-11deg)',offset:.5},{transform:base+' rotate(7deg)',offset:.74},{transform:base+' rotate(0)'}];
-  else if(trick==='sip'){
-   const from=image.getBoundingClientRect(),to=mostiButton?.getBoundingClientRect();
-   const dx=to?Math.max(-100,Math.min(100,to.left+to.width*.42-(from.left+from.width/2))):0;
-   const dy=to?Math.max(-85,Math.min(60,to.top+to.height*.35-(from.top+from.height/2))):0;
-   frames=[{transform:base+' translate(0,0) rotate(0)'},{transform:base+` translate(${dx*.55}px,${dy*.55}px) rotate(-18deg)`,offset:.42},{transform:base+` translate(${dx}px,${dy}px) rotate(-28deg)`,offset:.64},{transform:base+` translate(${dx*.8}px,${dy*.8}px) rotate(-22deg)`,offset:.8},{transform:base+' translate(0,0) rotate(0)'}];
-  } else frames=[{transform:base+' rotate(0) translateY(0)'},{transform:base+' rotate(10deg) translateY(-15px)',offset:.3},{transform:base+' rotate(-9deg) translateY(-25px)',offset:.58},{transform:base+' rotate(5deg) translateY(-10px)',offset:.82},{transform:base+' rotate(0) translateY(0)'}];
-  const duration=trick==='sip'?1050:760;
-  if(trick==='sip'){item.classList.add('is-vinegar-sipping');setMostiPose('sipping');}
-  else{setMostiPose('carry');}
+  if(!item||!image||!mostiButton)return;
+  const bottleRect=image.getBoundingClientRect(),mascotRect=mostiButton.getBoundingClientRect();
+  if(!bottleRect.width||!bottleRect.height||!mascotRect.width||!mascotRect.height)return;
+  const captionTop=item.querySelector('figcaption')?.getBoundingClientRect?.().top;
+  // The two-hand grip sprite closes around the bottle at the center of Mosti's body.
+  const bottleCenterX=bottleRect.left+bottleRect.width/2;
+  const bottleCenterY=bottleRect.top+bottleRect.height/2;
+  const targetLeft=bottleCenterX-mascotRect.width*.5;
+  const targetTop=Math.min(bottleCenterY-mascotRect.height*.62,Number.isFinite(captionTop)?captionTop-mascotRect.height:bottleCenterY-mascotRect.height*.62);
+  const walkX=targetLeft-mascotRect.left,walkY=targetTop-mascotRect.top;
+  const startX=mostiOffsetX,startY=mostiOffsetY,endX=startX+walkX,endY=startY+walkY;
+  item.style.zIndex='20';item.style.pointerEvents='none';mostiButton.style.zIndex='30';
+  setMostiPose('walk','back');
   try{
-   const animation=image.animate(frames,{duration,easing:'cubic-bezier(.2,.7,.25,1)',fill:'both'});
-   activeBottleAnimations.push(animation);
-   animation.finished.then(()=>{const i=activeBottleAnimations.indexOf(animation);if(i>=0)activeBottleAnimations.splice(i,1);animation.cancel();item.classList.remove('is-vinegar-sipping');}).catch(()=>{});
+   const walk=mostiButton.animate([
+    {transform:`translate(${startX}px,${startY}px)`},
+    {transform:`translate(${endX}px,${endY}px)`}
+   ],{duration:820,easing:'cubic-bezier(.35,.05,.2,1)',fill:'forwards'});
+   activeBottleAnimations.push(walk);
+   walk.finished.then(()=>{
+    const i=activeBottleAnimations.indexOf(walk);if(i>=0)activeBottleAnimations.splice(i,1);
+    mostiOffsetX=endX;mostiOffsetY=endY;mostiButton.style.transform=`translate(${endX}px,${endY}px)`;walk.cancel();
+   }).catch(()=>{});
   }catch{}
-  if(trick==='bow'||trick==='toss'||trick==='sip')item.classList.add('is-vinegar-impact');
-  scheduleMostiAct(duration,()=>{item.classList.remove('is-vinegar-impact','is-vinegar-sipping');item.style.removeProperty('z-index');});
-  if(trick==='sip')scheduleMostiAct(780,()=>{setMostiPose('push');});
-  else scheduleMostiAct(420,()=>{setMostiPose(index%2?'wave':'wink');});
+  scheduleMostiAct(820,()=>{
+   setMostiPose('grip');
+   // Center the original product bottle between both gloves at chest height.
+   const handX=targetLeft+mascotRect.width*.5;
+   const handY=targetTop+mascotRect.height*.62;
+   const grabX=handX-bottleCenterX;
+   const grabY=handY-bottleCenterY;
+   const lift=Math.min(bottleRect.height*2,Math.max(0,handY-bottleRect.height/2-4));
+   // Overlay both gloves over the real bottle so the contact reads clearly.
+   const gripHands=[
+    {clip:'inset(49% 56% 27% 22%)'},
+    {clip:'inset(49% 22% 27% 56%)'}
+   ].map(({clip})=>{
+    const hand=mostiImage(mostiPoseImages.grip.src);
+    Object.assign(hand.style,{position:'fixed',left:targetLeft+'px',top:targetTop+'px',width:mascotRect.width+'px',height:mascotRect.height+'px',maxWidth:'none',margin:'0',zIndex:'1201',objectFit:'contain',transform:'scaleX(-1)',clipPath:clip,pointerEvents:'none'});
+    document.body.append(hand);return hand;
+   });
+   const originalParent=image.parentNode;
+   // Move the same product image into a viewport layer so the high throw
+   // stays visible beyond the hero's clipped edges.
+   Object.assign(image.style,{position:'fixed',left:bottleRect.left+'px',top:bottleRect.top+'px',right:'auto',bottom:'auto',width:bottleRect.width+'px',height:bottleRect.height+'px',maxWidth:'none',margin:'0',zIndex:'1200',transform:'none',translate:'0px 0px',transformOrigin:'50% 50%',pointerEvents:'none'});
+   document.body.append(image);
+   activeBottleFlights.push({image,parent:originalParent});
+   try{
+    const toss=image.animate([
+     {translate:'0px 0px',rotate:'0deg',offset:0},
+     {translate:`${grabX}px ${grabY}px`,rotate:'0deg',offset:.12},
+     {translate:`${grabX}px ${grabY}px`,rotate:'0deg',offset:.38},
+     {translate:`${grabX}px ${grabY}px`,rotate:'0deg',offset:.43},
+     {translate:`${grabX}px ${grabY-lift}px`,rotate:'-5deg',offset:.55},
+     {translate:`${grabX}px ${grabY-lift}px`,rotate:'2deg',offset:.64},
+     {translate:`${grabX}px ${grabY}px`,rotate:'0deg',offset:.82},
+     {translate:`${grabX}px ${grabY}px`,rotate:'0deg',offset:.9},
+     {translate:'0px 0px',rotate:'0deg',offset:1}
+    ],{duration:1600,easing:'cubic-bezier(.28,.04,.24,1)',fill:'forwards'});
+    activeBottleAnimations.push(toss);
+    toss.finished.then(()=>{
+     const i=activeBottleAnimations.indexOf(toss);if(i>=0)activeBottleAnimations.splice(i,1);
+     const flightIndex=activeBottleFlights.findIndex(flight=>flight.image===image);if(flightIndex>=0)activeBottleFlights.splice(flightIndex,1);
+     toss.cancel();restoreBottleFlight({image,parent:originalParent});item.style.removeProperty('z-index');item.style.removeProperty('pointer-events');
+    }).catch(()=>{});
+   }catch{const flightIndex=activeBottleFlights.findIndex(flight=>flight.image===image);if(flightIndex>=0)activeBottleFlights.splice(flightIndex,1);restoreBottleFlight({image,parent:originalParent});item.style.removeProperty('z-index');item.style.removeProperty('pointer-events');}
+   // Hold the reach pose through the actual hand-to-bottle contact; switch
+   // to the juggling pose only after the bottle has left the hand.
+   scheduleMostiAct(700,()=>{gripHands.forEach(hand=>hand.remove());setMostiPose('juggle');});
+   scheduleMostiAct(1310,()=>setMostiPose('carry'));
+   scheduleMostiAct(1600,()=>setMostiPose('idle'));
+  });
  };
- // A compact circus revue: every original bottle gets its own trick, then Mosti takes a tiny sip from the cherry-pear vinegar.
+ const restoreFooterScene=()=>{
+  finaleSipHands.forEach(hand=>hand.remove());finaleSipHands=[];
+  if(finaleBottleImage){finaleBottleImage.classList.remove('mosti-footer-bottle');['position','left','top','right','bottom','width','height','z-index','transform','transform-origin','pointer-events'].forEach(property=>finaleBottleImage.style.removeProperty(property));if(finaleBottleLink)finaleBottleLink.append(finaleBottleImage);}
+  finaleBottleImage=null;finaleBottleLink=null;
+  if(mostiButton&&mostiFrame&&!mostiFrame.contains?.(mostiButton))mostiFrame.append(mostiButton);
+  if(mostiButton){mostiButton.style.transform='';mostiButton.style.zIndex='';mostiButton.style.position='';mostiButton.style.left='';mostiButton.style.top='';mostiButton.style.right='';mostiButton.style.bottom='';mostiButton.style.width='';mostiButton.style.height='';}mostiOffsetX=0;mostiOffsetY=0;
+  mostiFooterStage?.classList.remove('is-playing','is-drinking','is-empty');
+  if(mostiFooterStage)mostiFooterStage.hidden=true;
+  if(finaleScrollY!==null&&finaleScrollY!==undefined)window.scrollTo?.({top:finaleScrollY,behavior:'smooth'});
+  finaleScrollY=null;
+ };
+ const playFooterFinale=(lastImage)=>{
+  const lastLink=bottles.at(-1),lastItem=lastLink?.closest('.vinegar-lineup-item');
+  lastImage??=lastItem?.querySelector('img');
+  if(!mostiFooterStage||!mostiButton||!lastLink||!lastImage){swayRunning=false;stopMostiMusic();setMostiPose('idle');mostiFrame.classList.remove('is-mosti-playing');start();return;}
+  // The seventh bottle may still be finishing its throw when the finale
+  // starts. Restore that same node before measuring and moving it again.
+  const pendingFlightIndex=activeBottleFlights.findIndex(flight=>flight.image===lastImage);
+  if(pendingFlightIndex>=0){
+   const [pendingFlight]=activeBottleFlights.splice(pendingFlightIndex,1);
+   activeBottleAnimations.filter(animation=>animation.target===lastImage).forEach(animation=>{try{animation.cancel();}catch{}});
+   activeBottleAnimations.splice(0,activeBottleAnimations.length,...activeBottleAnimations.filter(animation=>animation.target!==lastImage));
+   restoreBottleFlight(pendingFlight);
+  }
+  const startRect=mostiButton.getBoundingClientRect(),bottleStartRect=lastImage.getBoundingClientRect();
+  finaleBottleImage=lastImage;finaleBottleLink=lastImage.parentNode||lastLink;
+  finaleScrollY=window.scrollY||0;
+  mostiFooterStage.hidden=false;mostiFooterStage.classList.add('is-playing');
+  mostiFooterStage.append(mostiButton);mostiFooterStage.append(lastImage);
+  // Keep the same product image in flight from its real place in the lineup.
+  // It only receives the footer layout after it visibly lands beside Mosti.
+  Object.assign(lastImage.style,{position:'fixed',left:bottleStartRect.left+'px',top:bottleStartRect.top+'px',right:'auto',bottom:'auto',width:bottleStartRect.width+'px',height:bottleStartRect.height+'px',zIndex:'1001',transformOrigin:'50% 80%',pointerEvents:'none'});
+  setMostiPose('leap');
+  mostiButton.style.position='fixed';mostiButton.style.left=startRect.left+'px';mostiButton.style.top=startRect.top+'px';mostiButton.style.right='auto';mostiButton.style.bottom='auto';mostiButton.style.width=startRect.width+'px';mostiButton.style.height=startRect.height+'px';mostiButton.style.zIndex='1000';mostiButton.style.transform='translate(0px,0px)';
+  mostiOffsetX=0;mostiOffsetY=0;
+  mostiFooterStage.scrollIntoView?.({behavior:'smooth',block:'center'});
+  finaleFlightTimer=window.setTimeout(()=>{
+   finaleFlightTimer=null;
+   if(!swayRunning||!finaleBottleImage)return;
+   const stageRect=mostiFooterStage.getBoundingClientRect();
+   const endX=stageRect.right-34-startRect.width-startRect.left;
+   const endY=stageRect.bottom-startRect.height-startRect.top;
+   const bottleWidth=42,bottleHeight=bottleStartRect.height*bottleWidth/bottleStartRect.width;
+   const bottleEndX=stageRect.right-132-bottleWidth-bottleStartRect.left;
+   const bottleEndY=stageRect.bottom-75-bottleHeight-bottleStartRect.top;
+   const arc=Math.max(65,Math.min(140,(window.innerHeight||700)*.18));
+   try{
+    const flight=mostiButton.animate([
+     {transform:'translate(0px,0px)',offset:0},
+     {transform:'translate('+endX*.25+'px,'+(endY*.25-arc*.72)+'px)',offset:.25},
+     {transform:'translate('+endX*.5+'px,'+(endY*.5-arc)+'px)',offset:.5},
+     {transform:'translate('+endX*.78+'px,'+(endY*.78-arc*.55)+'px)',offset:.78},
+     {transform:'translate('+endX+'px,'+endY+'px)',offset:1}
+    ],{duration:1250,easing:'cubic-bezier(.32,.05,.22,1)',fill:'forwards'});
+    activeBottleAnimations.push(flight);
+    flight.finished.then(()=>{const i=activeBottleAnimations.indexOf(flight);if(i>=0)activeBottleAnimations.splice(i,1);flight.cancel();}).catch(()=>{});
+   }catch{}
+   let bottleFlight;
+   try{
+    bottleFlight=lastImage.animate([
+     {transform:'translate(0px,0px) rotate(0deg)',offset:0},
+     {transform:`translate(${bottleEndX*.24}px,${bottleEndY*.22-arc*.35}px) rotate(-62deg)`,offset:.22},
+     {transform:`translate(${bottleEndX*.51}px,${bottleEndY*.52-arc}px) rotate(165deg)`,offset:.52},
+     {transform:`translate(${bottleEndX*.78}px,${bottleEndY*.8-arc*.38}px) rotate(390deg)`,offset:.8},
+     {transform:`translate(${bottleEndX}px,${bottleEndY}px) rotate(360deg)`,offset:1}
+    ],{duration:1850,easing:'cubic-bezier(.28,.04,.2,1)',fill:'forwards'});
+    activeBottleAnimations.push(bottleFlight);
+   }catch{}
+   window.setTimeout(()=>{
+    if(!swayRunning||!finaleBottleImage)return;
+    bottleFlight?.cancel();
+    const bottleAnimationIndex=activeBottleAnimations.indexOf(bottleFlight);if(bottleAnimationIndex>=0)activeBottleAnimations.splice(bottleAnimationIndex,1);
+    lastImage.classList.add('mosti-footer-bottle');
+    ['position','left','top','right','bottom','width','height','z-index','transform','transform-origin','pointer-events'].forEach(property=>lastImage.style.removeProperty(property));
+    mostiButton.style.position='absolute';mostiButton.style.left='auto';mostiButton.style.top='auto';mostiButton.style.right='34px';mostiButton.style.bottom='0';mostiButton.style.width='154px';mostiButton.style.height='166px';mostiButton.style.transform='';mostiButton.style.zIndex='1';
+    const landedStageRect=mostiFooterStage.getBoundingClientRect();
+    const bottleWidth=42,bottleHeight=bottleStartRect.height*bottleWidth/bottleStartRect.width;
+    const mobileStage=landedStageRect.width<400;
+    const mascotLeft=mobileStage?landedStageRect.width/2-72:landedStageRect.width-34-154;
+    const mascotTop=landedStageRect.height-166;
+    // The sip sprite's mouth sits left and above both gloves. Place the
+    // bottle pivot down-right so its neck points back into the mouth.
+    const gripX=mascotLeft+154*.82;
+    const gripY=mascotTop+166*.64;
+    Object.assign(lastImage.style,{position:'absolute',left:(gripX-bottleWidth/2)+'px',top:(gripY-bottleHeight*.42)+'px',right:'auto',bottom:'auto',width:bottleWidth+'px',height:'auto',zIndex:'2',transformOrigin:'50% 42%',pointerEvents:'none'});
+    finaleSipTimer=window.setTimeout(()=>{
+     finaleSipTimer=null;
+     if(!swayRunning||!finaleBottleImage)return;
+     setMostiPose('sipping');mostiFooterStage.classList.add('is-drinking');
+     finaleSipHands=[
+      {clip:'inset(41% 25% 23% 62%)'},
+      {clip:'inset(54% 32% 32% 48%)'}
+     ].map(({clip})=>{
+      const hand=mostiImage(mostiPoseImages.sipping.src);
+      hand.className='mosti-sip-hand';
+      Object.assign(hand.style,{position:'absolute',left:mascotLeft+'px',top:mascotTop+'px',width:'154px',height:'166px',maxWidth:'none',margin:'0',zIndex:'4',objectFit:'contain',clipPath:clip,pointerEvents:'none'});
+      mostiFooterStage.append(hand);return hand;
+     });
+     try{
+      const drink=lastImage.animate([
+       {transform:'rotate(-42deg) translateY(0px)'},
+       {transform:'rotate(-47deg) translateY(1px)',offset:.2},
+       {transform:'rotate(-40deg) translateY(-1px)',offset:.42},
+       {transform:'rotate(-48deg) translateY(1px)',offset:.64},
+       {transform:'rotate(-40deg) translateY(0px)',offset:.82},
+       {transform:'rotate(-42deg) translateY(0px)'}
+      ],{duration:2100,easing:'ease-in-out',fill:'forwards'});
+      activeBottleAnimations.push(drink);
+      window.setTimeout(()=>{
+       if(!swayRunning||!finaleBottleImage)return;
+       mostiFooterStage.classList.remove('is-drinking');mostiFooterStage.classList.add('is-empty');
+       try{const emptyShake=lastImage.animate([
+        {transform:'rotate(-42deg)'},
+        {transform:'rotate(138deg) translateY(0px)',offset:.28},
+        {transform:'rotate(145deg) translateY(-3px)',offset:.44},
+        {transform:'rotate(139deg) translateY(2px)',offset:.6},
+        {transform:'rotate(145deg) translateY(-2px)',offset:.76},
+        {transform:'rotate(138deg)'}
+       ],{duration:650,easing:'ease-in-out',fill:'forwards'});activeBottleAnimations.push(emptyShake);}catch{}
+      },2100);
+     }catch{}
+    },550);
+   },1850);
+  },600);
+  swayTimer=window.setTimeout(()=>{
+   restoreFooterScene();swayTimer=null;swayRunning=false;stopMostiMusic();setMostiPose('idle');
+   mostiFrame.classList.remove('is-mosti-playing');start();
+  },6500);
+ };
+
+ // The real image nodes are thrown in sequence; the seventh continues into the footer drinking scene.
  const playMosti=()=>{
   if(!mostiButton||swayRunning||!mostiFrame?.classList.contains('is-active'))return;
+  const finaleBottleImage=bottles.at(-1)?.closest('.vinegar-lineup-item')?.querySelector('img');
   resetSway();stop();swayRunning=true;mostiFrame.classList.add('is-mosti-playing');
   if(reducedMostiMotion()){
    setMostiPose('wink');
-   swayTimer=window.setTimeout(()=>{swayTimer=null;swayRunning=false;setMostiPose('idle');mostiFrame.classList.remove('is-mosti-playing');start();},950);
+   swayTimer=window.setTimeout(()=>{swayTimer=null;swayRunning=false;setMostiPose('idle');mostiFrame.classList.remove('is-mosti-playing');mostiFrame.querySelector('.vinegar-lineup')?.classList.remove('is-mosti-sequence');start();},950);
    return;
   }
-  mostiFrame.querySelector('.vinegar-lineup')?.classList.add('is-mosti-sequence');
-  playMoonwalkMusic();setMostiPose('wink');
-  scheduleMostiAct(420,()=>setMostiPose('wave'));
-  scheduleMostiAct(850,()=>setMostiPose('moonwalk'));
-  bottles.forEach((button,index)=>scheduleMostiAct(1500+index*850,()=>playBottleTrick(button,index)));
-  const endAt=1500+Math.max(0,bottles.length-1)*850+1850;
-  scheduleMostiAct(endAt-900,()=>{setMostiPose('push');});
-  swayTimer=window.setTimeout(()=>{swayTimer=null;swayRunning=false;stopMostiMusic();setMostiPose('idle');mostiFrame.classList.remove('is-mosti-playing');mostiFrame.querySelector('.vinegar-lineup')?.classList.remove('is-mosti-sequence');start();},endAt);
+  playMoonwalkMusic();setMostiPose('walk');
+  bottles.forEach((button,index)=>scheduleMostiAct(1100+index*2600,()=>playBottleTrick(button,index)));
+  // Leave a small settling margin after the seventh bottle's 820 ms approach
+  // and 1600 ms toss so its original image is back in the lineup before the finale reads it.
+  const endAt=1100+Math.max(0,bottles.length-1)*2600+3000;
+  swayTimer=window.setTimeout(()=>{swayTimer=null;playFooterFinale(finaleBottleImage);},endAt);
  };
  mostiButton?.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!swayRunning&&currentMostiPose==='idle')setMostiPose('wink');});
  mostiButton?.addEventListener('pointerleave',()=>{if(currentMostiPose==='wink'&&!swayRunning)setMostiPose('idle');});
  mostiButton?.addEventListener('click',event=>{playMosti();if((event?.detail||0)>0)mostiButton.blur();});
+ // Hover-topple remains a separate interaction; Mosti's circus act starts only from his own button.
  bottles.forEach((button,index)=>{
   button.addEventListener('pointerenter',event=>{
-   if(event.pointerType!=='mouse'||motion.matches)return;
+   if(event.pointerType!=='mouse'||motion.matches||swayRunning)return;
    const rect=button.getBoundingClientRect();
    const direction=Number.isFinite(event.clientX)&&rect.width?event.clientX<rect.left+rect.width/2?1:-1:1;
    playSway(index,direction);
@@ -534,7 +728,7 @@ if(offerCarousel){
  });
  if(motionToggle){
   motionToggle.hidden=false;motionToggle.disabled=motion.matches;
-  motionToggle.addEventListener('click',()=>{if(!motion.matches)playSway(Math.floor(bottles.length/2));});
+  motionToggle.addEventListener('click',()=>{if(!motion.matches&&!swayRunning)playSway(Math.floor(bottles.length/2));});
  }
  offerCarousel.querySelector('[data-vinegar-open]')?.addEventListener('click',openVinegar);
  vinegarDialog?.querySelector('[data-vinegar-close]')?.addEventListener('click',()=>vinegarDialog.close());
