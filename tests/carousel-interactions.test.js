@@ -156,8 +156,8 @@ test('Mosti walks to each bottle before the original image moves, then restores 
  assert.equal(env.animations.length,1,'only Mosti moves during the approach');
  assert.equal(env.animations[0].target,env.mostiButton);
  assert.equal(env.animations[0].options.duration,820);
- const loweredTop=Number(env.animations[0].frames.at(-1).transform.match(/,([\d.-]+)px\)$/)?.[1]);
- assert.ok(loweredTop>280,'Mosti walks down to the caption row instead of hovering high over the bottles: '+JSON.stringify(env.animations[0].frames.at(-1)));
+ const targetTop=Number(env.animations[0].frames.at(-1).transform.match(/,([\d.-]+)px\)$/)?.[1]);
+ assert.ok(targetTop>200&&targetTop+142<430,'Mosti reaches from beside the bottle while staying above its caption: '+JSON.stringify(env.animations[0].frames.at(-1)));
  env.finishAt(820);
  assert.equal(env.animations.length,2,'the original bottle moves only after Mosti reaches it');
  assert.match(env.mostiSprite.src,/mosti-reach\.webp$/,'Mosti reaches with his hand at the bottle');
@@ -165,14 +165,14 @@ test('Mosti walks to each bottle before the original image moves, then restores 
  const firstToss=env.animations[1];
  const catchOffset=firstToss.frames[1].translate.split(' ').map(value=>parseFloat(value));
  assert.equal(catchOffset[0],0,'Mosti catches the bottle directly in front of his hand');
- assert.ok(catchOffset[1]>80&&catchOffset[1]<86,'the bottle center meets the lowered hand at the catch');
+ assert.ok(catchOffset[1]>-8&&catchOffset[1]<-5,'the raised side hand grips the upper-middle of the bottle, not underneath it');
  assert.equal(firstToss.frames[2].translate,firstToss.frames[1].translate,'the bottle visibly stays in Mosti’s hand after contact');
  assert.equal(firstToss.frames[3].translate,firstToss.frames[1].translate,'the grip is held until the throw begins');
  assert.equal(firstToss.frames[3].offset,.43,'the hand-to-bottle contact lasts long enough to read clearly');
  assert.equal(firstToss.options.duration,1600,'the bottle is caught, tossed, and lowered in one continuous movement');
  const handPosition=firstToss.frames[1].translate.split(' ').map(value=>parseFloat(value));
  const apexPosition=firstToss.frames[4].translate.split(' ').map(value=>parseFloat(value));
- assert.ok(apexPosition[1]<=handPosition[1]-240,'the bottle rises at least one and a half bottle heights above Mosti');
+ assert.ok(250+apexPosition[1]>=0&&250+apexPosition[1]<=10,'the bottle reaches near the top of the viewport without disappearing above it');
  assert.equal(apexPosition[0],handPosition[0],'the bottle travels straight up without a sideways circle');
  assert.ok(firstToss.frames.every(frame=>Math.abs(parseFloat(frame.rotate)||0)<=5),'the bottle stays upright instead of spinning in a circle');
  assert.equal(firstToss.frames.at(-1).translate,'0px 0px','the bottle returns to its exact original position');

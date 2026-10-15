@@ -497,10 +497,12 @@ if(offerCarousel){
   const bottleRect=image.getBoundingClientRect(),mascotRect=mostiButton.getBoundingClientRect();
   if(!bottleRect.width||!bottleRect.height||!mascotRect.width||!mascotRect.height)return;
   const captionTop=item.querySelector('figcaption')?.getBoundingClientRect?.().top;
-  // Walk down to the name-card row: Mosti's reaching hand lines up with
-  // the bottle base while his feet stay just above the vinegar captions.
-  const targetLeft=bottleRect.left+bottleRect.width/2-mascotRect.width*.15;
-  const targetTop=Number.isFinite(captionTop)?captionTop-mascotRect.height*.92:(bottleRect.bottom??bottleRect.top+bottleRect.height)-mascotRect.height*.8;
+  // The mirrored reach sprite's raised glove is on Mosti's right at about
+  // 92% x / 50% y. Walk beside the bottle so that glove reaches its upper body.
+  const handX=bottleRect.left+bottleRect.width/2;
+  const handY=bottleRect.top+bottleRect.height*.46;
+  const targetLeft=handX-mascotRect.width*.92;
+  const targetTop=Math.min(handY-mascotRect.height*.5,Number.isFinite(captionTop)?captionTop-mascotRect.height:handY-mascotRect.height*.5);
   const walkX=targetLeft-mascotRect.left,walkY=targetTop-mascotRect.top;
   const startX=mostiOffsetX,startY=mostiOffsetY,endX=startX+walkX,endY=startY+walkY;
   item.style.zIndex='20';item.style.pointerEvents='none';mostiButton.style.zIndex='30';
@@ -518,10 +520,9 @@ if(offerCarousel){
   }catch{}
   scheduleMostiAct(820,()=>{
    setMostiPose('reach');
-   // The mirrored reach pose's lower glove sits at roughly 15% x / 82% y.
-   // Place the real bottle image there and hold it against the palm before release.
-   const handX=targetLeft+mascotRect.width*.15;
-   const handY=targetTop+mascotRect.height*.82;
+   // Keep the bottle at the raised glove's side-grip point, not under Mosti's feet.
+   const handX=targetLeft+mascotRect.width*.92;
+   const handY=targetTop+mascotRect.height*.5;
    const grabX=handX-(bottleRect.left+bottleRect.width/2);
    const grabY=handY-(bottleRect.top+bottleRect.height/2);
    const lift=Math.min(bottleRect.height*2,Math.max(0,handY-bottleRect.height/2-4));
