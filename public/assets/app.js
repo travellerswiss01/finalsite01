@@ -698,7 +698,9 @@ let finaleBottleImage=null,finaleBottleLink=null,finaleScrollY=null,finaleSipTim
   }
   playMoonwalkMusic();setMostiPose('walk');
   bottles.forEach((button,index)=>scheduleMostiAct(1100+index*2600,()=>playBottleTrick(button,index)));
-  const endAt=1100+Math.max(0,bottles.length-1)*2600+2500;
+  // Leave a small settling margin after the seventh bottle's 820 ms approach
+  // and 1600 ms toss so its original image is back in the lineup before the finale reads it.
+  const endAt=1100+Math.max(0,bottles.length-1)*2600+3000;
   swayTimer=window.setTimeout(()=>{swayTimer=null;playFooterFinale();},endAt);
  };
  mostiButton?.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!swayRunning&&currentMostiPose==='idle')setMostiPose('wink');});
