@@ -192,7 +192,7 @@ test('Mosti walks to each bottle before the original image moves, then restores 
  assert.equal(env.animations.filter(animation=>animation.target===env.mostiButton).length,7,'Mosti approaches every original bottle');
  assert.equal(env.animations.filter(animation=>animation.target!==env.mostiButton).length,7,'each original bottle gets a separate toss after the approach');
  assert.ok(env.bottles.every(button=>button.handlers.click===undefined),'the original product links remain in place');
- env.finishAt(19200);
+ env.finishAt(19700);
  const footerStage=env.carousel.children.find(child=>child.className==='mosti-footer-stage');
  assert.ok(footerStage&&!footerStage.hidden,'the final bottle and Mosti move into the footer scene');
  assert.ok(footerStage.children.includes(env.mostiButton));
