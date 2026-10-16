@@ -34,6 +34,40 @@ test('search, cart, filtered listings and errors are noindex while tracking URLs
  const tracked=await get('/sortiment?utm_source=test');assert.equal(meta(tracked.html,'robots'),undefined);assert.ok(tracked.html.includes(`rel="canonical" href="${canonicalOrigin}/sortiment"`));
  const robots=(await get('/robots.txt')).html;assert.ok(!robots.includes('Disallow: /suche'));assert.ok(!robots.includes('Disallow: /warenkorb'));assert.ok(robots.includes('Disallow: /api/'));assert.ok(robots.includes(`Sitemap: ${canonicalOrigin}/sitemap.xml`));
 }));
+
+test('sitemap stays valid if Shopify catalog is temporarily unavailable',async()=>{
+ let shouldFail=false;
+ const app=createApp({origin:canonicalOrigin,store:{
+  shop:async()=>null,
+  catalog:async()=>{if(shouldFail)throw new Error('Shopify unavailable');return [normalizedProduct];}
+ }});
+ await new Promise(resolve=>app.listen(0,'127.0.0.1',resolve));
+ const base='http://127.0.0.1:'+app.address().port;
+ try{
+  const first=await fetch(base+'/sitemap.xml');
+  assert.equal(first.status,200);
+  assert.match(first.headers.get('content-type'),/application\/xml/);
+  const original=await first.text();
+  assert.ok(original.includes(canonicalOrigin+productUrl(normalizedProduct)));
+  shouldFail=true;
+  const fallback=await fetch(base+'/sitemap.xml');
+  assert.equal(fallback.status,200);
+  const restored=await fallback.text();
+  assert.equal(restored,original);
+  const head=await fetch(base+'/sitemap.xml',{method:'HEAD'});
+  assert.equal(head.status,200);
+  assert.equal(await head.text(),'');
+ }finally{app.closeAllConnections();await new Promise(resolve=>app.close(resolve));}
+});
+
+test('cold-start sitemap still serves verified static routes if upstream is unavailable',()=>run(async get=>{
+ const res=await get('/sitemap.xml');
+ assert.equal(res.status,200);
+ assert.ok(res.html.includes('<urlset'));
+ assert.ok(res.html.includes(canonicalOrigin+'/kontakt'));
+ assert.ok(!res.html.includes('/produkte/test-produkt'));
+},{catalog:async()=>{throw new Error('Shopify unavailable');}}));
+
 test('every sitemap location resolves and excludes utility, filter and missing pages',()=>run(async get=>{
  const xml=(await get('/sitemap.xml')).html;
  const locations=[...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map(match=>match[1]);
