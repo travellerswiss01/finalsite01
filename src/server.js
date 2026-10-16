@@ -6,6 +6,7 @@ import path from 'node:path';
 import {createStorefront,StorefrontError} from './storefront.js';
 import * as view from './render.js';
 import {processOrderWebhook, readWebhookBody} from './review-webhook.js';
+import {connectReviewDatabase} from './review-database.js';
 
 const publicDir=path.resolve(fileURLToPath(new URL('../public/',import.meta.url)));
 const types={'.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml','.ico':'image/x-icon'};
@@ -201,5 +202,12 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
  });
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
- const port=Number(process.env.PORT||3000);createApp().listen(port,'0.0.0.0',()=>console.log(`Biottos Lädeli läuft auf Port ${port}.`));
+ const port=Number(process.env.PORT||3000);
+ try {
+  const database=await connectReviewDatabase();
+  createApp({reviewPurchaseStorage:database?.storage||null}).listen(port,'0.0.0.0',()=>console.log(`Biottos Lädeli läuft auf Port ${port}.`));
+ } catch (error) {
+  console.error('Review database initialization failed:',error.code||error.name||'unknown');
+  process.exitCode=1;
+ }
 }
