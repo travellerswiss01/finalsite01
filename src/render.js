@@ -49,6 +49,7 @@ export function shell(content,{path='/',title='Geschenke aus dem Thurgau',descri
  const imageUrl=product?.featuredImage?.url||origin+'/assets/hero.jpg';
  const structuredData=[];
  if(status===200){
+  if(path==='/')structuredData.push({'@context':'https://schema.org','@type':'Store','@id':origin+'/#store',name:BRAND,url:origin+'/',email:EMAIL,address:{'@type':'PostalAddress',streetAddress:'Hauptstrasse 90',postalCode:'8357',addressLocality:'Guntershausen',addressRegion:'Thurgau',addressCountry:'CH'},openingHoursSpecification:[{'@type':'OpeningHoursSpecification',dayOfWeek:['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],opens:'08:00',closes:'22:00'}]});
   if(path==='/')structuredData.push({'@context':'https://schema.org','@type':'Organization','@id':origin+'/#organization',name:BRAND,url:origin+'/',email:EMAIL,logo:origin+'/assets/logo.png'},{'@context':'https://schema.org','@type':'WebSite',name:BRAND,url:origin+'/',inLanguage:'de-CH'});
   if(productData)structuredData.push(productData,{'@context':'https://schema.org','@type':'BreadcrumbList',itemListElement:[{'@type':'ListItem',position:1,name:'Sortiment',item:origin+'/sortiment'},{'@type':'ListItem',position:2,name:product.title,item:canonical}]});
  }
