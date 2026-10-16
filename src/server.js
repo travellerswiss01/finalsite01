@@ -37,6 +37,7 @@ export function normalizeCartAddLines(body){
  return lines.map(line=>({merchandiseId:line.merchandiseId,quantity:line.quantity}));
 }
 export function createApp({store=createStorefront(),origin=process.env.PUBLIC_ORIGIN}={}) {
+ let lastKnownSitemapProducts=[];
  return httpServer(async(req,res)=>{
   res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');res.setHeader('X-Frame-Options','DENY');
   res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https://cdn.shopify.com; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' mailto:");
@@ -126,8 +127,20 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
    if(pathname==='/health'){sendJson(res,200,{status:'ok'});return;}
    if(pathname==='/robots.txt'){res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8'});res.end(`User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: ${publicOrigin}/sitemap.xml\n`);return;}
    if(pathname==='/sitemap.xml'){
-    const products=await store.catalog();const routes=['/','/sortiment','/saisonales','/geschenkkoerbe','/geschenk-konfigurator','/kochservice','/garten','/ueber-uns','/kontakt',...products.map(view.productUrl)];
-    res.writeHead(200,{'Content-Type':'application/xml; charset=utf-8'});res.end(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${routes.map(route=>`<url><loc>${view.escape(publicOrigin+route)}</loc></url>`).join('')}</urlset>`);return;
+    // Keep information pages discoverable during an upstream outage.
+    // Never invent product links: reuse only routes fetched from the real catalog.
+    let productRoutes=lastKnownSitemapProducts;
+    try{
+     const products=await store.catalog();
+     productRoutes=products.map(view.productUrl);
+     lastKnownSitemapProducts=productRoutes;
+    }catch(err){
+     console.warn('Sitemap: Shopify catalog unavailable; serving last known products or static routes.',err?.message||'Unknown error');
+    }
+    const routes=[...new Set(['/','/sortiment','/saisonales','/geschenkkoerbe','/geschenk-konfigurator','/kochservice','/garten','/ueber-uns','/kontakt',...productRoutes])];
+    const xml=`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${routes.map(route=>`<url><loc>${view.escape(publicOrigin+route)}</loc></url>`).join('')}</urlset>`;
+    res.writeHead(200,{'Content-Type':'application/xml; charset=utf-8','Cache-Control':'public, max-age=300'});
+    res.end(req.method==='HEAD'?undefined:xml);return;
    }
    const shop=await store.shop();let content,title,description,product,status=200;
    // Descriptions reflect existing page copy; they never change visible content.
