@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createApp} from '../src/server.js';
-import {shell,productUrl} from '../src/render.js';
+import {shell,productUrl,image} from '../src/render.js';
 import {normalizedProduct} from './fixtures.js';
 
 const canonicalOrigin='https://biottoslaedeli.ch';
@@ -9,7 +9,7 @@ async function run(fn,{catalog=async()=>[normalizedProduct]}={}){
  const app=createApp({origin:canonicalOrigin+'/',store:{catalog,shop:async()=>null}});
  await new Promise(resolve=>app.listen(0,'127.0.0.1',resolve));
  const base=`http://127.0.0.1:${app.address().port}`;
- try{await fn(async path=>{const response=await fetch(base+path);return {status:response.status,html:await response.text()};});}
+ try{await fn(async(path,options={})=>{const response=await fetch(base+path,options);return {status:response.status,html:await response.text(),headers:response.headers};});}
  finally{app.closeAllConnections();await new Promise(resolve=>app.close(resolve));}
 }
 const meta=(html,name)=>html.match(new RegExp(`<meta name="${name}" content="([^"]*)"`))?.[1];
@@ -49,11 +49,50 @@ test('product structured data preserves source prices and stock, escapes content
  assert.ok(schema.offers.every(offer=>!('sku' in offer)));assert.ok(!('aggregateRating' in schema));assert.ok(!html.includes('<script>alert(1)</script>'));
  assert.equal(breadcrumb['@type'],'BreadcrumbList');assert.equal(breadcrumb.itemListElement[0].item,canonicalOrigin+'/sortiment');
 });
-test('homepage identity data uses only existing brand, contact and local logo',()=>{
- const schemas=data(shell('',{origin:canonicalOrigin}));assert.deepEqual(schemas.map(s=>s['@type']),['Organization','WebSite']);
- assert.equal(schemas[0].name,'Biottos Lädeli');assert.equal(schemas[0].email,'biottoslaedeli@gmail.com');assert.ok(!('openingHours' in schemas[0]));
+test('homepage local business schema includes verified address, phone and opening hours',()=>{
+ const schemas=data(shell('',{origin:canonicalOrigin}));
+ assert.deepEqual(schemas.map(s=>s['@type']),['Store','Organization','WebSite']);
+ const [store,organization]=schemas;
+ assert.equal(store.name,'Biottos Lädeli');assert.equal(store.telephone,'+41523653658');
+ assert.equal(store.address.streetAddress,'Hauptstrasse 90');assert.equal(store.address.postalCode,'8357');
+ assert.equal(store.address.addressLocality,'Guntershausen');assert.equal(store.address.addressCountry,'CH');
+ assert.equal(store.openingHoursSpecification[0].opens,'08:00');
+ assert.equal(store.openingHoursSpecification[0].closes,'22:00');
+ assert.deepEqual(store.openingHoursSpecification[0].dayOfWeek,['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']);
+ assert.equal(organization.email,'biottoslaedeli@gmail.com');
+ assert.equal(organization.telephone,'+41523653658');
  assert.deepEqual(data(shell('',{origin:canonicalOrigin,status:503})),[]);
 });
 test('upstream failure remains an error and is never indexable',()=>run(async get=>{
  const result=await get('/sortiment');assert.equal(result.status,500);assert.equal(meta(result.html,'robots'),'noindex');assert.ok(result.html.includes(`rel="canonical" href="${canonicalOrigin}/sortiment"`));
 },{catalog:async()=>{throw new Error('fixture failure');}}));
+
+test('pickup and business-gift FAQ is visible and matches its structured data',()=>run(async get=>{
+ const {status,html}=await get('/kontakt');
+ assert.equal(status,200);
+ const faq=data(html).find(schema=>schema['@type']==='FAQPage');
+ assert.ok(faq);assert.equal(faq.mainEntity.length,4);
+ for(const entry of faq.mainEntity){
+  assert.equal(entry['@type'],'Question');
+  assert.equal(entry.acceptedAnswer['@type'],'Answer');
+  assert.ok(html.includes(entry.name));
+  assert.ok(html.includes(entry.acceptedAnswer.text));
+ }
+ assert.ok(html.includes('Maischhausen'));
+ assert.ok(html.includes('052 365 36 58'));
+}));
+
+test('temporary upload names never appear as product image alt text',()=>{
+ const img={url:'https://cdn.shopify.com/test.jpg',width:900,height:900,altText:'rn-image_picker_lib_temp_12345.jpg'};
+ const html=image(img,{title:'Thurgauer Apfelessig'});
+ assert.ok(html.includes('alt="Thurgauer Apfelessig"'));assert.ok(!html.includes('image_picker_lib_temp'));
+ assert.ok(image({...img,altText:'Birnen-Balsamico 100 ml'},{title:'Birnen-Balsamico'}).includes('alt="Birnen-Balsamico 100 ml"'));
+});
+
+test('both umlaut aliases redirect to the canonical domain and preserve path and query',()=>run(async get=>{
+ for(const host of ['xn--biottosldeli-ncb.ch','www.xn--biottosldeli-ncb.ch']){
+  const response=await get('/geschenkkoerbe?utm_source=plakat',{redirect:'manual',headers:{Host:host}});
+  assert.equal(response.status,301,host);
+  assert.equal(response.headers.get('location'),canonicalOrigin+'/geschenkkoerbe?utm_source=plakat');
+ }
+}));
