@@ -41,6 +41,11 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
   res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');res.setHeader('X-Frame-Options','DENY');
   res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https://cdn.shopify.com; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' mailto:");
   let url;try{url=new URL(req.url,'http://localhost');}catch{sendJson(res,400,{error:'Ungültige Adresse.'});return;}
+  const hostname=String(req.headers.host||'').split(':')[0].toLowerCase();
+  if(['xn--biottosldeli-ncb.ch','www.xn--biottosldeli-ncb.ch'].includes(hostname)){
+   res.writeHead(301,{'Location':'https://biottoslaedeli.ch'+url.pathname+url.search,'Cache-Control':'public, max-age=3600'});
+   res.end();return;
+  }
   const pathname=url.pathname;
   const forwardedProto = req.headers['x-forwarded-proto']?.split(',')[0]?.trim();
   const protocol = forwardedProto
