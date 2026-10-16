@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {request as httpRequest} from 'node:http';
 import assert from 'node:assert/strict';
 import {createApp} from '../src/server.js';
 import {shell,productUrl,image} from '../src/render.js';
@@ -89,10 +90,19 @@ test('temporary upload names never appear as product image alt text',()=>{
  assert.ok(image({...img,altText:'Birnen-Balsamico 100 ml'},{title:'Birnen-Balsamico'}).includes('alt="Birnen-Balsamico 100 ml"'));
 });
 
-test('both umlaut aliases redirect to the canonical domain and preserve path and query',()=>run(async get=>{
- for(const host of ['xn--biottosldeli-ncb.ch','www.xn--biottosldeli-ncb.ch']){
-  const response=await get('/geschenkkoerbe?utm_source=plakat',{redirect:'manual',headers:{Host:host}});
-  assert.equal(response.status,301,host);
-  assert.equal(response.headers.get('location'),canonicalOrigin+'/geschenkkoerbe?utm_source=plakat');
- }
-}));
+test('both umlaut aliases redirect to the canonical domain and preserve path and query',async()=>{
+ const app=createApp({origin:canonicalOrigin,store:{catalog:async()=>[],shop:async()=>null}});
+ await new Promise(resolve=>app.listen(0,'127.0.0.1',resolve));
+ try{
+  for(const host of ['xn--biottosldeli-ncb.ch','www.xn--biottosldeli-ncb.ch']){
+   const response=await new Promise((resolve,reject)=>{
+    const req=httpRequest({hostname:'127.0.0.1',port:app.address().port,path:'/geschenkkoerbe?utm_source=plakat',headers:{Host:host}},res=>{
+     res.resume();res.on('end',()=>resolve({status:res.statusCode,location:res.headers.location}));
+    });
+    req.on('error',reject);req.end();
+   });
+   assert.equal(response.status,301,host);
+   assert.equal(response.location,canonicalOrigin+'/geschenkkoerbe?utm_source=plakat');
+  }
+ }finally{app.closeAllConnections();await new Promise(resolve=>app.close(resolve));}
+});
