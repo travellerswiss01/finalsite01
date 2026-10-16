@@ -204,7 +204,10 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  const port=Number(process.env.PORT||3000);
  try {
+  console.info('Review database configured:',Boolean(process.env.DATABASE_URL));
   const database=await connectReviewDatabase();
+  console.info('Review database connection:',database?'ready':'disabled');
+  console.info('Shopify review webhook configured:',Boolean(process.env.SHOPIFY_WEBHOOK_SECRET));
   createApp({reviewPurchaseStorage:database?.storage||null}).listen(port,'0.0.0.0',()=>console.log(`Biottos Lädeli läuft auf Port ${port}.`));
  } catch (error) {
   console.error('Review database initialization failed:',error.code||error.name||'unknown');
