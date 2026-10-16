@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {createStorefront,StorefrontError} from './storefront.js';
 import * as view from './render.js';
+import {processOrderWebhook, readWebhookBody} from './review-webhook.js';
 
 const publicDir=path.resolve(fileURLToPath(new URL('../public/',import.meta.url)));
 const types={'.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml','.ico':'image/x-icon'};
@@ -36,7 +37,7 @@ export function normalizeCartAddLines(body){
  for(const line of lines){if(!line||!validVariantId(line.merchandiseId)||!validQuantity(line.quantity))throw new StorefrontError('Bitte prüfe Produktauswahl und Mengen.',400);}
  return lines.map(line=>({merchandiseId:line.merchandiseId,quantity:line.quantity}));
 }
-export function createApp({store=createStorefront(),origin=process.env.PUBLIC_ORIGIN}={}) {
+export function createApp({store=createStorefront(),origin=process.env.PUBLIC_ORIGIN,reviewPurchaseStorage=null}={}) {
  let lastKnownSitemapProducts=[];
  return httpServer(async(req,res)=>{
   res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');res.setHeader('X-Frame-Options','DENY');
@@ -79,6 +80,24 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
      const stream=createReadStream(requested,{start,end});res.on('close',()=>stream.destroy());stream.on('error',()=>res.destroy());stream.pipe(res);return;
     }
     res.writeHead(200,{'Content-Type':types[path.extname(requested)]||'application/octet-stream','Cache-Control':'public, max-age=3600'});res.end(req.method==='HEAD'?undefined:await readFile(requested));return;
+   }
+   if(pathname==='/webhooks/shopify/orders-paid'){
+    if(req.method!=='POST'){sendJson(res,405,{error:'Methode nicht erlaubt.'});return;}
+    if(typeof reviewPurchaseStorage?.savePurchase!=='function'||!process.env.SHOPIFY_WEBHOOK_SECRET){
+      sendJson(res,503,{error:'Bewertungsintegration nicht konfiguriert.'});return;
+    }
+    let rawBody;
+    try {rawBody=await readWebhookBody(req);}
+    catch(error){sendJson(res,error.status||400,{error:'Ungültige Webhook-Anfrage.'});return;}
+    const result=await processOrderWebhook({
+      rawBody,
+      hmac:req.headers['x-shopify-hmac-sha256'],
+      topic:req.headers['x-shopify-topic'],
+      shopDomain:req.headers['x-shopify-shop-domain'],
+      secret:process.env.SHOPIFY_WEBHOOK_SECRET,
+      savePurchase:purchase=>reviewPurchaseStorage.savePurchase(purchase)
+    });
+    sendJson(res,result.status,result.body);return;
    }
    if(pathname.startsWith('/api/')){
     let cartId=readCartCookie(req.headers.cookie);
