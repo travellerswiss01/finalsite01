@@ -111,6 +111,11 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
       const outcome=result.status===200?(result.body?.accepted?'purchase-saved':'not-eligible'):
         result.status===401?'invalid-signature':result.status===403?'unknown-shop':
         result.status===400?'invalid-event':result.status===503?'not-configured':'rejected';
+      if(outcome==='unknown-shop') {
+        // HMAC was validated before the shop-domain check; log only the bounded domain.
+        const domain=String(req.headers['x-shopify-shop-domain']||'').toLowerCase();
+        console.warn('Shopify review webhook rejected shop domain:',/^[a-z0-9.-]{1,120}$/.test(domain)?domain:'invalid-domain-format');
+      }
       console.info('Shopify review webhook outcome:',outcome);
       sendJson(res,result.status,result.body);return;
     } catch(error) {
