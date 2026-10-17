@@ -5,6 +5,8 @@ import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {createStorefront,StorefrontError} from './storefront.js';
 import * as view from './render.js';
+import {processOrderWebhook, readWebhookBody} from './review-webhook.js';
+import {connectReviewDatabase} from './review-database.js';
 
 const publicDir=path.resolve(fileURLToPath(new URL('../public/',import.meta.url)));
 const types={'.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml','.ico':'image/x-icon'};
@@ -36,7 +38,7 @@ export function normalizeCartAddLines(body){
  for(const line of lines){if(!line||!validVariantId(line.merchandiseId)||!validQuantity(line.quantity))throw new StorefrontError('Bitte prüfe Produktauswahl und Mengen.',400);}
  return lines.map(line=>({merchandiseId:line.merchandiseId,quantity:line.quantity}));
 }
-export function createApp({store=createStorefront(),origin=process.env.PUBLIC_ORIGIN}={}) {
+export function createApp({store=createStorefront(),origin=process.env.PUBLIC_ORIGIN,reviewPurchaseStorage=null}={}) {
  let lastKnownSitemapProducts=[];
  return httpServer(async(req,res)=>{
   res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');res.setHeader('X-Frame-Options','DENY');
@@ -79,6 +81,47 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
      const stream=createReadStream(requested,{start,end});res.on('close',()=>stream.destroy());stream.on('error',()=>res.destroy());stream.pipe(res);return;
     }
     res.writeHead(200,{'Content-Type':types[path.extname(requested)]||'application/octet-stream','Cache-Control':'public, max-age=3600'});res.end(req.method==='HEAD'?undefined:await readFile(requested));return;
+   }
+   if(pathname==='/webhooks/shopify/orders-paid'){
+    // Operational diagnostics only: never log headers, signatures, secrets, bodies or customer data.
+    console.info('Shopify review webhook received:',req.method==='POST'?'POST':'other-method');
+    if(req.method!=='POST'){
+      console.info('Shopify review webhook outcome: method-not-allowed');
+      sendJson(res,405,{error:'Methode nicht erlaubt.'});return;
+    }
+    if(typeof reviewPurchaseStorage?.savePurchase!=='function'||!process.env.SHOPIFY_WEBHOOK_SECRET){
+      console.warn('Shopify review webhook outcome: not-configured');
+      sendJson(res,503,{error:'Bewertungsintegration nicht konfiguriert.'});return;
+    }
+    let rawBody;
+    try {rawBody=await readWebhookBody(req);}
+    catch(error){
+      console.warn('Shopify review webhook outcome: invalid-body');
+      sendJson(res,error.status||400,{error:'Ungültige Webhook-Anfrage.'});return;
+    }
+    try {
+      const result=await processOrderWebhook({
+        rawBody,
+        hmac:req.headers['x-shopify-hmac-sha256'],
+        topic:req.headers['x-shopify-topic'],
+        shopDomain:req.headers['x-shopify-shop-domain'],
+        secret:process.env.SHOPIFY_WEBHOOK_SECRET,
+        savePurchase:purchase=>reviewPurchaseStorage.savePurchase(purchase)
+      });
+      const outcome=result.status===200?(result.body?.accepted?'purchase-saved':'not-eligible'):
+        result.status===401?'invalid-signature':result.status===403?'unknown-shop':
+        result.status===400?'invalid-event':result.status===503?'not-configured':'rejected';
+      if(outcome==='unknown-shop') {
+        // HMAC was validated before the shop-domain check; log only the bounded domain.
+        const domain=String(req.headers['x-shopify-shop-domain']||'').toLowerCase();
+        console.warn('Shopify review webhook rejected shop domain:',/^[a-z0-9.-]{1,120}$/.test(domain)?domain:'invalid-domain-format');
+      }
+      console.info('Shopify review webhook outcome:',outcome);
+      sendJson(res,result.status,result.body);return;
+    } catch(error) {
+      console.error('Shopify review webhook outcome: processing-failed');
+      sendJson(res,500,{error:'Webhook konnte nicht verarbeitet werden.'});return;
+    }
    }
    if(pathname.startsWith('/api/')){
     let cartId=readCartCookie(req.headers.cookie);
@@ -182,5 +225,15 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
  });
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
- const port=Number(process.env.PORT||3000);createApp().listen(port,'0.0.0.0',()=>console.log(`Biottos Lädeli läuft auf Port ${port}.`));
+ const port=Number(process.env.PORT||3000);
+ try {
+  console.info('Review database configured:',Boolean(process.env.DATABASE_URL));
+  const database=await connectReviewDatabase();
+  console.info('Review database connection:',database?'ready':'disabled');
+  console.info('Shopify review webhook configured:',Boolean(process.env.SHOPIFY_WEBHOOK_SECRET));
+  createApp({reviewPurchaseStorage:database?.storage||null}).listen(port,'0.0.0.0',()=>console.log(`Biottos Lädeli läuft auf Port ${port}.`));
+ } catch (error) {
+  console.error('Review database initialization failed:',error.code||error.name||'unknown');
+  process.exitCode=1;
+ }
 }
