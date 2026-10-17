@@ -83,22 +83,40 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
     res.writeHead(200,{'Content-Type':types[path.extname(requested)]||'application/octet-stream','Cache-Control':'public, max-age=3600'});res.end(req.method==='HEAD'?undefined:await readFile(requested));return;
    }
    if(pathname==='/webhooks/shopify/orders-paid'){
-    if(req.method!=='POST'){sendJson(res,405,{error:'Methode nicht erlaubt.'});return;}
+    // Operational diagnostics only: never log headers, signatures, secrets, bodies or customer data.
+    console.info('Shopify review webhook received:',req.method==='POST'?'POST':'other-method');
+    if(req.method!=='POST'){
+      console.info('Shopify review webhook outcome: method-not-allowed');
+      sendJson(res,405,{error:'Methode nicht erlaubt.'});return;
+    }
     if(typeof reviewPurchaseStorage?.savePurchase!=='function'||!process.env.SHOPIFY_WEBHOOK_SECRET){
+      console.warn('Shopify review webhook outcome: not-configured');
       sendJson(res,503,{error:'Bewertungsintegration nicht konfiguriert.'});return;
     }
     let rawBody;
     try {rawBody=await readWebhookBody(req);}
-    catch(error){sendJson(res,error.status||400,{error:'Ungültige Webhook-Anfrage.'});return;}
-    const result=await processOrderWebhook({
-      rawBody,
-      hmac:req.headers['x-shopify-hmac-sha256'],
-      topic:req.headers['x-shopify-topic'],
-      shopDomain:req.headers['x-shopify-shop-domain'],
-      secret:process.env.SHOPIFY_WEBHOOK_SECRET,
-      savePurchase:purchase=>reviewPurchaseStorage.savePurchase(purchase)
-    });
-    sendJson(res,result.status,result.body);return;
+    catch(error){
+      console.warn('Shopify review webhook outcome: invalid-body');
+      sendJson(res,error.status||400,{error:'Ungültige Webhook-Anfrage.'});return;
+    }
+    try {
+      const result=await processOrderWebhook({
+        rawBody,
+        hmac:req.headers['x-shopify-hmac-sha256'],
+        topic:req.headers['x-shopify-topic'],
+        shopDomain:req.headers['x-shopify-shop-domain'],
+        secret:process.env.SHOPIFY_WEBHOOK_SECRET,
+        savePurchase:purchase=>reviewPurchaseStorage.savePurchase(purchase)
+      });
+      const outcome=result.status===200?(result.body?.accepted?'purchase-saved':'not-eligible'):
+        result.status===401?'invalid-signature':result.status===403?'unknown-shop':
+        result.status===400?'invalid-event':result.status===503?'not-configured':'rejected';
+      console.info('Shopify review webhook outcome:',outcome);
+      sendJson(res,result.status,result.body);return;
+    } catch(error) {
+      console.error('Shopify review webhook outcome: processing-failed');
+      sendJson(res,500,{error:'Webhook konnte nicht verarbeitet werden.'});return;
+    }
    }
    if(pathname.startsWith('/api/')){
     let cartId=readCartCookie(req.headers.cookie);
