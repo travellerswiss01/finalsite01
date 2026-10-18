@@ -1,3 +1,4 @@
+import {getAsset,versionAssets} from './assets.js';
 import {createServer as httpServer} from 'node:http';
 import {readFile,stat} from 'node:fs/promises';
 import {createReadStream} from 'node:fs';
@@ -78,7 +79,18 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
      if(req.method==='HEAD'){res.end();return;}
      const stream=createReadStream(requested,{start,end});res.on('close',()=>stream.destroy());stream.on('error',()=>res.destroy());stream.pipe(res);return;
     }
-    res.writeHead(200,{'Content-Type':types[path.extname(requested)]||'application/octet-stream','Cache-Control':'public, max-age=3600'});res.end(req.method==='HEAD'?undefined:await readFile(requested));return;
+    const asset=getAsset(path.basename(requested));
+    const immutable=asset&&url.searchParams.get('v')===asset.hash;
+    const headers={'Content-Type':types[path.extname(requested)]||'application/octet-stream','Cache-Control':immutable?'public, max-age=31536000, immutable':'public, max-age=0, must-revalidate','Vary':'Accept-Encoding'};
+    let body=asset?.body||await readFile(requested);
+    if(asset){
+     const accepts=String(req.headers['accept-encoding']||'');
+     const encoding=/\bbr\b/.test(accepts)&&asset.br?'br':/\bgzip\b/.test(accepts)&&asset.gzip?'gzip':null;
+     if(encoding){body=asset[encoding];headers['Content-Encoding']=encoding;}
+     headers.ETag=`"${asset.hash}-${encoding||'identity'}"`;
+     if(req.headers['if-none-match']===headers.ETag){res.writeHead(304,headers);res.end();return;}
+    }
+    headers['Content-Length']=body.length;res.writeHead(200,headers);res.end(req.method==='HEAD'?undefined:body);return;
    }
    if(pathname.startsWith('/api/')){
     let cartId=readCartCookie(req.headers.cookie);
