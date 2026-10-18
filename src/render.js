@@ -1,3 +1,4 @@
+import localImages from './image-assets.json' with {type:'json'};
 import {versionAssets} from './assets.js';
 export const BRAND='Biottos Lädeli';
 export const EMAIL='biottoslaedeli@gmail.com';
@@ -10,10 +11,13 @@ export function icon(name){const paths={cart:'<path d="M2 3h3l3 13h11l3-10H6"/><
 export function image(img, {className='',loading='lazy',width=900,sizes='(min-width: 1100px) 23vw, (min-width: 600px) 45vw, 90vw',title=''}={}) {
  if(!img)return '<div class="missing-image">Produktbild folgt</div>';
  const url=new URL(img.url);if(url.protocol!=='https:')return '<div class="missing-image">Produktbild folgt</div>';
- const source=w=>{const next=new URL(url);next.searchParams.set('width',w);return escape(next.href);};
+ // Only use a local derivative when Shopify's full versioned source URL still matches.
+ const local=localImages[url.href];
+ const widths=local?.sizes||[320,480,600,800,1200];
+ const source=w=>{if(local){const size=widths.find(size=>size>=w)||widths.at(-1);return `/assets/${local.stem}-${size}.webp`;}const next=new URL(url);next.searchParams.set('width',w);return escape(next.href);};
  const suppliedAlt=typeof img.altText==='string'?img.altText.trim():'';
  const descriptiveAlt=/^(?:rn[-_])?image[-_]?picker[-_]?lib[-_]?temp/i.test(suppliedAlt)?title:(suppliedAlt||title);
- return `<img src="${source(width)}" srcset="${[320,480,600,800,1200].map(w=>`${source(w)} ${w}w`).join(', ')}" sizes="${escape(sizes)}" width="${Number(img.width)||900}" height="${Number(img.height)||900}" loading="${loading}" decoding="async" class="${escape(className)}" alt="${escape(descriptiveAlt)}">`;
+ return `<img src="${source(width)}" srcset="${widths.map(w=>`${source(w)} ${w}w`).join(', ')}" sizes="${escape(sizes)}" width="${Number(img.width)||900}" height="${Number(img.height)||900}" loading="${loading}" decoding="async" class="${escape(className)}" alt="${escape(descriptiveAlt)}">`;
 }
 export const productUrl=p=>`/produkte/${encodeURIComponent(p.handle)}`;
 export function lowestPrice(p){return p.variants.reduce((a,v)=>Number(v.price.amount)<Number(a.price.amount)?v:a,p.variants[0]).price;}
@@ -71,7 +75,7 @@ export function shell(content,{path='/',title='Geschenke aus dem Thurgau',descri
 export function imageFilm(product){return `<section class="imagefilm container" aria-labelledby="ImagefilmHeading"><div class="imagefilm-copy"><p class="imagefilm-eyebrow">BIOTTOS LÄDELI · THURGAU</p><h2 id="ImagefilmHeading">Vom Thurgauer<br>Apfel zum Most</h2><p>Ein Blick hinter die Kulissen: vom Pressen unserer Äpfel bis zum ersten Schluck Süssmost.</p><span class="imagefilm-duration"><span aria-hidden="true">▶</span> Unser Film · 35 Sekunden</span></div><div class="imagefilm-media" data-imagefilm><video width="1920" height="1080" poster="/assets/imagefilm-poster-768.webp" preload="none" playsinline controls aria-label="Vom Apfel zum Most – Imagefilm von Biottos Lädeli" data-film-video data-src="/assets/imagefilm.mp4"><p><a href="/assets/imagefilm.mp4">Film direkt öffnen</a></p></video><button class="imagefilm-play" type="button" data-film-play aria-label="Film ansehen: Vom Apfel zum Most"><span class="imagefilm-play-circle" aria-hidden="true">▶</span><span>Film ansehen</span></button><p class="imagefilm-error" data-film-error role="status" hidden>Der Film konnte nicht gestartet werden. <a href="/assets/imagefilm.mp4">Film direkt öffnen</a></p><noscript><p class="imagefilm-nojs"><a href="/assets/imagefilm.mp4">Film ansehen</a></p></noscript></div><div class="imagefilm-shop"><img class="imagefilm-product" src="/assets/suessmost-3-liter-160.webp" srcset="/assets/suessmost-3-liter-160.webp 160w, /assets/suessmost-3-liter-320.webp 320w" sizes="(max-width:599px) 72px, 100px" width="800" height="960" alt="Süssmost im 3-Liter-Gebinde von Biottos Lädeli" loading="lazy"><div class="imagefilm-shop-copy"><p class="imagefilm-shop-eyebrow">EIN STÜCK THURGAU FÜR ZUHAUSE</p><h3>Lust auf einen Schluck?</h3><p>Unser Süssmost. Dein Lieblingsgebinde.</p>${product?`<a class="imagefilm-details" href="${productUrl(product)}">Süssmost kennenlernen ${icon('arrow')}</a>`:''}</div><div class="imagefilm-purchase">${product?`<p class="imagefilm-price" data-price>${money((product.variants.find(v=>v.availableForSale)||product.variants[0]).price)}</p>${buyForm(product,{idSuffix:'-film'})}`:'<a class="button" href="/sortiment?kategorie=S%C3%A4fte">Süssmost entdecken</a>'}</div></div></section>`;}
 function seasonalOfferCard(product,index){
  return `<article class="seasonal-offer-card">
-  <a class="seasonal-offer-image" href="${productUrl(product)}" aria-label="${escape(product.title)} ansehen">${image(product.featuredImage,{title:product.title,width:360,loading:'lazy',sizes:'(min-width: 1200px) 16vw, 30vw'})}</a>
+  <a class="seasonal-offer-image" href="${productUrl(product)}" aria-label="${escape(product.title)} ansehen">${image(product.featuredImage,{title:product.title,width:360,loading:'lazy',sizes:'(min-width: 1200px) 16vw, 30vw'}).replace(/\bsrc=/g,'data-src=').replace(/\bsrcset=/g,'data-srcset=')}</a>
   <div class="seasonal-offer-details"><h3><a href="${productUrl(product)}">${escape(product.title)}</a></h3><p class="seasonal-offer-price">${money(lowestPrice(product))}</p>${buyForm(product,{idSuffix:`-seasonal-${index}`,buttonText:'Bestellen'})}</div>
  </article>`;
 }

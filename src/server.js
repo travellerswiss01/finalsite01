@@ -85,7 +85,8 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
     let body=asset?.body||await readFile(requested);
     if(asset){
      const accepts=String(req.headers['accept-encoding']||'');
-     const encoding=/\bbr\b/.test(accepts)&&asset.br?'br':/\bgzip\b/.test(accepts)&&asset.gzip?'gzip':null;
+     const supports=name=>accepts.split(',').some(part=>{const [coding,...parameters]=part.trim().split(';');const q=parameters.find(p=>p.trim().startsWith('q='));return coding===name&&(!q||Number(q.trim().slice(2))>0);});
+     const encoding=supports('br')&&asset.br?'br':supports('gzip')&&asset.gzip?'gzip':null;
      if(encoding){body=asset[encoding];headers['Content-Encoding']=encoding;}
      headers.ETag=`"${asset.hash}-${encoding||'identity'}"`;
      if(req.headers['if-none-match']===headers.ETag){res.writeHead(304,headers);res.end();return;}

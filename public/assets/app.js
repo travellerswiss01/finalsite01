@@ -1,3 +1,7 @@
+// Stop decorative CSS motion when the document is hidden.
+const updateDocumentMotion=()=>document.documentElement.classList.toggle('is-page-hidden',document.hidden);
+document.addEventListener('visibilitychange',updateDocumentMotion);
+updateDocumentMotion();
 const drawer=document.getElementById('CartDrawer');
 const status=document.getElementById('CartStatus');
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -289,6 +293,14 @@ if(offerCarousel){
   const image=mostiPoseImages[pose]||mostiPoseImages.idle;
   if(image&&mostiSprite&&mostiSprite.src!==image.src)mostiSprite.src=image.src;
  };
+ let posesWarmed=false;
+ const warmMostiPoses=()=>{
+  if(posesWarmed||motion.matches)return;posesWarmed=true;
+  for(const pose of [...Object.values(mostiPoseImages),...mostiWalkFrames,...mostiMoonwalkFrames]){const image=new Image();image.src=pose.src;}
+ };
+ mostiButton?.addEventListener('pointerenter',warmMostiPoses);
+ mostiButton?.addEventListener('pointerdown',warmMostiPoses);
+ mostiButton?.addEventListener('focus',warmMostiPoses);
  const mostiPoseTimers=[];
  const resetMosti=()=>{
   stopMostiWalk();
@@ -393,6 +405,7 @@ if(offerCarousel){
   deferred.forEach(image=>{
    if(image.dataset.src&&!image.hasAttribute('src')){
     image.loading='eager';
+    if(image.dataset.srcset){image.srcset=image.dataset.srcset;image.removeAttribute('data-srcset');}
     image.src=image.dataset.src;
     image.removeAttribute('data-src');
    }
