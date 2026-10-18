@@ -1,0 +1,314 @@
+[
+  {
+    "phase": "baseline",
+    "device": "mobile",
+    "run": 1,
+    "url": "https://biottoslaedeli.ch/",
+    "timestamp": "2026-10-18T21:33:44.513Z",
+    "lighthouse": "13.5.0",
+    "scores": {
+      "performance": 68,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "largest-contentful-paint": 1383.8610000000003,
+      "first-contentful-paint": 1308.8610000000003,
+      "total-blocking-time": 0,
+      "cumulative-layout-shift": 0.5450239960970624,
+      "speed-index": 12320.942809999902,
+      "total-byte-weight": 3480777
+    },
+    "config": {
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "screen": {
+        "mobile": true,
+        "width": 412,
+        "height": 823,
+        "deviceScaleFactor": 1.75,
+        "disabled": false
+      }
+    }
+  },
+  {
+    "phase": "baseline",
+    "device": "desktop",
+    "run": 1,
+    "url": "https://biottoslaedeli.ch/",
+    "timestamp": "2026-10-18T22:28:24.842Z",
+    "lighthouse": "13.5.0",
+    "scores": {
+      "performance": 92,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "largest-contentful-paint": 805.5195000000017,
+      "first-contentful-paint": 661.7500000000009,
+      "total-blocking-time": 0,
+      "cumulative-layout-shift": 0.02074982927411439,
+      "speed-index": 3058.3179366666664,
+      "total-byte-weight": 3211461
+    },
+    "config": {
+      "throttling": {
+        "rttMs": 40,
+        "throughputKbps": 10240,
+        "requestLatencyMs": 0,
+        "downloadThroughputKbps": 0,
+        "uploadThroughputKbps": 0,
+        "cpuSlowdownMultiplier": 1
+      },
+      "screen": {
+        "mobile": false,
+        "width": 1350,
+        "height": 940,
+        "deviceScaleFactor": 1,
+        "disabled": false
+      }
+    }
+  },
+  {
+    "phase": "preview",
+    "device": "mobile",
+    "run": 1,
+    "url": "https://biottos-laedeli-pr-28.onrender.com/",
+    "timestamp": "2026-10-18T22:27:43.723Z",
+    "lighthouse": "13.5.0",
+    "scores": {
+      "performance": 92,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 69
+    },
+    "metrics": {
+      "largest-contentful-paint": 1868.034,
+      "first-contentful-paint": 1343.034,
+      "total-blocking-time": 0,
+      "cumulative-layout-shift": 0,
+      "speed-index": 7945.307607999992,
+      "total-byte-weight": 517117
+    },
+    "config": {
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "screen": {
+        "mobile": true,
+        "width": 412,
+        "height": 823,
+        "deviceScaleFactor": 1.75,
+        "disabled": false
+      }
+    }
+  },
+  {
+    "phase": "preview",
+    "device": "mobile",
+    "run": 2,
+    "url": "https://biottos-laedeli-pr-28.onrender.com/",
+    "timestamp": "2026-10-18T22:27:56.283Z",
+    "lighthouse": "13.5.0",
+    "scores": {
+      "performance": 99,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 69
+    },
+    "metrics": {
+      "largest-contentful-paint": 1786.7591,
+      "first-contentful-paint": 1336.7591,
+      "total-blocking-time": 0,
+      "cumulative-layout-shift": 0,
+      "speed-index": 2571.689597999989,
+      "total-byte-weight": 516639
+    },
+    "config": {
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "screen": {
+        "mobile": true,
+        "width": 412,
+        "height": 823,
+        "deviceScaleFactor": 1.75,
+        "disabled": false
+      }
+    }
+  },
+  {
+    "phase": "preview",
+    "device": "mobile",
+    "run": 3,
+    "url": "https://biottos-laedeli-pr-28.onrender.com/",
+    "timestamp": "2026-10-18T22:28:04.743Z",
+    "lighthouse": "13.5.0",
+    "scores": {
+      "performance": 99,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 69
+    },
+    "metrics": {
+      "largest-contentful-paint": 1816.2885999999999,
+      "first-contentful-paint": 1366.2885999999999,
+      "total-blocking-time": 0,
+      "cumulative-layout-shift": 0,
+      "speed-index": 2588.5972579999884,
+      "total-byte-weight": 516698
+    },
+    "config": {
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "screen": {
+        "mobile": true,
+        "width": 412,
+        "height": 823,
+        "deviceScaleFactor": 1.75,
+        "disabled": false
+      }
+    }
+  },
+  {
+    "phase": "preview",
+    "device": "desktop",
+    "run": 1,
+    "url": "https://biottos-laedeli-pr-28.onrender.com/",
+    "timestamp": "2026-10-18T22:28:23.467Z",
+    "lighthouse": "13.5.0",
+    "scores": {
+      "performance": 91,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 69
+    },
+    "metrics": {
+      "largest-contentful-paint": 687.853,
+      "first-contentful-paint": 587.853,
+      "total-blocking-time": 0,
+      "cumulative-layout-shift": 0.021440574735426644,
+      "speed-index": 3992.5484334999937,
+      "total-byte-weight": 324038
+    },
+    "config": {
+      "throttling": {
+        "rttMs": 40,
+        "throughputKbps": 10240,
+        "requestLatencyMs": 0,
+        "downloadThroughputKbps": 0,
+        "uploadThroughputKbps": 0,
+        "cpuSlowdownMultiplier": 1
+      },
+      "screen": {
+        "mobile": false,
+        "width": 1350,
+        "height": 940,
+        "deviceScaleFactor": 1,
+        "disabled": false
+      }
+    }
+  },
+  {
+    "phase": "preview",
+    "device": "desktop",
+    "run": 2,
+    "url": "https://biottos-laedeli-pr-28.onrender.com/",
+    "timestamp": "2026-10-18T22:28:37.703Z",
+    "lighthouse": "13.5.0",
+    "scores": {
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 69
+    },
+    "metrics": {
+      "largest-contentful-paint": 585.9662000000001,
+      "first-contentful-paint": 565.9662000000001,
+      "total-blocking-time": 0,
+      "cumulative-layout-shift": 0.021440574735426644,
+      "speed-index": 747.8799502499921,
+      "total-byte-weight": 323583
+    },
+    "config": {
+      "throttling": {
+        "rttMs": 40,
+        "throughputKbps": 10240,
+        "requestLatencyMs": 0,
+        "downloadThroughputKbps": 0,
+        "uploadThroughputKbps": 0,
+        "cpuSlowdownMultiplier": 1
+      },
+      "screen": {
+        "mobile": false,
+        "width": 1350,
+        "height": 940,
+        "deviceScaleFactor": 1,
+        "disabled": false
+      }
+    }
+  },
+  {
+    "phase": "preview",
+    "device": "desktop",
+    "run": 3,
+    "url": "https://biottos-laedeli-pr-28.onrender.com/",
+    "timestamp": "2026-10-18T22:28:46.202Z",
+    "lighthouse": "13.5.0",
+    "scores": {
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 69
+    },
+    "metrics": {
+      "largest-contentful-paint": 579.8052,
+      "first-contentful-paint": 559.8052,
+      "total-blocking-time": 0,
+      "cumulative-layout-shift": 0.02074982927411439,
+      "speed-index": 804.3729174166533,
+      "total-byte-weight": 323575
+    },
+    "config": {
+      "throttling": {
+        "rttMs": 40,
+        "throughputKbps": 10240,
+        "requestLatencyMs": 0,
+        "downloadThroughputKbps": 0,
+        "uploadThroughputKbps": 0,
+        "cpuSlowdownMultiplier": 1
+      },
+      "screen": {
+        "mobile": false,
+        "width": 1350,
+        "height": 940,
+        "deviceScaleFactor": 1,
+        "disabled": false
+      }
+    }
+  }
+]
