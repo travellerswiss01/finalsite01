@@ -1,0 +1,18 @@
+{
+  "base": "https://biottos-laedeli-pr-28.onrender.com",
+  "checks": [
+    "SSR vinegar hero active",
+    "carousel and all three juice sizes",
+    "Mosti routine starts",
+    "original label dialog",
+    "video playback",
+    "product variant and add to cart",
+    "cart 1 → 2 → 1",
+    "checkout navigation",
+    "cart removal",
+    "gift builder, greeting and cleanup",
+    "navigation routes",
+    "no JavaScript exceptions"
+  ],
+  "errors": []
+}

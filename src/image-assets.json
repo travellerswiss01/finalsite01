@@ -1,0 +1,28 @@
+{
+  "https://cdn.shopify.com/s/files/1/0967/9559/0922/files/es-troepfli-heimat.webp?v=1791575334": {
+    "sizes": [
+      320,
+      480,
+      800
+    ],
+    "stem": "gift-chli-fii"
+  },
+  "https://cdn.shopify.com/s/files/1/0967/9559/0922/files/geschenksharassli-mittel.png?v=1791575343": {
+    "sizes": [
+      320,
+      480,
+      800,
+      1200
+    ],
+    "stem": "gift-fein-guet"
+  },
+  "https://cdn.shopify.com/s/files/1/0967/9559/0922/files/geschenksharass-gross.webp?v=1791575350": {
+    "sizes": [
+      320,
+      480,
+      800,
+      1200
+    ],
+    "stem": "gift-gross-guet"
+  }
+}

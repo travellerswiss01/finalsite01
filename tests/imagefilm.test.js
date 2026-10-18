@@ -4,7 +4,7 @@ import {home,listing,productPage,imageFilm} from '../src/render.js';
 import {normalizedProduct} from './fixtures.js';
 test('film follows homepage products and waits for an explicit play action',()=>{
  const html=home([normalizedProduct]);assert.ok(html.indexOf('class="imagefilm container"')>html.indexOf('class="featured container"'));
- assert.match(html,/preload="none" playsinline controls/);assert.match(html,/data-src="\/assets\/imagefilm.mp4"/);assert.ok(!html.includes('autoplay'));assert.ok(!html.includes('<source'));assert.match(html,/imagefilm-poster.webp/);
+ assert.match(html,/preload="none" playsinline controls/);assert.match(html,/data-src="\/assets\/imagefilm.mp4"/);assert.ok(!html.includes('autoplay'));assert.ok(!html.includes('<source'));assert.match(html,/imagefilm-poster-768.webp/);
 });
 test('film purchase uses live variants, disables sold-out sizes and has a unique selector ID',()=>{
  const p={...normalizedProduct,title:'Süssmost',handle:'sussmost',availableForSale:true,variants:[{...normalizedProduct.variants[0],title:'3 Liter',availableForSale:false},{...normalizedProduct.variants[0],id:'gid://shopify/ProductVariant/2',title:'5 Liter',availableForSale:true,price:{amount:'13',currencyCode:'CHF'}}]};
