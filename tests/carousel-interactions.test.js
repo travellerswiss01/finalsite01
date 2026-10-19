@@ -25,7 +25,7 @@ test('Mosti has separate transparent walk frames and a wink-and-wave pose',()=>{
   assert.equal(image.toString('ascii',8,12),'WEBP',name);
  }
 });
-function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=true){
+function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=true,autoplay=true){
  const animations=[];let mostiButton,mostiSprite;
  const element=()=>({
   children:[],remove(){this.removed=true;},blur(){this.blurred=true;},append(child){this.children.push(child);},handlers:{},attrs:{},inert:false,hidden:true,textContent:'',
@@ -69,6 +69,7 @@ function setup(reduced=false,audioSupported=true,withMosti=false,hoverSupported=
  if(audioSupported)window.AudioContext=FakeAudioContext;
  const Image=class{constructor(){this.complete=false;this.naturalWidth=0;this.src='';this.handlers={};}addEventListener(type,fn){this.handlers[type]=fn;}};
  vm.runInNewContext(carouselScript,{document,window,Image});
+ if(autoplay&&!reduced)controls['[data-offer-toggle]'].handlers.click();
  return {mostiButton,mostiSprite,animations,bottles,figures,images,controls,carousel,dialog,detailGrid,detailHeading,detailPhotos,document,motion,timeouts,audio,
   next(){controls['[data-offer-next]'].handlers.click();},running:()=>interval!==null,
   finish(){const [key,timeout]=timeouts.entries().next().value;timeouts.delete(key);timeout.fn();}
@@ -203,4 +204,12 @@ test('Mosti waves without motion or audio when reduced motion is requested',()=>
  assert.equal(env.audio.notes,0);
  env.finishAt(950);
  assert.match(env.mostiSprite.src,/mosti-domino\.webp$/);
+});
+
+test('initial carousel remains stable until the visitor requests autoplay',()=>{
+ const env=setup(false,true,false,true,false);
+ assert.equal(env.running(),false);
+ assert.equal(env.images[3].classList.contains('is-active'),true);
+ env.next();assert.equal(env.running(),false);
+ env.controls['[data-offer-toggle]'].handlers.click();assert.equal(env.running(),true);
 });

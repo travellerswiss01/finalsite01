@@ -15,3 +15,8 @@ if(!trioData)throw new Error('Juice trio artwork is missing or invalid');
 const trioImage=Buffer.from(trioData[1],'base64');
 if(trioImage.toString('ascii',0,4)!=='RIFF'||trioImage.toString('ascii',8,12)!=='WEBP')throw new Error('Juice trio must be WebP');
 await writeFile(new URL('../public/assets/suessmost-trio.webp',import.meta.url),trioImage);
+
+// One render-blocking stylesheet, preserving the original cascade order.
+const styles=['base','sections','site','imagefilm','most-gallery','garden'];
+const bundled=await Promise.all(styles.map(name=>readFile(new URL('../public/assets/'+name+'.css',import.meta.url),'utf8')));
+await writeFile(new URL('../public/assets/site-bundle.css',import.meta.url),bundled.join('\n'));
