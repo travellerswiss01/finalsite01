@@ -441,3 +441,5 @@
 /* Keep the hero heading clear of the first bottle on laptop widths. */
 @media(min-width:1200px) and (max-width:1599px){.hero .hero-offer-heading{font-size:60px}}
 .is-page-hidden *, .offer-carousel.is-offscreen *{animation-play-state:paused!important}
+/* Reserve space for the progressive motion controls before their script loads. */
+@media(min-width:600px){.vinegar-tools{min-width:263px}}
