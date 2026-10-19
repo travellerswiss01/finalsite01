@@ -81,3 +81,11 @@ test('malformed asset path returns a client error instead of a server failure',(
  assert.equal(response.status,400);
  assert.ok(!(await response.text()).includes('Die Anfrage konnte nicht abgeschlossen werden'));
 }));
+
+test('malformed encoded product URL returns 400 instead of a server error',()=>run(async({origin})=>{
+ const response=await fetch(origin+'/produkte/%E0%A4%A');
+ assert.equal(response.status,400);
+ const html=await response.text();
+ assert.ok(html.includes('Ungültige Produktadresse.'));
+ assert.ok(html.includes('name="robots" content="noindex"'));
+}));
