@@ -64,7 +64,9 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
   try {
    if(pathname.startsWith('/assets/')){
     if(req.method!=='GET'&&req.method!=='HEAD'){sendJson(res,405,{error:'Methode nicht erlaubt.'});return;}
-    const requested=path.resolve(publicDir,'.'+decodeURIComponent(pathname));
+    let decodedPath;
+    try{decodedPath=decodeURIComponent(pathname);}catch{throw new StorefrontError('Ungültiger Dateipfad.',400);}
+    const requested=path.resolve(publicDir,'.'+decodedPath);
     if(!requested.startsWith(publicDir+path.sep)||requested.includes('\0'))throw new StorefrontError('Datei nicht gefunden.',404);
     let file;try{file=await stat(requested);}catch{throw new StorefrontError('Datei nicht gefunden.',404);}
     if(!file.isFile())throw new StorefrontError('Datei nicht gefunden.',404);
