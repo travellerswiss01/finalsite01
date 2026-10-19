@@ -187,7 +187,9 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
     const q=(url.searchParams.get('q')||'').slice(0,200);const category=(url.searchParams.get('kategorie')||'').slice(0,100);
     const seasonal=pathname==='/saisonales';content=view.listing(await store.catalog(),{q,category,gifts:pathname==='/geschenkkoerbe',search:pathname==='/suche',seasonal});title=seasonal?'Saisonales':pathname==='/geschenkkoerbe'?'Geschenkkörbe aus dem Thurgau':pathname==='/suche'?'Produkte suchen':'Sortiment';
    }else if(pathname.startsWith('/produkte/')){
-    const handle=decodeURIComponent(pathname.slice('/produkte/'.length));product=(await store.catalog()).find(p=>p.handle===handle);
+    let handle;
+    try{handle=decodeURIComponent(pathname.slice('/produkte/'.length));}catch{throw new StorefrontError('Ungültige Produktadresse.',400);}
+    product=(await store.catalog()).find(p=>p.handle===handle);
     if(product){const selected=product.variants.find(v=>v.id.split('/').pop()===url.searchParams.get('variant'));product={...product,selectedVariantId:selected?.id};content=view.productPage(product);title=product.title;description=metaDescription(product);}
    }else if(pathname==='/kontakt'){content=view.contact();title='Kontakt & individuelle Geschenke';}
    else if(pathname==='/ueber-uns'){content=view.about();title='Über Biottos Lädeli';}
