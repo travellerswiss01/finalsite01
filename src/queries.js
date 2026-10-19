@@ -37,7 +37,7 @@ export const CART_FIELDS = `fragment CartFields on Cart {
   cost { subtotalAmount { amount currencyCode } totalAmount { amount currencyCode } }
   lines(first: 250) {
     nodes {
-      id quantity cost { totalAmount { amount currencyCode } }
+      id quantity attributes { key value } cost { totalAmount { amount currencyCode } }
       merchandise {
         ... on ProductVariant {
           id title availableForSale price { amount currencyCode }

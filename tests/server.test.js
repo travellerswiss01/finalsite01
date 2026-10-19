@@ -20,7 +20,7 @@ test('imagefilm supports byte ranges, seeking and HEAD without downloading the w
 test('serves styles, scripts and original images with correct MIME types',()=>run(async({origin})=>{for(const [file,type] of [['base.css','text/css'],['app.js','text/javascript'],['logo.png','image/png'],['hero.jpg','image/jpeg'],['suessmost-3-liter.webp','image/webp'],['lucia-kocht.jpg','image/jpeg'],['lucia-salate.webp','image/webp'],['lucia-hero-banner.webp','image/webp'],['firmen-geschenke.webp','image/webp'],['geschenk-auswahl.webp','image/webp'],['troepfli-heimat.webp','image/webp'],['essig-liegend.webp','image/webp'],['essig-original.webp','image/webp'],['essig-birnen.webp','image/webp'],['essig-balsamico.webp','image/webp'],['essig-himbeer.webp','image/webp'],['essig-holunder.webp','image/webp'],['essig-kirschen-birnen.webp','image/webp'],['essig-kirsch.webp','image/webp'],['saison-aepfel.webp','image/webp'],...Array.from({length:7},(_,i)=>[`lucia-menu-${i+1}.webp`,'image/webp'])]){const response=await fetch(origin+'/assets/'+file);assert.equal(response.status,200,file);assert.ok(response.headers.get('content-type').startsWith(type));assert.ok((await response.arrayBuffer()).byteLength>0);}assert.equal((await fetch(origin+'/assets/missing.css')).status,404);}));
 
 test('serverless adapter accepts a body already parsed by the platform',async()=>{
- const app=createApp({store:{mutateCart:async()=>({cart:cartFixture(),warnings:[]})}});
+ const app=createApp({store:{catalog:async()=>[normalizedProduct],mutateCart:async()=>({cart:cartFixture(),warnings:[]})}});
  const handler=app.listeners('request')[0];
  const server=createServer((req,res)=>{req.body={variantId:'gid://shopify/ProductVariant/1',quantity:1};handler(req,res);});
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
@@ -68,4 +68,10 @@ test('uses the request host for cart checks while keeping the configured canonic
   assert.equal(page.status,200);
   assert.match(await page.text(),/rel="canonical" href="https:\/\/canonical\.example\//);
  }finally{server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
+});
+test('confirmed kilogram units survive the server boundary as Shopify checkout line attributes',async()=>{
+ let input;const product={...normalizedProduct,handle:'apfel-gemischt'};
+ const app=createApp({store:{catalog:async()=>[product],cart:async()=>null,mutateCart:async(action,id,data)=>{input=data;return {cart:cartFixture(),warnings:[]};}}});
+ await new Promise(r=>app.listen(0,'127.0.0.1',r));
+ try{const res=await fetch('http://127.0.0.1:'+app.address().port+'/api/cart/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({variantId:product.variants[0].id,quantity:2,attributes:[{key:'Bestelleinheit',value:'wrong'}]})});assert.equal(res.status,200);assert.deepEqual(input.lines[0].attributes,[{key:'Bestelleinheit',value:'1 kg'}]);assert.equal(input.lines[0].quantity,2);}finally{app.closeAllConnections();await new Promise(r=>app.close(r));}
 });

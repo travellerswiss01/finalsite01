@@ -1,4 +1,4 @@
-import {presentProduct,metaDescription} from '../public/assets/product-copy.js';
+import {presentProduct,metaDescription,saleUnit} from '../public/assets/product-copy.js';
 import {getAsset,versionAssets} from './assets.js';
 import {createServer as httpServer} from 'node:http';
 import {readFile,stat} from 'node:fs/promises';
@@ -119,6 +119,8 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
     let result;
     if(pathname==='/api/cart/add'){
       const lines=normalizeCartAddLines(body);
+      const products=await store.catalog();
+      for(const line of lines){const product=products.find(p=>p.variants.some(v=>v.id===line.merchandiseId));const unit=saleUnit(product);if(unit)line.attributes=[{key:'Bestelleinheit',value:'1 '+unit}];}
       const greeting=normalizeGreetingCard(body.greetingCard);
       const existingCart=cartId?await store.cart(cartId):null;
       if(cartId&&!existingCart)cartId=null;
