@@ -5,3 +5,7 @@ node_modules/
 .DS_Store
 playwright-report/
 test-results/
+
+public/assets/site-bundle.css
+/public/assets/mosti-domino.webp
+/public/assets/suessmost-trio.webp

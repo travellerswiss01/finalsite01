@@ -1,0 +1,73 @@
+{
+  "https://cdn.shopify.com/s/files/1/0967/9559/0922/files/es-troepfli-heimat.webp?v=1791575334": {
+    "sizes": [
+      320,
+      480,
+      800
+    ],
+    "stem": "gift-chli-fii"
+  },
+  "https://cdn.shopify.com/s/files/1/0967/9559/0922/files/geschenksharassli-mittel.png?v=1791575343": {
+    "sizes": [
+      320,
+      480,
+      800,
+      1200
+    ],
+    "stem": "gift-fein-guet"
+  },
+  "https://cdn.shopify.com/s/files/1/0967/9559/0922/files/geschenksharass-gross.webp?v=1791575350": {
+    "sizes": [
+      320,
+      480,
+      800,
+      1200
+    ],
+    "stem": "gift-gross-guet"
+  },
+  "https://cdn.shopify.com/s/files/1/0967/9559/0922/files/rn-image_picker_lib_temp_ff2a8155-abdd-460b-845d-4b608fc97d57.png?v=1791927478": {
+    "stem": "apfelessig",
+    "sizes": [
+      320,
+      480,
+      800,
+      1200
+    ]
+  },
+  "https://cdn.shopify.com/s/files/1/0967/9559/0922/files/rn-image_picker_lib_temp_8654d998-d6bc-4a80-923d-9a4d54c90f96.png?v=1791927329": {
+    "stem": "birnenessig-2",
+    "sizes": [
+      320,
+      480,
+      800,
+      1200
+    ]
+  },
+  "https://cdn.shopify.com/s/files/1/0967/9559/0922/files/rn-image_picker_lib_temp_de3ef529-c3aa-400a-9b95-c98cf6cd4e3d.png?v=1791799246": {
+    "stem": "tomaten-gemischt",
+    "sizes": [
+      320,
+      480,
+      800,
+      1200
+    ]
+  },
+  "https://cdn.shopify.com/s/files/1/0967/9559/0922/files/rn-image_picker_lib_temp_aade94eb-e507-4524-8e56-aa8f79562452.png?v=1791799604": {
+    "stem": "birnen-gemischt",
+    "sizes": [
+      320,
+      480,
+      800,
+      1200
+    ]
+  },
+  "https://cdn.shopify.com/s/files/1/0967/9559/0922/files/rn-image_picker_lib_temp_658c447f-e4f1-42bd-8b32-e8410ad9ff4b.png?v=1791799728": {
+    "stem": "apfel-gemischt",
+    "sizes": [
+      320,
+      480,
+      800,
+      1200
+    ]
+  }
+}

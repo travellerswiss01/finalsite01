@@ -23,11 +23,11 @@ test('homepage rotates matching gift and cooking photos without changing the her
  const page=home([]);
  assert.equal((page.match(/data-offer-image/g)||[]).length,5);
  assert.match(page,/src="\/assets\/lucia-hero-banner\.webp"/);
- assert.match(page,/src="\/assets\/suessmost-trio\.webp\?v=spaced-2"/);
+ assert.match(page,/src="\/assets\/suessmost-trio-960\.webp"/);
  assert.match(page,/class="hero-image bundled-hero hero-offer-image product-offer-banner" data-offer-image data-src="\/assets\/firmen-geschenke\.webp"/);
- assert.ok(page.indexOf('/assets/suessmost-trio.webp')<page.indexOf('/assets/essig-original-cutout.svg'));
+ assert.ok(page.indexOf('/assets/suessmost-trio-960.webp')<page.indexOf('/assets/essig-original-cutout.webp'));
  assert.doesNotMatch(page,/src="\/assets\/saison-aepfel\.webp"/);
- assert.match(page,/<h1 id="HeroHeading">Geschenke aus<br>dem Thurgau<\/h1>/);
+ assert.match(page,/<h1 id="HeroHeading" class="hero-offer-heading">Dein Geschenk.<br>Deine Auswahl.<\/h1>/);
  assert.match(page,/Süssmost entdecken/);
  assert.match(page,/Lucia kocht<br>für dich/);
  assert.match(page,/href="\/kochservice">Lucias Kochservice entdecken/);
@@ -35,13 +35,13 @@ test('homepage rotates matching gift and cooking photos without changing the her
  assert.match(page,/aria-hidden="true" inert/);
  for(const path of ["/kontakt","/geschenk-konfigurator","/saisonales"])assert.ok(page.includes(`href="${path}"`));
  assert.match(page,/Firmengeschenke anfragen/);
- assert.match(page,/(?:src|data-src)="\/assets\/essig-original-cutout\.svg/);
+ assert.match(page,/(?:src|data-src)="\/assets\/essig-original-cutout\.webp/);
  assert.match(page,/class="vinegar-lineup"/);
  assert.equal((page.match(/class="vinegar-lineup-item"/g)||[]).length,7);
  const colorOrder=['essig-birnen','essig-holunder','essig-balsamico','essig-original','essig-kirsch','essig-himbeer','essig-kirschen-birnen'];
  for(const className of ['vinegar-lineup','vinegar-detail-grid']){
   const images=page.match(new RegExp(`<div class="${className}"[^>]*>([\\s\\S]*?)</div>`))[1];
-  assert.deepEqual([...images.matchAll(/<img (?:src|data-src)="\/assets\/([^"]+)-cutout\.svg/g)].map(match=>match[1]),colorOrder);
+  assert.deepEqual([...images.matchAll(/<img (?:src|data-src)="\/assets\/([^"]+)-cutout\.(?:webp|svg)/g)].map(match=>match[1]),colorOrder);
  }
  assert.match(page,/data-vinegar-dialog/);
  assert.match(page,/data-vinegar-open/);

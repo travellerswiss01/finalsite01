@@ -1,3 +1,8 @@
+import {saleUnit,tidyText} from '/assets/product-copy.js';
+// Stop decorative CSS motion when the document is hidden.
+const updateDocumentMotion=()=>document.documentElement.classList.toggle('is-page-hidden',document.hidden);
+document.addEventListener('visibilitychange',updateDocumentMotion);
+updateDocumentMotion();
 const drawer=document.getElementById('CartDrawer');
 const status=document.getElementById('CartStatus');
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -10,11 +15,12 @@ async function api(path,data){
 }
 function cartMarkup(value){
  if(!value?.totalQuantity)return '<p>Dein Warenkorb ist leer.</p><a class="button" href="/sortiment">Weiter einkaufen</a>';
- return `<div class="cart-form">${value.lines.nodes.map(line=>{const v=line.merchandise;return `<div class="cart-item" data-line="${escape(line.id)}">${v.image?`<a href="/produkte/${encodeURIComponent(v.product.handle)}"><img src="${escape(v.image.url)}" width="90" height="90" alt="${escape(v.image.altText||v.product.title)}" loading="lazy"></a>`:'<span></span>'}<div><a class="cart-row-title" href="/produkte/${encodeURIComponent(v.product.handle)}">${escape(v.product.title)}</a>${!['Default','Default Title'].includes(v.title)?`<small>${escape(v.title)}</small>`:''}<p>${money(line.cost.totalAmount)}</p><div class="quantity-controls"><button type="button" data-delta="-1" aria-label="Menge für ${escape(v.product.title)} verringern" ${line.quantity===1?'disabled':''}>−</button><input type="number" min="1" max="250" step="1" value="${line.quantity}" data-cart-quantity aria-label="Menge für ${escape(v.product.title)}"><button type="button" data-delta="1" aria-label="Menge für ${escape(v.product.title)} erhöhen" ${line.quantity>=250?'disabled':''}>+</button></div><button type="button" class="cart-remove" data-remove>Entfernen</button></div></div>`;}).join('')}${value.note?`<p class="cart-note"><strong>Grusskarte / Bestellnotiz</strong><br>${escape(value.note).replace(/\n/g,'<br>')}</p>`:''}<p class="cart-total">Zwischensumme <strong>${money(value.cost.subtotalAmount)}</strong></p><p class="checkout-note">Abhol- und Lieferoptionen, Rabatte und allfällige Kosten werden im Shopify-Checkout angezeigt.</p><div class="cart-buttons"><button class="button cart-checkout" type="button" data-checkout>Zur Kasse</button><a href="/sortiment">Weiter einkaufen</a></div></div>`;
+ return `<div class="cart-form">${value.lines.nodes.map(line=>{const v=line.merchandise;return `<div class="cart-item" data-line="${escape(line.id)}">${v.image?`<a href="/produkte/${encodeURIComponent(v.product.handle)}"><img src="${escape(v.image.url)}" width="90" height="90" alt="${escape(tidyText(v.product.title))}" loading="lazy"></a>`:'<span></span>'}<div><a class="cart-row-title" href="/produkte/${encodeURIComponent(v.product.handle)}">${escape(tidyText(v.product.title))}</a>${!['Default','Default Title'].includes(v.title)?`<small>${escape(v.title)}</small>`:''}${saleUnit(v.product)?`<small>${line.quantity} ${saleUnit(v.product)} · 1 Bestelleinheit = 1 ${saleUnit(v.product)}</small>`:''}<p>${money(line.cost.totalAmount)}</p><div class="quantity-controls"><button type="button" data-delta="-1" aria-label="Menge für ${escape(tidyText(v.product.title))} verringern" ${line.quantity===1?'disabled':''}>−</button><input type="number" min="1" max="250" step="1" value="${line.quantity}" data-cart-quantity aria-label="Menge für ${escape(tidyText(v.product.title))}"><button type="button" data-delta="1" aria-label="Menge für ${escape(tidyText(v.product.title))} erhöhen" ${line.quantity>=250?'disabled':''}>+</button></div><button type="button" class="cart-remove" data-remove>Entfernen</button></div></div>`;}).join('')}${value.note?`<p class="cart-note"><strong>Grusskarte / Bestellnotiz</strong><br>${escape(value.note).replace(/\n/g,'<br>')}</p>`:''}<p class="cart-total">Zwischensumme <strong>${money(value.cost.subtotalAmount)}</strong></p><p class="checkout-note">Abhol- und Lieferoptionen, Rabatte und allfällige Kosten werden im Shopify-Checkout angezeigt.</p><div class="cart-buttons"><button class="button cart-checkout" type="button" data-checkout>Zur Kasse</button><a href="/sortiment">Weiter einkaufen</a></div></div>`;
 }
 function renderCart(value,warnings=[]){
  cart=value;
  document.querySelectorAll('[data-cart-count]').forEach(el=>el.textContent=value?.totalQuantity||0);
+ document.querySelectorAll('[data-cart-open]').forEach(el=>el.setAttribute('aria-label',`Warenkorb öffnen – ${value?.totalQuantity||0} Artikel`));
  for(const selector of ['[data-cart-content]','[data-cart-page-content]'])document.querySelectorAll(selector).forEach(el=>el.innerHTML=cartMarkup(value));
  const message=warnings.map(w=>w.message).join(' ');document.querySelectorAll('[data-cart-message]').forEach(el=>{el.textContent=message;el.classList.toggle('cart-warning',Boolean(message));});
  if(status)status.textContent=`${value?.totalQuantity||0} Artikel im Warenkorb. ${message}`;
@@ -54,7 +60,7 @@ if(giftForm){
     chosen++;
     const variant=selectedVariant(item);
     if(control.tagName==='INPUT'){control.dataset.price=variant.dataset.price;control.dataset.currency=variant.dataset.currency;}
-    item.querySelector('[data-gift-price]').textContent=money({amount:variant.dataset.price,currencyCode:variant.dataset.currency});
+    item.querySelector('[data-gift-price]').textContent=money({amount:variant.dataset.price,currencyCode:variant.dataset.currency})+(item.dataset.saleUnit?' / '+item.dataset.saleUnit:'');
     total+=Number(variant.dataset.price)*Number(quantity.value||1);
    }
   }
@@ -122,7 +128,8 @@ document.addEventListener('change',async e=>{
  if(e.target.matches('[data-cart-quantity]')){const value=Number(e.target.value);if(!Number.isInteger(value)||value<1||value>250){e.target.reportValidity();return;}await changeLine(e.target.closest('[data-line]').dataset.line,value);}
  if(e.target.matches('[data-variant-select]')){
   const option=e.target.selectedOptions[0];const root=e.target.closest('.imagefilm-shop')||e.target.closest('.product-detail')||e.target.closest('.product-card');root.querySelector('[data-price]').textContent=option.dataset.price;
-  const image=root.querySelector('.detail-main-image')||root.querySelector('.product-image img');if(image&&option.dataset.image){image.removeAttribute('srcset');image.src=option.dataset.image;}
+  const image=root.querySelector('.detail-main-image')||root.querySelector('.product-image img');if(image&&option.dataset.image){image.removeAttribute('srcset');image.src=option.dataset.image;image.alt=option.dataset.alt||'';}
+  if(root.classList.contains('product-detail')){const u=new URL(location.href);u.searchParams.set('variant',option.value.split('/').pop());history.replaceState(null,'',u);const submit=root.querySelector('.product-form button[type=submit]');submit.disabled=option.dataset.available!=='true';submit.lastChild.textContent=submit.disabled?'Ausverkauft':'In den Warenkorb';}
  }
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.nav-dropdown[open],.mobile-nav[open]').forEach(el=>el.open=false);});
@@ -250,13 +257,14 @@ if(offerCarousel){
   mostiSprite.src='/assets/mosti-domino.webp';
   mostiButton.append(mostiSprite);mostiFrame.append(mostiButton);
  }
- const mostiImage=src=>{const image=new Image();image.src=src;return image;};
+ // Pose resources load when used, rather than competing with the initial content.
+ const mostiImage=src=>({src});
  const mostiPoseImages={
   idle:mostiImage('/assets/mosti-domino.webp'),
   wink:mostiImage('/assets/mosti-wink-wave.webp'),
   wave:mostiImage('/assets/mosti-wink-wave.webp'),
   push:mostiImage('/assets/mosti-push-v2.webp'),
-  carry:mostiImage('/assets/mosti-carry-body.svg')
+  carry:mostiImage('/assets/mosti-carry-body.webp')
  };
  const mostiWalkFrames=[mostiImage('/assets/mosti-walk-a.webp'),mostiImage('/assets/mosti-walk-b.webp')];
  const mostiMoonwalkFrames=[mostiImage('/assets/mosti-moonwalk-a.webp'),mostiImage('/assets/mosti-moonwalk-b.webp')];
@@ -287,6 +295,14 @@ if(offerCarousel){
   const image=mostiPoseImages[pose]||mostiPoseImages.idle;
   if(image&&mostiSprite&&mostiSprite.src!==image.src)mostiSprite.src=image.src;
  };
+ let posesWarmed=false;
+ const warmMostiPoses=()=>{
+  if(posesWarmed||motion.matches)return;posesWarmed=true;
+  for(const pose of [...Object.values(mostiPoseImages),...mostiWalkFrames,...mostiMoonwalkFrames]){const image=new Image();image.src=pose.src;}
+ };
+ mostiButton?.addEventListener('pointerenter',warmMostiPoses);
+ mostiButton?.addEventListener('pointerdown',warmMostiPoses);
+ mostiButton?.addEventListener('focus',warmMostiPoses);
  const mostiPoseTimers=[];
  const resetMosti=()=>{
   stopMostiWalk();
@@ -295,11 +311,11 @@ if(offerCarousel){
   mostiFrame?.querySelector('.vinegar-lineup')?.classList.remove('is-mosti-sequence');
   if(mostiButton)mostiButton.removeAttribute('aria-busy');
  };
- let current=0,timer=null,swayTimer=null,swayRunning=false,paused=motion.matches,hovered=false;
+ let current=0,timer=null,swayTimer=null,swayRunning=false,paused=true,hovered=false,inViewport=true;
  const stop=()=>{if(timer!==null){window.clearInterval(timer);timer=null;}};
  const start=()=>{
   stop();
-  if(slides.length>1&&!paused&&!hovered&&!document.hidden&&!vinegarDialog?.open&&!mostDialog.open&&!swayRunning&&!document.activeElement?.matches?.(':focus-visible')){
+  if(slides.length>1&&inViewport&&!paused&&!hovered&&!document.hidden&&!vinegarDialog?.open&&!mostDialog.open&&!swayRunning&&!document.activeElement?.matches?.(':focus-visible')){
    timer=window.setInterval(()=>show(current+1),6000);
   }
  };
@@ -391,6 +407,7 @@ if(offerCarousel){
   deferred.forEach(image=>{
    if(image.dataset.src&&!image.hasAttribute('src')){
     image.loading='eager';
+    if(image.dataset.srcset){image.srcset=image.dataset.srcset;image.removeAttribute('data-srcset');}
     image.src=image.dataset.src;
     image.removeAttribute('data-src');
    }
@@ -400,7 +417,7 @@ if(offerCarousel){
   resetSway();
   current=(index+slides.length)%slides.length;
   loadOfferImage(current);
-  loadOfferImage((current+1)%slides.length);
+
   slides.forEach((slide,i)=>{
    const active=i===current;
    slide.classList.toggle('is-active',active);
@@ -425,7 +442,11 @@ if(offerCarousel){
  }
  offerCarousel.addEventListener('focusin',event=>{if(event.target.matches?.(':focus-visible'))stop();});
  offerCarousel.addEventListener('focusout',event=>{if(!offerCarousel.contains(event.relatedTarget))window.setTimeout(start,0);});
- document.addEventListener('visibilitychange',()=>{if(document.hidden)resetSway();start();});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden){resetSway();stopMostiMusic();}start();});
+ if('IntersectionObserver' in window){
+  const observer=new window.IntersectionObserver(([entry])=>{inViewport=entry.isIntersecting;offerCarousel.classList.toggle('is-offscreen',!inViewport);if(!inViewport){resetSway();stopMostiMusic();}start();});
+  observer.observe(offerCarousel);
+ }
  motion.addEventListener('change',event=>{if(motionToggle)motionToggle.disabled=event.matches;if(event.matches){resetSway();paused=true;updateToggle();}start();});
 
  const openVinegar=selection=>{

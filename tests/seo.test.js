@@ -80,8 +80,8 @@ test('product structured data preserves source prices and stock, escapes content
  const html=shell('<h1>Produkt</h1>',{product,path:productUrl(product),origin:canonicalOrigin});
  const [schema,breadcrumb]=data(html);
  assert.equal(schema.name,product.title);assert.deepEqual(schema.image,[product.featuredImage.url]);
- assert.equal(schema.offers[0].price,'8.50');assert.equal(schema.offers[1].price,'12.75');assert.equal(schema.offers[1].availability,'https://schema.org/OutOfStock');
- assert.ok(schema.offers.every(offer=>!('sku' in offer)));assert.ok(!('aggregateRating' in schema));assert.ok(!html.includes('<script>alert(1)</script>'));
+ assert.equal(schema['@type'],'ProductGroup');assert.equal(schema.hasVariant[0].offers.price,'8.50');assert.equal(schema.hasVariant[1].offers.price,'12.75');assert.equal(schema.hasVariant[1].offers.availability,'https://schema.org/OutOfStock');
+ assert.ok(schema.hasVariant.every(variant=>!('sku' in variant)));assert.ok(!('aggregateRating' in schema));assert.ok(!html.includes('<script>alert(1)</script>'));
  assert.equal(breadcrumb['@type'],'BreadcrumbList');assert.equal(breadcrumb.itemListElement[0].item,canonicalOrigin+'/sortiment');
 });
 test('homepage local business schema includes verified address, phone and opening hours',()=>{
@@ -138,5 +138,29 @@ test('both umlaut aliases redirect to the canonical domain and preserve path and
    assert.equal(response.status,301,host);
    assert.equal(response.location,canonicalOrigin+'/geschenkkoerbe?utm_source=plakat');
   }
+ }finally{app.closeAllConnections();await new Promise(resolve=>app.close(resolve));}
+});
+
+test('variant URLs preselect the exact price, sold-out state and canonical without a query',()=>run(async get=>{
+ const product={...normalizedProduct,variants:[normalizedProduct.variants[0],{...normalizedProduct.variants[0],id:'gid://shopify/ProductVariant/992',title:'250ml',availableForSale:false,price:{amount:'12.75',currencyCode:'CHF'}}]};
+ await run(async load=>{
+  const {html}=await load(productUrl(product)+'?variant=992');
+  assert.match(html,/<option[^>]*value="gid:\/\/shopify\/ProductVariant\/992"[^>]*selected/);
+  assert.match(html,/<p class="detail-price" data-price>CHF 12.75<\/p>/);
+  assert.match(html,/<button class="button" type="submit" disabled>/);
+  assert.ok(html.includes('rel="canonical" href="'+canonicalOrigin+productUrl(product)+'"'));
+  const group=data(html).find(s=>s['@type']==='ProductGroup');
+  assert.equal(group.hasVariant[1].offers.url,canonicalOrigin+productUrl(product)+'?variant=992');
+  assert.equal(group.hasVariant[1].offers.availability,'https://schema.org/OutOfStock');
+ },{catalog:async()=>[product]});
+}));
+
+test('preview indexing protection follows the request host and does not leak to the production host',async()=>{
+ const app=createApp({origin:canonicalOrigin,store:{catalog:async()=>[normalizedProduct],shop:async()=>null}});
+ await new Promise(resolve=>app.listen(0,'127.0.0.1',resolve));
+ const request=(host,path='/')=>new Promise((resolve,reject)=>{const req=httpRequest({hostname:'127.0.0.1',port:app.address().port,path,headers:{Host:host}},res=>{let html='';res.on('data',d=>html+=d);res.on('end',()=>resolve({headers:res.headers,html}));});req.on('error',reject);req.end();});
+ try{
+  const preview=await request('biottos-laedeli-pr-test.onrender.com');assert.match(preview.headers['x-robots-tag'],/noindex/);assert.equal(meta(preview.html,'robots'),'noindex');
+  const production=await request('biottoslaedeli.ch');assert.equal(production.headers['x-robots-tag'],undefined);assert.equal(meta(production.html,'robots'),undefined);
  }finally{app.closeAllConnections();await new Promise(resolve=>app.close(resolve));}
 });

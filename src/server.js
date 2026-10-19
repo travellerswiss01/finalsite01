@@ -1,3 +1,5 @@
+import {presentProduct,metaDescription} from '../public/assets/product-copy.js';
+import {getAsset,versionAssets} from './assets.js';
 import {createServer as httpServer} from 'node:http';
 import {readFile,stat} from 'node:fs/promises';
 import {createReadStream} from 'node:fs';
@@ -37,13 +39,15 @@ export function normalizeCartAddLines(body){
  return lines.map(line=>({merchandiseId:line.merchandiseId,quantity:line.quantity}));
 }
 export function createApp({store=createStorefront(),origin=process.env.PUBLIC_ORIGIN}={}) {
+ const sourceStore=store;
+ store={...sourceStore,catalog:async(...args)=>(await sourceStore.catalog(...args)).map(presentProduct)};
  let lastKnownSitemapProducts=[];
  return httpServer(async(req,res)=>{
   res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');res.setHeader('X-Frame-Options','DENY');
   res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https://cdn.shopify.com; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' mailto:");
   let url;try{url=new URL(req.url,'http://localhost');}catch{sendJson(res,400,{error:'Ungültige Adresse.'});return;}
   const hostname=String(req.headers.host||'').split(':')[0].toLowerCase();
-  if(['xn--biottosldeli-ncb.ch','www.xn--biottosldeli-ncb.ch'].includes(hostname)){
+  if(['www.biottoslaedeli.ch','xn--biottosldeli-ncb.ch','www.xn--biottosldeli-ncb.ch'].includes(hostname)){
    res.writeHead(301,{'Location':'https://biottoslaedeli.ch'+url.pathname+url.search,'Cache-Control':'public, max-age=3600'});
    res.end();return;
   }
@@ -55,6 +59,8 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
   const requestOrigin = `${protocol}://${req.headers.host}`;
   const publicOrigin=new URL(origin||requestOrigin).origin;
   const secure=requestOrigin.startsWith('https://');
+  const preview=hostname.endsWith('.onrender.com')||process.env.PREVIEW_NOINDEX==='true';
+  if(preview)res.setHeader('X-Robots-Tag','noindex, nofollow');
   try {
    if(pathname.startsWith('/assets/')){
     if(req.method!=='GET'&&req.method!=='HEAD'){sendJson(res,405,{error:'Methode nicht erlaubt.'});return;}
@@ -78,7 +84,19 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
      if(req.method==='HEAD'){res.end();return;}
      const stream=createReadStream(requested,{start,end});res.on('close',()=>stream.destroy());stream.on('error',()=>res.destroy());stream.pipe(res);return;
     }
-    res.writeHead(200,{'Content-Type':types[path.extname(requested)]||'application/octet-stream','Cache-Control':'public, max-age=3600'});res.end(req.method==='HEAD'?undefined:await readFile(requested));return;
+    const asset=getAsset(path.basename(requested));
+    const immutable=asset&&url.searchParams.get('v')===asset.hash;
+    const headers={'Content-Type':types[path.extname(requested)]||'application/octet-stream','Cache-Control':immutable?'public, max-age=31536000, immutable':'public, max-age=0, must-revalidate','Vary':'Accept-Encoding'};
+    let body=asset?.body||await readFile(requested);
+    if(asset){
+     const accepts=String(req.headers['accept-encoding']||'');
+     const supports=name=>accepts.split(',').some(part=>{const [coding,...parameters]=part.trim().split(';');const q=parameters.find(p=>p.trim().startsWith('q='));return coding===name&&(!q||Number(q.trim().slice(2))>0);});
+     const encoding=supports('br')&&asset.br?'br':supports('gzip')&&asset.gzip?'gzip':null;
+     if(encoding){body=asset[encoding];headers['Content-Encoding']=encoding;}
+     headers.ETag=`"${asset.hash}-${encoding||'identity'}"`;
+     if(req.headers['if-none-match']===headers.ETag){res.writeHead(304,headers);res.end();return;}
+    }
+    headers['Content-Length']=body.length;res.writeHead(200,headers);res.end(req.method==='HEAD'?undefined:body);return;
    }
    if(pathname.startsWith('/api/')){
     let cartId=readCartCookie(req.headers.cookie);
@@ -125,7 +143,7 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
    }
    if(req.method!=='GET'&&req.method!=='HEAD'){sendJson(res,405,{error:'Methode nicht erlaubt.'});return;}
    if(pathname==='/health'){sendJson(res,200,{status:'ok'});return;}
-   if(pathname==='/robots.txt'){res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8'});res.end(`User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: ${publicOrigin}/sitemap.xml\n`);return;}
+   if(pathname==='/robots.txt'){res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8'});res.end(preview?'User-agent: *\nAllow: /\n':`User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: ${publicOrigin}/sitemap.xml\n`);return;}
    if(pathname==='/sitemap.xml'){
     // Keep information pages discoverable during an upstream outage.
     // Never invent product links: reuse only routes fetched from the real catalog.
@@ -155,7 +173,7 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
     '/warenkorb':'Deine ausgewählten Produkte bei Biottos Lädeli prüfen und zur Bestellung weitergehen.'
    };
    description=descriptions[pathname];
-   const noindex=['/sortiment','/saisonales','/geschenkkoerbe'].includes(pathname)&&['q','kategorie'].some(key=>Boolean(url.searchParams.get(key)));
+   const noindex=preview||['/sortiment','/saisonales','/geschenkkoerbe'].includes(pathname)&&['q','kategorie'].some(key=>Boolean(url.searchParams.get(key)));
 
    if(pathname==='/'){content=view.home(await store.catalog());title='Spezialitäten & Geschenkharassen aus dem Thurgau';}
    else if(pathname==='/geschenk-konfigurator'){content=view.giftConfigurator(await store.catalog());title='Geschenk zusammenstellen';description='Wähle Thurgauer Spezialitäten und stelle dein persönliches Geschenk zusammen.';}
@@ -166,7 +184,7 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
     const seasonal=pathname==='/saisonales';content=view.listing(await store.catalog(),{q,category,gifts:pathname==='/geschenkkoerbe',search:pathname==='/suche',seasonal});title=seasonal?'Saisonales':pathname==='/geschenkkoerbe'?'Geschenkkörbe aus dem Thurgau':pathname==='/suche'?'Produkte suchen':'Sortiment';
    }else if(pathname.startsWith('/produkte/')){
     const handle=decodeURIComponent(pathname.slice('/produkte/'.length));product=(await store.catalog()).find(p=>p.handle===handle);
-    if(product){content=view.productPage(product);title=product.title;description=(product.description.trim()||product.title).replace(/\s+/g,' ').slice(0,160);}
+    if(product){const selected=product.variants.find(v=>v.id.split('/').pop()===url.searchParams.get('variant'));product={...product,selectedVariantId:selected?.id};content=view.productPage(product);title=product.title;description=metaDescription(product);}
    }else if(pathname==='/kontakt'){content=view.contact();title='Kontakt & individuelle Geschenke';}
    else if(pathname==='/ueber-uns'){content=view.about();title='Über Biottos Lädeli';}
    else if(pathname==='/warenkorb'){content=view.cartPage();title='Warenkorb';}
