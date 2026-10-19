@@ -75,3 +75,9 @@ test('confirmed kilogram units survive the server boundary as Shopify checkout l
  await new Promise(r=>app.listen(0,'127.0.0.1',r));
  try{const res=await fetch('http://127.0.0.1:'+app.address().port+'/api/cart/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({variantId:product.variants[0].id,quantity:2,attributes:[{key:'Bestelleinheit',value:'wrong'}]})});assert.equal(res.status,200);assert.deepEqual(input.lines[0].attributes,[{key:'Bestelleinheit',value:'1 kg'}]);assert.equal(input.lines[0].quantity,2);}finally{app.closeAllConnections();await new Promise(r=>app.close(r));}
 });
+
+test('malformed asset path returns a client error instead of a server failure',()=>run(async({origin})=>{
+ const response=await fetch(origin+'/assets/%E0%A4%A');
+ assert.equal(response.status,400);
+ assert.ok(!(await response.text()).includes('Die Anfrage konnte nicht abgeschlossen werden'));
+}));
