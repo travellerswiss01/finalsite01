@@ -145,7 +145,7 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
    }
    if(req.method!=='GET'&&req.method!=='HEAD'){sendJson(res,405,{error:'Methode nicht erlaubt.'});return;}
    if(pathname==='/health'){sendJson(res,200,{status:'ok'});return;}
-   if(pathname==='/robots.txt'){res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8'});res.end(preview?'User-agent: *\nAllow: /\n':`User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: ${publicOrigin}/sitemap.xml\n`);return;}
+   if(pathname==='/robots.txt'){res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8'});res.end(preview?'User-agent: *\nDisallow: /\n':`User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: ${publicOrigin}/sitemap.xml\n`);return;}
    if(pathname==='/sitemap.xml'){
     // Keep information pages discoverable during an upstream outage.
     // Never invent product links: reuse only routes fetched from the real catalog.
