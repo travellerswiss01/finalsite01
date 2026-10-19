@@ -163,6 +163,7 @@ test('preview indexing protection follows the request host and does not leak to 
  const request=(host,path='/')=>new Promise((resolve,reject)=>{const req=httpRequest({hostname:'127.0.0.1',port:app.address().port,path,headers:{Host:host}},res=>{let html='';res.on('data',d=>html+=d);res.on('end',()=>resolve({headers:res.headers,html}));});req.on('error',reject);req.end();});
  try{
   const preview=await request('biottos-laedeli-pr-test.onrender.com');assert.match(preview.headers['x-robots-tag'],/noindex/);assert.equal(meta(preview.html,'robots'),'noindex');
+  const previewRobots=await request('biottos-laedeli-pr-test.onrender.com','/robots.txt');assert.match(previewRobots.html,/User-agent: \*\nDisallow: \/\n/);
   const production=await request('biottoslaedeli.ch');assert.equal(production.headers['x-robots-tag'],undefined);assert.equal(meta(production.html,'robots'),undefined);
  }finally{app.closeAllConnections();await new Promise(resolve=>app.close(resolve));}
 });
