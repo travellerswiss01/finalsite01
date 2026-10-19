@@ -192,7 +192,7 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
    else if(pathname==='/warenkorb'){content=view.cartPage();title='Warenkorb';}
    else if(pathname.startsWith('/rechtliches/')){const result=view.legal(shop,pathname.split('/').pop());if(result){content=result.content;title=result.title;description=`${result.title} – Informationen von Biottos Lädeli.`;}}
    if(!content){status=404;title='Seite nicht gefunden';content='<section class="container page-content service-error"><h1>Diese Seite wurde nicht gefunden.</h1><p>Entdecke unsere aktuellen Produkte im Sortiment.</p><a class="button" href="/sortiment">Zum Sortiment</a></section>';}
-   res.writeHead(status,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end(req.method==='HEAD'?undefined:view.shell(content,{path:pathname,title,description,product,shop,origin:publicOrigin,status,noindex}));
+   res.writeHead(status,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end(req.method==='HEAD'?undefined:view.shell(content,{path:pathname,title,description,product,shop,origin:publicOrigin,assetOrigin:requestOrigin,status,noindex}));
   }catch(err){
     const status=err instanceof StorefrontError?err.status:500;
     const error=err instanceof StorefrontError?err.message:'Die Anfrage konnte nicht abgeschlossen werden. Bitte versuche es später erneut.';

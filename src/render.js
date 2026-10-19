@@ -60,14 +60,14 @@ const pickupFaq=[
  {question:'Sind individuelle Geschenke für Firmen möglich?',answer:'Ja. Für Firmengeschenke und persönliche Geschenkharasse kannst du uns über die Kontaktseite eine Anfrage senden.'}
 ];
 const policyNames={privacyPolicy:['datenschutz','Datenschutz'],refundPolicy:['rueckgabe','Rückgabe'],termsOfService:['agb','AGB'],shippingPolicy:['versand','Versand und Abholung']};
-export function shell(content,{path='/',title='Geschenke aus dem Thurgau',description='Regionale Spezialitäten und Geschenkharassen aus dem Thurgau bei Biottos Lädeli entdecken. Abholung in Guntershausen.',origin='http://localhost:3000',product,shop,status=200,noindex=false}={}) {
+export function shell(content,{path='/',title='Geschenke aus dem Thurgau',description='Regionale Spezialitäten und Geschenkharassen aus dem Thurgau bei Biottos Lädeli entdecken. Abholung in Guntershausen.',origin='http://localhost:3000',assetOrigin=origin,product,shop,status=200,noindex=false}={}) {
  origin=new URL(origin).origin;
  const canonical=origin+(product?productUrl(product):path);
  const pageTitle=title.includes(BRAND)?title:`${title} | ${BRAND}`;
  const baseProduct=product?{'@context':'https://schema.org','@type':'Product',name:product.title,description:product.description,url:canonical,image:[...new Set([product.featuredImage?.url,...product.images.map(i=>i.url)].filter(Boolean))]}:null;
  const offer=v=>({'@type':'Offer','@id':`${canonical}#offer-${v.id.split('/').pop()}`,name:product.variants.length>1?`${product.title} · ${v.title}`:product.title,price:v.price.amount,priceCurrency:v.price.currencyCode,availability:'https://schema.org/'+(v.availableForSale?'InStock':'OutOfStock'),url:canonical+(product.variants.length>1?'?variant='+v.id.split('/').pop():'')});
  const productData=!product?null:product.variants.length===1?{...baseProduct,offers:product.variants.map(offer)}:{...baseProduct,'@type':'ProductGroup','@id':canonical+'#group',productGroupID:product.id,variesBy:['https://schema.org/size'],hasVariant:product.variants.map(v=>({'@type':'Product','@id':canonical+'#variant-'+v.id.split('/').pop(),productID:v.id,name:`${product.title} · ${v.title}`,description:product.description,size:v.title,image:[v.image?.url||product.featuredImage?.url].filter(Boolean),offers:offer(v)}))};
- const publicImage=url=>{const local=localImages[url];return local?origin+'/assets/'+local.stem+'-'+local.sizes.at(-1)+'.webp':url;};
+ const publicImage=url=>{const local=localImages[url];return local?assetOrigin+'/assets/'+local.stem+'-'+local.sizes.at(-1)+'.webp':url;};
  const mapSchemaImages=value=>{if(!value||typeof value!=='object')return;for(const [key,item] of Object.entries(value)){if(key==='image')value[key]=Array.isArray(item)?item.map(publicImage):publicImage(item);else if(Array.isArray(item))item.forEach(mapSchemaImages);else if(item&&typeof item==='object')mapSchemaImages(item);}};
  mapSchemaImages(productData);
  const imageUrl=product?.featuredImage?.url?publicImage(product.featuredImage.url):origin+'/assets/hero.jpg';
