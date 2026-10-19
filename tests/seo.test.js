@@ -115,6 +115,8 @@ test('pickup and business-gift FAQ is visible and matches its structured data',(
  }
  assert.ok(html.includes('Maischhausen'));
  assert.ok(html.includes('052 365 36 58'));
+ assert.ok(html.includes('Eine durchgehende telefonische Erreichbarkeit ist nicht zugesichert.'));
+ assert.ok(!html.includes('ist eine Ansprechperson telefonisch erreichbar'));
 }));
 
 test('temporary upload names never appear as product image alt text',()=>{
