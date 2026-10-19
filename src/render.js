@@ -56,7 +56,7 @@ function nav(path){return `<ul class="nav-list"><li><a href="/" ${path==='/'?'ar
 const pickupFaq=[
  {question:'Wo befindet sich Biottos Lädeli?',answer:`An der ${business.street} in ${business.district} (Gemeinde Aadorf), Postort ${business.postalCode} ${business.locality} im ${business.region}.`},
  {question:'Wann ist die Abholung möglich?',answer:`Montag bis Samstag von ${business.opens} bis ${business.closes} Uhr. Sonntag geschlossen.`},
- {question:'Ist Biottos Lädeli ein Selbstbedienungsladen?',answer:'Ja, du kannst vor Ort selbstständig einkaufen. Bei Fragen ist eine Ansprechperson telefonisch erreichbar.'},
+ {question:'Ist Biottos Lädeli ein Selbstbedienungsladen?',answer:'Ja, du kannst vor Ort selbstständig einkaufen. Bei Fragen kannst du uns telefonisch kontaktieren. Eine durchgehende telefonische Erreichbarkeit ist nicht zugesichert.'},
  {question:'Sind individuelle Geschenke für Firmen möglich?',answer:'Ja. Für Firmengeschenke und persönliche Geschenkharasse kannst du uns über die Kontaktseite eine Anfrage senden.'}
 ];
 const policyNames={privacyPolicy:['datenschutz','Datenschutz'],refundPolicy:['rueckgabe','Rückgabe'],termsOfService:['agb','AGB'],shippingPolicy:['versand','Versand und Abholung']};
