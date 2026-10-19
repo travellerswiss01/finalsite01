@@ -33,3 +33,8 @@ test('Shopify image revisions automatically bypass stale local derivatives',()=>
  const updated=image({url:url.replace('1791575334','9999999999')});
  assert.match(updated,/cdn.shopify.com/);assert.doesNotMatch(updated,/gift-chli-fii/);
 });
+
+test('browser module imports use the dependency content hash regardless of filename order',()=>{
+ const app=getAsset('app.js');const copy=getAsset('product-copy.js');
+ assert.ok(app.body.toString().includes('/assets/product-copy.js?v='+copy.hash));
+});

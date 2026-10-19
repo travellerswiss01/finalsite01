@@ -13,5 +13,8 @@ function register(name,body){
 const names=readdirSync(root).filter(name=>/\.(css|js|svg|webp|png|jpg|ico)$/.test(name));
 // Images first, then scripts/styles so references participate in their content hash.
 for(const name of names.filter(n=>! /\.(css|js)$/.test(n)))register(name,readFileSync(new URL(name,root)));
-for(const name of names.filter(n=>/\.(css|js)$/.test(n)))register(name,Buffer.from(versionAssets(readFileSync(new URL(name,root),'utf8'))));
+const code=names.filter(n=>/\.(css|js)$/.test(n));
+// Register modules before rewriting imports, including alphabetically later dependencies.
+for(const name of code)register(name,readFileSync(new URL(name,root)));
+for(const name of code)register(name,Buffer.from(versionAssets(readFileSync(new URL(name,root),'utf8'))));
 export const getAsset=name=>assets.get(name);
