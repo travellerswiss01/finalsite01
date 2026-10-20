@@ -15,7 +15,7 @@ function startAnalytics(){
  document.head.append(script);
 }
 function getConsent(){try{return localStorage.getItem(KEY);}catch{return null;}}
-function setConsent(value){try{localStorage.setItem(KEY,value);}catch{}if(value==='accepted')startAnalytics();render(false);}
+function setConsent(value){const wasStarted=started;try{localStorage.setItem(KEY,value);}catch{}if(value==='accepted')startAnalytics();else if(wasStarted){location.reload();return;}render(false);}
 const dialog=document.createElement('section');
 dialog.id='AnalyticsConsent';
 dialog.setAttribute('aria-label','Datenschutzeinstellungen');
