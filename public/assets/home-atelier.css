@@ -70,8 +70,7 @@
 .home-page .offer-carousel .hero-offer-image { left: 40%; width: 60%; }
 .home-page .offer-carousel .vinegar-lineup-frame { background: var(--paper); z-index: 0; }
 .home-page .vinegar-lineup,
-.home-page .vinegar-lineup-frame.has-mosti .vinegar-lineup,
-.home-page .vinegar-lineup.is-mosti-sequence {
+.home-page .vinegar-lineup-frame.has-mosti .vinegar-lineup{
   position: absolute; inset: 0;
   display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); grid-template-rows: auto;
   align-items: stretch; gap: 22px;
@@ -79,8 +78,7 @@
   overflow: visible; background: transparent;
   scroll-snap-type: none;
 }
-.home-page .vinegar-lineup-item,
-.home-page .vinegar-lineup.is-mosti-sequence .vinegar-lineup-item {
+.home-page .vinegar-lineup-item{
   position: relative; display: flex; flex-direction: column;
   container-type: normal;
   min-width: 0; min-height: 0; height: auto; width: auto; margin: 0;
@@ -99,16 +97,14 @@
 }
 .home-page .balsamico-apple .vinegar-bottle-trigger::before { background-image: url('/assets/botanical-apple.webp'); }
 .home-page .balsamico-pear .vinegar-bottle-trigger::before { background-image: url('/assets/botanical-pear.webp'); }
-.home-page .vinegar-lineup-item img,
-.home-page .vinegar-lineup.is-mosti-sequence .vinegar-lineup-item img {
+.home-page .vinegar-lineup-item img{
   position: absolute; left: 50%; top: 50%;
   height: 100%; width: auto; max-width: none;
   object-fit: contain; transform: translate(-50%,-50%);
   transform-origin: 50% 94%; filter: none;
   mix-blend-mode: multiply;
 }
-.home-page .vinegar-lineup-item .card-body,
-.home-page .vinegar-lineup.is-mosti-sequence .vinegar-lineup-item figcaption {
+.home-page .vinegar-lineup-item .card-body{
   position: static; display: flex; flex-direction: column;
   flex: 1; min-height: 0; max-height: none; overflow: visible;
   padding: 12px 0 0; margin: 0;
@@ -126,7 +122,6 @@
 .home-page .vinegar-tools { right: 12px; top: 5px; left: auto; bottom: auto; gap: 4px; }
 .home-page .vinegar-zoom { background: transparent; border: 0; font-size: 11px; padding: 0 4px; min-height: 32px; }
 .home-page .vinegar-zoom .icon { width: 15px; height: 15px; }
-.home-page .vinegar-motion, .home-page .vinegar-sound { width: 32px; height: 32px; min-height: 32px; border-color: transparent; background: transparent; }
 .home-page .mosti-domino { width: 54px; height: 62px; right: 0; bottom: 7px; top: auto; }
 .home-page .mosti-domino img { mix-blend-mode: normal; }
 .home-page .vinegar-dialog { background: var(--paper); border-radius: 8px; }
@@ -178,7 +173,7 @@
   .home-page .hero h1, .home-page .hero .hero-offer-heading { font-size: 38px; }
   .home-page .hero .hero-content .button { font-size: 14px; padding: 12px; }
   .home-page .offer-carousel .hero-offer-image { left: 36%; width: 64%; }
-  .home-page .vinegar-lineup, .home-page .vinegar-lineup-frame.has-mosti .vinegar-lineup, .home-page .vinegar-lineup.is-mosti-sequence { gap: 12px; padding: 50px 6% 40px 0; }
+  .home-page .vinegar-lineup, .home-page .vinegar-lineup-frame.has-mosti .vinegar-lineup{ gap: 12px; padding: 50px 6% 40px 0; }
   .home-page .vinegar-bottle-trigger { height: 270px; }
   .home-page .vinegar-lineup-item h3 { font-size: 19px; }
   .home-page .vinegar-lineup-item .price { font-size: 15px; }
@@ -207,7 +202,7 @@
   .home-page .hero .hero-content .button { min-height: 40px; padding: 9px 16px; font-size: 13px; }
   .home-page .offer-carousel .hero-offer-image { left: 0; width: 100%; top: 160px; bottom: 55px; height: auto; }
   .home-page .offer-carousel .vinegar-lineup-frame { top: 160px; bottom: 55px; }
-  .home-page .vinegar-lineup, .home-page .vinegar-lineup-frame.has-mosti .vinegar-lineup, .home-page .vinegar-lineup.is-mosti-sequence {
+  .home-page .vinegar-lineup, .home-page .vinegar-lineup-frame.has-mosti .vinegar-lineup{
     inset: 0; height: auto; padding: 12px 5% 10px; gap: 14px;
     grid-template-columns: repeat(2,minmax(0,1fr)); grid-template-rows: auto;
     overflow: visible;

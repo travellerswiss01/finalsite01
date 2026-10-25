@@ -14,7 +14,7 @@ Die freigegebene Gestaltung stellt Apfelbalsamico und Birnen-Balsamico im vorhan
 
 ## Funktionsschutz
 
-`src/server.js`, `src/storefront.js`, `src/queries.js`, `public/assets/app.js`, `public/assets/imagefilm.js` und `public/assets/most-gallery.js` sind unverändert. Bestehende Produktformulare, Attribute und Event-Handler werden wiederverwendet. Alle fünf Karussellansichten, Mosti, Etikettenansicht, Suche, Navigation, Film und Kaufwege bleiben erhalten. Die neuen Styles werden ausschliesslich auf der Startseite geladen.
+`src/server.js`, `src/storefront.js`, `src/queries.js`, `public/assets/imagefilm.js` und `public/assets/most-gallery.js` sind unverändert. Bestehende Produktformulare, Attribute und Event-Handler werden wiederverwendet. Alle fünf Karussellansichten, Mosti, Etikettenansicht, Suche, Navigation, Film und Kaufwege bleiben erhalten. Die neuen Styles werden ausschliesslich auf der Startseite geladen.
 
 Die redaktionelle Karussell-Auswahl und ihre Etikettenübersicht enthalten jetzt die zwei freigegebenen Balsamicos statt der veralteten sieben Sorten. Das ist keine Änderung oder Löschung von Shopify-Produkten.
 
@@ -43,3 +43,7 @@ Die isolierte Browserumgebung kann Shopify-Bildadressen nicht direkt abrufen. F�
 ![Desktop](home-desktop.png)
 
 ![Mobil](home-mobile.png)
+
+## Mosti auf ausdrücklichen Wunsch vereinfacht
+
+Die Flaschenanimation, ihre Hover-Auslöser, Zirkusabläufe, Musik und Ton-/Bewegungsschalter wurden entfernt. Mosti wechselt nur nach Klick oder Tastaturaktivierung für 700 ms zum Zwinkerbild. Produktlinks, Kaufwege, Etikettenansicht und Karussellsteuerung bleiben erhalten.
