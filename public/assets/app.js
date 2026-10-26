@@ -37,12 +37,13 @@ if(giftForm){
  const giftTotal=giftForm.querySelector('[data-gift-total]');
  const giftSubmit=giftForm.querySelector('[data-gift-submit]');
  const giftError=giftForm.querySelector('[data-gift-error]');
+ const giftSelection=giftForm.querySelector('[data-gift-selection]');
  const giftMessage=document.querySelector('[data-gift-message]');
  const giftMessageCount=document.querySelector('[data-gift-message-count]');
  const selectedVariant=item=>{const control=item.querySelector('[data-gift-variant]');return control.tagName==='SELECT'?control.selectedOptions[0]:control;};
  const updateGiftBuilder=()=>{
   const query=(giftSearch?.value||'').trim().toLocaleLowerCase('de');
-  let chosen=0,total=0;
+  let chosen=0,total=0;const selection=[];
   for(const item of giftItems){
    item.hidden=Boolean(query&&!item.dataset.giftSearch.includes(query));
    const checkbox=item.querySelector('[data-gift-select]');
@@ -55,9 +56,14 @@ if(giftForm){
     const variant=selectedVariant(item);
     if(control.tagName==='INPUT'){control.dataset.price=variant.dataset.price;control.dataset.currency=variant.dataset.currency;}
     item.querySelector('[data-gift-price]').textContent=money({amount:variant.dataset.price,currencyCode:variant.dataset.currency});
-    total+=Number(variant.dataset.price)*Number(quantity.value||1);
+    const lineTotal=Number(variant.dataset.price)*Number(quantity.value||1);
+    total+=lineTotal;
+    const title=item.querySelector('h2').textContent.trim();
+    const size=control.tagName==='SELECT'?variant.textContent.split(' · CHF')[0]:'';
+    selection.push(`<li><span><strong>${escape(title)}</strong><small>${escape(quantity.value||'1')} × ${escape(size||'Stück')}</small></span><span>${money({amount:lineTotal,currencyCode:'CHF'})}</span></li>`);
    }
   }
+  if(giftSelection)giftSelection.innerHTML=selection.join('')||'<li class="gift-selection-empty">Wähle deine Lieblingsprodukte aus.</li>';
   giftCount.textContent=`${chosen} ${chosen===1?'Produkt':'Produkte'} ausgewählt`;
   giftTotal.textContent=money({amount:total,currencyCode:'CHF'});
   giftSubmit.disabled=chosen===0||busy;
@@ -171,7 +177,7 @@ if(offerCarousel){
  const start=()=>{
   stop();
   if(slides.length>1&&!paused&&!hovered&&!document.hidden&&!vinegarDialog?.open&&!mostDialog.open&&!document.activeElement?.matches?.(':focus-visible')){
-   timer=window.setInterval(()=>show(current+1),6000);
+   timer=window.setInterval(()=>show(current+1),10000);
   }
  };
  const formatMostPrice=value=>money(value);
