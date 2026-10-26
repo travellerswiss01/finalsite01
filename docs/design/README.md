@@ -51,3 +51,9 @@ Die Flaschenanimation, ihre Hover-Auslöser, Zirkusabläufe, Musik und Ton-/Bewe
 ## Freigegebene Produktrotation
 
 Das bestehende Karussell erhält zusätzliche Ansichten mit maximal zwei verfügbaren Shopprodukten mit Originalfoto. Bereits separat gezeigte Balsamicos, Süssmost und Geschenkkörbe werden dort nicht doppelt angezeigt. Saisonale Produkte behalten ihre Kategorie; mehr als zwei erhalten weitere Saisonansichten. Die Anzahl und Beschriftung der Folien folgt dem Shopify-Katalog. Kauf- und Variantenhandler bleiben unverändert; die neuen Produktansichten nutzen ihre bestehenden Klassen und Attribute. Pfeile, Pausieren und reduzierte Bewegung gelten weiterhin für alle Ansichten. Bei ungerader Produktzahl erscheint das letzte Produkt allein.
+
+## Freigegebene Kaufgestaltung und Bildkorrekturen
+
+Kaufbuttons sind einheitlich dunkelgrün, die Produktrotation verwendet «In den Warenkorb». Informationslinks im Startseiten-Karussell und beim Konfigurator-Einstieg erscheinen unterstrichen. Produktseiten erhalten die freigegebenen Hinweise zum Warenkorb und warme Typografie/Farben; alle bestehenden Felder, Formulare und Handler bleiben erhalten. Auch Konfigurator-Kaufbutton und Warenkorb-Checkout verwenden Grün.
+
+Lucia und Firmengeschenk erhalten grössere, zentrierte Bildausschnitte. Die Süssmost-Gebinde erscheinen als CSS-Ausschnitte des unveränderten Originalbildes auf ihren bestehenden Klickflächen. Alle drei Grössen öffnen weiterhin ihre passende Kaufansicht. Detaillierte SVG-Silhouetten maskieren nur den Hintergrund der unveränderten Balsamico-Fotos, einschliesslich der bei Variantenwechsel geladenen Shopify-Originale. Etiketten bleiben deckend. Es wurden keine Produktfotos, Logos oder Etiketten generiert oder ersetzt.

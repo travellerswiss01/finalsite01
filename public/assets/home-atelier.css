@@ -265,12 +265,6 @@
 }
 /* Clip only the surrounding photographic paper; never blend botanical ink through a label. */
 .home-page .vinegar-lineup-item img { mix-blend-mode: normal; }
-.home-page .vinegar-lineup-item img[src="/assets/balsamico-apfel.webp"] {
-  clip-path: polygon(20% 0,82% 0,83% 17%,79% 19%,79% 26%,87% 30%,97% 33%,98% 95%,94% 99%,6% 99%,2% 95%,3% 33%,13% 30%,23% 26%,23% 19%,19% 17%);
-}
-.home-page .vinegar-lineup-item img[src="/assets/balsamico-birne.webp"] {
-  clip-path: polygon(18% 0,84% 0,84% 18%,80% 20%,80% 27%,88% 31%,97% 35%,97% 96%,93% 99%,7% 99%,3% 96%,3% 35%,12% 31%,23% 27%,23% 20%,18% 18%);
-}
 .home-page .offer-carousel, .home-page .offer-carousel:has(.vinegar-lineup-frame.is-active) { min-height: 520px; }
 .home-page .imagefilm.container { border-radius: 0; padding: 38px 0 0; background: transparent; border: 0; border-top: 1px solid var(--rule); color: var(--green); box-shadow: none; }
 .home-page .imagefilm-copy h2 { color: var(--green); }
@@ -290,11 +284,9 @@
    Crop their photographic margins in CSS as well, keeping original label pixels opaque. */
 .home-page .balsamico-apple .product-image img[src*="1000007749"] {
   height: 109.7%; top: 52.1%;
-  clip-path: polygon(41.7% 2.5%,58.4% 2.5%,58.5% 18%,57.5% 19%,57.5% 26%,60% 29%,62.5% 33%,62.5% 91%,61% 94%,39% 94%,37.4% 91%,37.4% 33%,40% 29%,42.5% 26%,42.5% 19%,41.7% 18%);
 }
 .home-page .balsamico-pear .product-image img[src*="1000007619"] {
   height: 125.6%; top: 50.2%;
-  clip-path: polygon(40.5% 9.8%,56.5% 9.8%,56.5% 23%,55% 24%,55% 30%,58% 33%,59.5% 36%,59.5% 87%,58% 90%,39% 90%,37.5% 87%,37.5% 36%,40% 33%,42% 30%,42% 24%,40.5% 23%);
 }
 /* Keep Mosti in the control gutter, clear of both mobile purchase buttons. */
 @media (max-width: 599px) {
@@ -343,3 +335,61 @@
 .home-page .seasonal-offer-card.product-card{min-height:0}
 .home-page .seasonal-offer-image.product-image{aspect-ratio:auto}
 .home-page .seasonal-offer-card .product-form select{width:100%;min-width:0;font-size:13px;padding:8px 5px;min-height:40px;margin-bottom:8px}
+/* Give the three original hero photographs a consistent visual weight. */
+.home-page .offer-carousel .lucia-offer-banner{
+ left:42%;width:55%;top:30px;bottom:30px;height:calc(100% - 60px);
+ object-fit:cover;object-position:52% center;background:var(--paper)
+}
+.home-page .offer-carousel .product-offer-banner{
+ left:50%;width:38%;top:25px;bottom:25px;height:calc(100% - 50px);
+ object-fit:cover;object-position:center 74%;background:var(--paper)
+}
+/* Render the intact original trio as three CSS crops on its existing click targets. */
+.home-page .offer-carousel .hero-image.most-trio-banner{
+ left:41%;width:57%;top:30px;bottom:30px;height:calc(100% - 60px);padding:0
+}
+.home-page .offer-carousel .most-trio-art{opacity:0}
+.home-page .offer-carousel .most-size-hotspot{top:12%;height:82%}
+.home-page .offer-carousel .most-size-3{left:6%;width:26%}
+.home-page .offer-carousel .most-size-5{left:35%;width:26%}
+.home-page .offer-carousel .most-size-10{left:64%;width:31%}
+.home-page .offer-carousel .most-size-hotspot::before{
+ content:"";position:absolute;inset:0;pointer-events:none;
+ background-image:url('/assets/suessmost-trio.webp?v=spaced-2');background-repeat:no-repeat;
+ background-size:500% auto;background-position:left center
+}
+.home-page .offer-carousel .most-size-5::before{background-position:center}
+.home-page .offer-carousel .most-size-10::before{background-size:420% auto;background-position:right center}
+.home-page .offer-carousel .most-trio-hint{top:4px}
+@media(max-width:899px) and (min-width:600px){
+ .home-page .offer-carousel .lucia-offer-banner{left:45%;width:53%;top:30px;bottom:30px;height:calc(100% - 60px)}
+ .home-page .offer-carousel .product-offer-banner{left:44%;width:54%;top:25px;bottom:25px;height:calc(100% - 50px)}
+ .home-page .offer-carousel .hero-image.most-trio-banner{left:43%;width:55%}
+ .home-page .offer-carousel .most-trio-hint{white-space:normal;text-align:center;width:90%}
+}
+@media(max-width:599px){
+ .home-page .offer-carousel .lucia-offer-banner{
+  left:5%;width:90%;top:180px;bottom:65px;height:calc(100% - 245px);object-position:50% center
+ }
+ .home-page .offer-carousel .product-offer-banner{
+  left:5%;width:90%;top:180px;bottom:65px;height:calc(100% - 245px);object-fit:contain;object-position:center
+ }
+ .home-page .offer-carousel .hero-image.most-trio-banner{
+  left:2%;width:96%;top:190px;bottom:65px;height:calc(100% - 255px)
+ }
+ .home-page .offer-carousel .most-size-hotspot{top:5%;height:90%}
+}
+
+/* Detailed vector silhouettes retain the original photographs and opaque labels. */
+.home-page .vinegar-lineup-item img{clip-path:none;mask-size:100% 100%;mask-repeat:no-repeat;-webkit-mask-size:100% 100%;-webkit-mask-repeat:no-repeat}
+.home-page .balsamico-apple img{mask-image:url('/assets/balsamico-apple-mask.svg');-webkit-mask-image:url('/assets/balsamico-apple-mask.svg')}
+.home-page .balsamico-pear img{mask-image:url('/assets/balsamico-pear-mask.svg');-webkit-mask-image:url('/assets/balsamico-pear-mask.svg')}
+.home-page .balsamico-apple img[src*="1000007749"]{mask-image:url('/assets/balsamico-apple-original-mask.svg');-webkit-mask-image:url('/assets/balsamico-apple-original-mask.svg')}
+.home-page .balsamico-pear img[src*="1000007619"]{mask-image:url('/assets/balsamico-pear-original-mask.svg');-webkit-mask-image:url('/assets/balsamico-pear-original-mask.svg')}
+/* Mobile photographs need no left-hand text fade. */
+@media(max-width:599px){
+ .home-page .offer-carousel:has(.lucia-offer-banner.is-active):before,
+ .home-page .offer-carousel:has(.product-offer-banner.is-active):before{background:none}
+}
+
+.home-page .balsamico-pear img[src*="1000006936"]{height:106%;top:51.2%;mask-image:url('/assets/balsamico-pear-250-mask.svg');-webkit-mask-image:url('/assets/balsamico-pear-250-mask.svg')}
