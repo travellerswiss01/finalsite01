@@ -17,7 +17,8 @@ test('the approved carousel features both Balsamicos with direct product links a
   assert.match(html,new RegExp(`id="Variant-${handle}-hero" data-variant-select`));
  }
  assert.equal((html.match(/data-vinegar-bottle/g)||[]).length,2);
- assert.equal((html.match(/action="\/api\/cart\/add"/g)||[]).length,2);
+ const balsamicoPanel=html.split('vinegar-lineup-frame')[1].split('vinegar-tools')[0];
+ assert.equal((balsamicoPanel.match(/action="\/api\/cart\/add"/g)||[]).length,2);
  assert.doesNotMatch(html,/Holunderblütenessig|Himbeeressig|Kirschessig|Kirschen-Birnen-Essig|Birnenessig/);
  assert.match(html,/balsamico-apfel.webp/);assert.match(html,/balsamico-birne.webp/);
 });

@@ -14,7 +14,7 @@ Die freigegebene Gestaltung stellt Apfelbalsamico und Birnen-Balsamico im vorhan
 
 ## Funktionsschutz
 
-`src/server.js`, `src/storefront.js`, `src/queries.js`, `public/assets/imagefilm.js` und `public/assets/most-gallery.js` sind unverändert. Bestehende Produktformulare, Attribute und Event-Handler werden wiederverwendet. Alle fünf Karussellansichten, Mosti, Etikettenansicht, Suche, Navigation, Film und Kaufwege bleiben erhalten. Die neuen Styles werden ausschliesslich auf der Startseite geladen.
+`src/server.js`, `src/storefront.js`, `src/queries.js`, `public/assets/imagefilm.js` und `public/assets/most-gallery.js` sind unverändert. Bestehende Produktformulare, Attribute und Event-Handler werden wiederverwendet. Alle fünf bisherigen Karussellansichten, Mosti, Etikettenansicht, Suche, Navigation, Film und Kaufwege bleiben erhalten. Die neuen Styles werden ausschliesslich auf der Startseite geladen.
 
 Die redaktionelle Karussell-Auswahl und ihre Etikettenübersicht enthalten jetzt die zwei freigegebenen Balsamicos statt der veralteten sieben Sorten. Das ist keine Änderung oder Löschung von Shopify-Produkten.
 
@@ -47,3 +47,7 @@ Die isolierte Browserumgebung kann Shopify-Bildadressen nicht direkt abrufen. F�
 ## Mosti auf ausdrücklichen Wunsch vereinfacht
 
 Die Flaschenanimation, ihre Hover-Auslöser, Zirkusabläufe, Musik und Ton-/Bewegungsschalter wurden entfernt. Mosti wechselt nur nach Klick oder Tastaturaktivierung für 700 ms zum Zwinkerbild. Produktlinks, Kaufwege, Etikettenansicht und Karussellsteuerung bleiben erhalten.
+
+## Freigegebene Produktrotation
+
+Das bestehende Karussell erhält zusätzliche Ansichten mit maximal zwei verfügbaren Shopprodukten mit Originalfoto. Bereits separat gezeigte Balsamicos, Süssmost und Geschenkkörbe werden dort nicht doppelt angezeigt. Saisonale Produkte behalten ihre Kategorie; mehr als zwei erhalten weitere Saisonansichten. Die Anzahl und Beschriftung der Folien folgt dem Shopify-Katalog. Kauf- und Variantenhandler bleiben unverändert; die neuen Produktansichten nutzen ihre bestehenden Klassen und Attribute. Pfeile, Pausieren und reduzierte Bewegung gelten weiterhin für alle Ansichten. Bei ungerader Produktzahl erscheint das letzte Produkt allein.

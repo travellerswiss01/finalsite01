@@ -338,3 +338,8 @@
 @media(max-width:899px){
  .home-page .offer-carousel:has(.seasonal-offer-products.is-active) .hero-offer-controls{top:auto;bottom:9px}
 }
+
+/* Reuse existing variant and image hooks without inheriting catalog card dimensions. */
+.home-page .seasonal-offer-card.product-card{min-height:0}
+.home-page .seasonal-offer-image.product-image{aspect-ratio:auto}
+.home-page .seasonal-offer-card .product-form select{width:100%;min-width:0;font-size:13px;padding:8px 5px;min-height:40px;margin-bottom:8px}
