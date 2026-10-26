@@ -78,7 +78,7 @@ export function discoverGallery(products){
  products=products.filter(p=>p.variants?.length);
  const most=products.find(p=>/s[üu]ssmost|apfelmost/i.test(p.title));
  const vinegar=products.find(p=>p.handle==='birnen-balsamico');
- const apple=products.find(p=>p.handle==='apfelessig-33-sorten');
+ const apple=products.find(p=>['apfelessig-33-sorten','apfelessig'].includes(p.handle));
  const purchase=(product,asset,label,href,index)=>`<div class="discover-product"><img src="/assets/${asset}" width="80" height="100" loading="lazy" alt="${escape(label)}"><div><h3><a href="${product?productUrl(product):href}">${escape(product?.title||label)}</a></h3>${product?`<p data-price>Ab ${money(lowestPrice(product))}</p>`:''}<a class="discover-product-link" href="${product?productUrl(product):href}">${product?'Produkt ansehen':'Entdecken'} ${icon('arrow')}</a></div>${product?buyForm(product,{idSuffix:`-discover-${index}`}):''}</div>`;
  const cards=[
  {title:'Vom Apfel zum Most',asset:'imagefilm-poster.webp',label:'Süssmost',product:most,thumb:'suessmost-3-liter.webp',href:'/sortiment?kategorie=S%C3%A4fte',film:true},
