@@ -1,0 +1,395 @@
+@font-face { font-family: 'Atelier Serif'; src: url('/assets/fraunces-500.ttf') format('truetype'); font-weight: 500 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Atelier Sans'; src: url('/assets/dm-sans-400.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Atelier Sans'; src: url('/assets/dm-sans-500.ttf') format('truetype'); font-weight: 500 700; font-style: normal; font-display: swap; }
+/* Approved botanical homepage. All selectors stay scoped to this route. */
+.home-page {
+  --green: #173d29;
+  --red: #4a6b4a;
+  --red-hover: #365436;
+  --heading-font: 'Atelier Serif', Georgia, serif;
+  --body-font: 'Atelier Sans', Arial, sans-serif;
+  --paper: #faf9f6;
+  --rule: #dddccf;
+  color: #2c2c2c;
+  background: var(--paper);
+}
+.home-page h1, .home-page h2, .home-page h3 { font-weight: 500; }
+.home-page .button {
+  gap: 10px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  min-height: 44px;
+  transition: background .2s ease, transform .2s ease;
+}
+.home-page .button .icon { width: 20px; height: 20px; }
+.home-page :focus-visible { outline: 3px solid #996623; outline-offset: 4px; }
+.home-page .announcement { min-height: 35px; height: 35px; padding-block: 6px; font-size: 13px; background: #244c34; }
+.home-page .announcement .icon { width: 17px; height: 17px; }
+.home-page .header { min-height: 82px; height: 90px; padding: 12px 3.4%; gap: 20px; border-bottom: 1px solid #e8e6de; }
+.home-page .brand img.bundled-logo { width: clamp(220px,23vw,340px); height: 58px; }
+.home-page .nav-list { gap: clamp(14px,1.65vw,27px); font-size: 15px; }
+.home-page .nav-list a { padding-block: 12px; }
+.home-page .nav-list [aria-current=page]:after { height: 2px; background: #b18a4c; }
+.home-page .header-actions { gap: 10px; }
+.home-page .header-actions .icon { width: 29px; height: 29px; }
+.home-page .cart-count { width: 23px; min-width: 23px; height: 23px; font-size: 12px; top: -2px; right: -3px; background: #8b6027; }
+.home-page .dropdown { border: 1px solid var(--rule); border-radius: 4px; padding: 10px 20px; box-shadow: 0 10px 24px #173d2910; }
+.home-page .offer-carousel,
+.home-page .offer-carousel:has(.vinegar-lineup-frame.is-active) {
+  min-height: 490px;
+  background: var(--paper);
+  --vinegar-backdrop: var(--paper);
+}
+.home-page .hero:before { background: linear-gradient(90deg,var(--paper) 0%,#faf9f6e8 31%,#faf9f600 65%); }
+.home-page .offer-carousel:has(.vinegar-lineup-frame.is-active):before { background: var(--paper); }
+.home-page .offer-carousel .hero-content {
+  width: 40%;
+  max-width: none;
+  padding: 95px 16px 90px 4%;
+}
+.home-page .hero h1,
+.home-page .hero .hero-offer-heading {
+  font-size: clamp(38px,4.25vw,66px);
+  letter-spacing: -.045em;
+  line-height: 1.04;
+  margin: 0 0 25px;
+}
+.home-page .hero-offer { transform: translateY(8px); transition: opacity .65s ease, transform .65s ease; }
+.home-page .hero-offer.is-active { transform: translateY(0); }
+.home-page .hero-offer:not(:first-child) { inset: 0; }
+.home-page .hero .hero-content .button { padding: 13px 21px; font-size: 16px; }
+.home-page .hero-offer-controls,
+.home-page .offer-carousel:has(.most-trio-banner.is-active) .hero-offer-controls,
+.home-page .offer-carousel:has(.seasonal-offer-products.is-active) .hero-offer-controls {
+  left: 4%; right: auto; bottom: 46px;
+  gap: 8px; border: 0; background: transparent; box-shadow: none;
+}
+.home-page .hero-offer-controls button { width: 44px; height: 44px; border-radius: 50%; background: #fffdf9; border: 1px solid #deded2; }
+.home-page .hero-offer-controls button:hover { background: #e9eee5; }
+.home-page .offer-carousel .hero-offer-image { left: 40%; width: 60%; }
+.home-page .offer-carousel .vinegar-lineup-frame { background: var(--paper); z-index: 0; }
+.home-page .vinegar-lineup,
+.home-page .vinegar-lineup-frame.has-mosti .vinegar-lineup{
+  position: absolute; inset: 0;
+  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); grid-template-rows: auto;
+  align-items: stretch; gap: 22px;
+  height: auto; padding: 40px 5.5% 28px 0;
+  overflow: visible; background: transparent;
+  scroll-snap-type: none;
+}
+.home-page .vinegar-lineup-item{
+  position: relative; display: flex; flex-direction: column;
+  container-type: normal;
+  min-width: 0; min-height: 0; height: auto; width: auto; margin: 0;
+  border: 0; border-radius: 0; box-shadow: none; background: transparent;
+  overflow: visible;
+}
+.home-page .vinegar-bottle-trigger {
+  position: relative; inset: auto;
+  display: block; height: 270px; aspect-ratio: auto;
+  overflow: visible; isolation: isolate; border-radius: 0;
+}
+.home-page .vinegar-bottle-trigger::before {
+  content: ''; position: absolute; inset: -20px -18px -4px; z-index: -1;
+  background-position: center; background-size: contain; background-repeat: no-repeat;
+  pointer-events: none; opacity: .65;
+}
+.home-page .balsamico-apple .vinegar-bottle-trigger::before { background-image: url('/assets/botanical-apple.webp'); }
+.home-page .balsamico-pear .vinegar-bottle-trigger::before { background-image: url('/assets/botanical-pear.webp'); }
+.home-page .vinegar-lineup-item img{
+  position: absolute; left: 50%; top: 50%;
+  height: 100%; width: auto; max-width: none;
+  object-fit: contain; transform: translate(-50%,-50%);
+  transform-origin: 50% 94%; filter: none;
+  mix-blend-mode: multiply;
+}
+.home-page .vinegar-lineup-item .card-body{
+  position: static; display: flex; flex-direction: column;
+  flex: 1; min-height: 0; max-height: none; overflow: visible;
+  padding: 12px 0 0; margin: 0;
+  border: 0; border-radius: 0; box-shadow: none; background: transparent;
+  color: var(--green); text-align: center;
+  font: inherit; line-height: 1.4;
+}
+.home-page .vinegar-lineup-item h3 { font-size: clamp(20px,1.7vw,28px); letter-spacing: -.025em; margin: 0 0 5px; line-height: 1.15; }
+.home-page .vinegar-lineup-item .price { font-size: 17px; font-weight: 500; margin: 0 0 8px; }
+.home-page .vinegar-lineup-item .product-form { margin: auto 0 0; padding: 0; }
+.home-page .vinegar-lineup-item .variant-label { margin: 0 0 3px; font-size: 12px; font-weight: 400; text-align: left; color: #52604c; }
+.home-page .vinegar-lineup-item select { min-height: 38px; font-size: 13px; padding: 6px 8px; border: 1px solid #c9cfc3; background: #fffdf9; margin: 0 0 8px; }
+.home-page .vinegar-lineup-item .button { width: 100%; font-size: 14px; padding: 10px; }
+.home-page .vinegar-lineup-item .form-error { font-size: 13px; text-align: left; line-height: 1.4; }
+.home-page .vinegar-tools { right: 12px; top: 5px; left: auto; bottom: auto; gap: 4px; }
+.home-page .vinegar-zoom { background: transparent; border: 0; font-size: 11px; padding: 0 4px; min-height: 32px; }
+.home-page .vinegar-zoom .icon { width: 15px; height: 15px; }
+.home-page .mosti-domino { width: 54px; height: 62px; right: 0; bottom: 7px; top: auto; }
+.home-page .mosti-domino img { mix-blend-mode: normal; }
+.home-page .vinegar-dialog { background: var(--paper); border-radius: 8px; }
+.home-page .vinegar-detail-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.home-page .vinegar-detail-grid img { width: auto; max-width: 100%; height: 400px; margin-inline: auto; object-fit: contain; mix-blend-mode: multiply; }
+.home-page .vinegar-detail-grid figcaption { font-family: var(--heading-font); font-size: 22px; }
+.home-page .featured.container { width: 92%; max-width: 1544px; padding: 22px 0 38px; border-top: 1px solid var(--rule); }
+.home-page .featured .product-grid { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 0; }
+.home-page .featured .product-card { min-height: 0; border: 0; border-right: 1px solid var(--rule); border-radius: 0; background: transparent; box-shadow: none; padding: 0 20px; }
+.home-page .featured .product-card:first-child { padding-left: 0; }
+.home-page .featured .product-card:last-child { padding-right: 0; border-right: 0; }
+.home-page .featured .product-image,
+.home-page .featured .gift-image-premium { aspect-ratio: 1.65; background: transparent; overflow: hidden; border-radius: 0; }
+.home-page .featured .product-image img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+.home-page .featured .card-body { padding: 12px 0 0; text-align: center; background: transparent; align-items: stretch; }
+.home-page .featured .card-body h2 { font-size: clamp(20px,1.7vw,27px); letter-spacing: -.025em; line-height: 1.12; margin: 0 0 6px; white-space: normal; }
+.home-page .featured .card-body p { font-size: 14px; margin: 0 0 5px; line-height: 1.45; }
+.home-page .featured .card-body .price { margin: 0 0 12px; font-size: 16px; }
+.home-page .featured .product-form, .home-page .featured .card-body>.button { margin-top: auto; padding-top: 0; }
+.home-page .featured .button { width: 100%; padding: 11px 8px; font-size: 14px; }
+.home-page .gift-image-premium::before, .home-page .gift-image-premium::after { content: none; animation: none; }
+.home-page .gift-image-premium .icon { width: 68px; height: 68px; filter: none; stroke-width: 1.25; }
+.home-page .gift-kicker { color: #63735b; font-size: 9px; letter-spacing: .13em; }
+.home-page .inquiry-card .gift-description { font-size: 13px; max-width: 28ch; margin: 3px auto 14px; }
+.home-page .imagefilm.container { width: 92%; margin-block: 25px 60px; border-top: 1px solid var(--rule); padding-top: 38px; }
+.home-page .imagefilm-media { border-radius: 6px; box-shadow: none; }
+.home-page .imagefilm-shop { border-radius: 0; box-shadow: none; background: transparent; border-color: var(--rule); }
+.home-page .footer.container { width: 92%; color: #52604c; }
+.home-page .cart-drawer { background: var(--paper); }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .home-page .button:hover { transform: translateY(-4px); }
+}
+@media (min-width: 1600px) {
+  .home-page .offer-carousel, .home-page .offer-carousel:has(.vinegar-lineup-frame.is-active) { min-height: 540px; }
+  .home-page .vinegar-bottle-trigger { height: 310px; }
+  .home-page .vinegar-lineup { padding-top: 45px; }
+}
+@media (min-width: 900px) and (max-width: 1199px) {
+  .home-page .header { height: 82px; }
+  .home-page .hero .hero-offer-heading, .home-page .hero h1 { font-size: 44px; }
+  .home-page .vinegar-lineup { gap: 15px; padding-right: 6%; }
+  .home-page .vinegar-lineup-item h3 { font-size: 21px; }
+}
+@media (max-width: 899px) {
+  .home-page .header { height: 76px; padding: 10px 4%; gap: 6px; }
+  .home-page .brand img.bundled-logo { width: clamp(155px,30vw,230px); height: 43px; }
+  .home-page .offer-carousel, .home-page .offer-carousel:has(.vinegar-lineup-frame.is-active) { min-height: 520px; }
+  .home-page .offer-carousel .hero-content { width: 36%; padding: 100px 8px 100px 4%; }
+  .home-page .hero h1, .home-page .hero .hero-offer-heading { font-size: 38px; }
+  .home-page .hero .hero-content .button { font-size: 14px; padding: 12px; }
+  .home-page .offer-carousel .hero-offer-image { left: 36%; width: 64%; }
+  .home-page .vinegar-lineup, .home-page .vinegar-lineup-frame.has-mosti .vinegar-lineup{ gap: 12px; padding: 50px 6% 40px 0; }
+  .home-page .vinegar-bottle-trigger { height: 270px; }
+  .home-page .vinegar-lineup-item h3 { font-size: 19px; }
+  .home-page .vinegar-lineup-item .price { font-size: 15px; }
+  .home-page .vinegar-lineup-item .button { font-size: 12px; gap: 5px; }
+  .home-page .vinegar-lineup-item .button .icon { width: 16px; height: 16px; }
+  .home-page .featured .product-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 26px 0; }
+  .home-page .featured .product-card { padding-inline: 16px; }
+  .home-page .featured .product-card:nth-child(odd) { padding-left: 0; }
+  .home-page .featured .product-card:nth-child(even) { padding-right: 0; border-right: 0; }
+}
+@media (max-width: 599px) {
+  .home-page .announcement { height: 30px; min-height: 30px; font-size: 11px; }
+  .home-page .header { height: 69px; min-height: 69px; }
+  .home-page .brand { margin-right: auto; }
+  .home-page .brand img.bundled-logo { width: clamp(145px,43vw,210px); height: 36px; }
+  .home-page .mobile-nav { order: -1; }
+  .home-page .mobile-nav>summary { min-width: 36px; width: 36px; font-size: 24px; }
+  .home-page .header-actions { gap: 0; }
+  .home-page .header-actions .icon { width: 25px; height: 25px; }
+  .home-page .icon-link { min-width: 38px; }
+  .home-page .mobile-nav>.nav-list { display: block; padding: 15px 6%; }
+  .home-page .mobile-nav .dropdown { box-shadow: none; }
+  .home-page .offer-carousel, .home-page .offer-carousel:has(.vinegar-lineup-frame.is-active) { min-height: 590px; }
+  .home-page .offer-carousel .hero-content { width: 100%; max-width: none; padding: 22px 5% 0; text-align: center; }
+  .home-page .hero h1, .home-page .hero .hero-offer-heading { font-size: clamp(32px,8.5vw,46px); line-height: 1.02; letter-spacing: -.035em; margin-bottom: 13px; }
+  .home-page .hero .hero-content .button { min-height: 40px; padding: 9px 16px; font-size: 13px; }
+  .home-page .offer-carousel .hero-offer-image { left: 0; width: 100%; top: 160px; bottom: 55px; height: auto; }
+  .home-page .offer-carousel .vinegar-lineup-frame { top: 160px; bottom: 55px; }
+  .home-page .vinegar-lineup, .home-page .vinegar-lineup-frame.has-mosti .vinegar-lineup{
+    inset: 0; height: auto; padding: 12px 5% 10px; gap: 14px;
+    grid-template-columns: repeat(2,minmax(0,1fr)); grid-template-rows: auto;
+    overflow: visible;
+  }
+  .home-page .vinegar-bottle-trigger { height: 210px; }
+  .home-page .vinegar-bottle-trigger::before { inset: -8px -10px 0; opacity: .6; }
+  .home-page .vinegar-lineup-item h3 { font-size: clamp(17px,4.65vw,24px); line-height: 1.16; }
+  .home-page .vinegar-lineup-item .price { font-size: 14px; margin-bottom: 6px; }
+  .home-page .vinegar-lineup-item .variant-label { font-size: 11px; }
+  .home-page .vinegar-lineup-item select { font-size: 12px; min-height: 37px; padding-inline: 5px; }
+  .home-page .vinegar-lineup-item .button { min-height: 44px; font-size: 12px; padding: 9px 5px; }
+  .home-page .vinegar-lineup-item .card-body { padding-top: 9px; }
+  .home-page .vinegar-tools { top: auto; right: 5%; bottom: -40px; left: auto; }
+  .home-page .vinegar-tools .vinegar-zoom { width: auto; padding: 0 4px; min-height: 35px; }
+  .home-page .vinegar-tools .vinegar-zoom span { display: inline; font-size: 10px; }
+  .home-page .hero-offer-controls,
+  .home-page .offer-carousel:has(.most-trio-banner.is-active) .hero-offer-controls,
+  .home-page .offer-carousel:has(.seasonal-offer-products.is-active) .hero-offer-controls { left: 5%; right: auto; bottom: 9px; gap: 4px; }
+  .home-page .hero-offer-controls button { width: 40px; height: 40px; min-width: 40px; min-height: 40px; }
+  .home-page .mosti-domino { width: 38px; height: 42px; bottom: 0; right: 0; top: auto; }
+  .home-page .featured.container { padding-top: 20px; padding-bottom: 25px; }
+  .home-page .featured .product-grid { gap: 25px 0; }
+  .home-page .featured .product-card { padding-inline: 11px; }
+  .home-page .featured .product-image, .home-page .featured .gift-image-premium { aspect-ratio: 1.18; }
+  .home-page .featured .card-body h2 { font-size: clamp(18px,4.8vw,23px); }
+  .home-page .featured .card-body p { font-size: 12px; }
+  .home-page .featured .card-body .price { font-size: 14px; margin-bottom: 10px; }
+  .home-page .featured .button { font-size: 12px; gap: 5px; min-height: 44px; }
+  .home-page .featured .button .icon { width: 16px; height: 16px; }
+  .home-page .gift-image-premium { padding: 12px 3px; gap: 7px; }
+  .home-page .gift-image-premium .icon { width: 55px; height: 55px; }
+  .home-page .gift-kicker { font-size: 7px; letter-spacing: .07em; }
+  .home-page .inquiry-card .gift-description { font-size: 11px; margin-bottom: 12px; }
+  .home-page .imagefilm.container { margin-block: 10px 35px; padding-top: 25px; }
+  .home-page .vinegar-detail-grid img { height: 270px; }
+  .home-page .vinegar-detail-grid figcaption { font-size: 18px; }
+  .home-page .offer-carousel .hero-image.most-trio-banner { top: 190px; bottom: 65px; height: auto; padding: 10px 5%; }
+  .home-page .offer-carousel .most-size-3 { left: 4%; width: 25%; }
+  .home-page .offer-carousel .most-size-5 { left: 36%; width: 26%; }
+  .home-page .offer-carousel .most-size-10 { left: 72%; width: 26%; }
+  .home-page .offer-carousel .most-size-hotspot { top: 5%; height: 85%; }
+  .home-page .offer-carousel .lucia-offer-banner,
+  .home-page .offer-carousel .product-offer-banner { top: 180px; bottom: 55px; object-position: center; }
+  .home-page .offer-carousel .seasonal-offer-products { top: 185px; bottom: 60px; left: 4%; width: 92%; height: auto; }
+  .home-page .offer-carousel:has(.seasonal-offer-products.is-active) .hero-content { width: 100%; max-width: none; }
+  .home-page .offer-carousel:has(.seasonal-offer-products.is-active) .hero-offer.is-active>a { display: inline-flex; }
+  .home-page .seasonal-offer-image img { max-height: 130px; }
+  .home-page .seasonal-offer-details h3 { font-size: 13px; }
+  .home-page .seasonal-offer-price { font-size: 13px; }
+  .home-page .seasonal-offer-card .product-form .button { min-height: 44px; font-size: 12px; white-space: normal; }
+}
+@media (max-width: 359px) {
+  .home-page .header { padding-inline: 8px; gap: 2px; }
+  .home-page .brand img.bundled-logo { width: 142px; }
+  .home-page .vinegar-lineup { gap: 10px; }
+  .home-page .vinegar-lineup-item .button .icon { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-page .hero-offer, .home-page .button { transition: none; transform: none; }
+}
+/* Clip only the surrounding photographic paper; never blend botanical ink through a label. */
+.home-page .vinegar-lineup-item img { mix-blend-mode: normal; }
+.home-page .offer-carousel, .home-page .offer-carousel:has(.vinegar-lineup-frame.is-active) { min-height: 520px; }
+.home-page .imagefilm.container { border-radius: 0; padding: 38px 0 0; background: transparent; border: 0; border-top: 1px solid var(--rule); color: var(--green); box-shadow: none; }
+.home-page .imagefilm-copy h2 { color: var(--green); }
+.home-page .imagefilm-copy>p:not(.imagefilm-eyebrow) { color: #4b594a; }
+.home-page .imagefilm-eyebrow, .home-page .imagefilm-duration { color: #74603c; }
+.home-page .imagefilm-eyebrow::before { background: #b18a4c; }
+.home-page .imagefilm-shop { background: #f0f1e9; border: 0; border-top: 1px solid var(--rule); padding-inline: 24px; }
+@media (min-width: 1600px) {
+ .home-page .offer-carousel, .home-page .offer-carousel:has(.vinegar-lineup-frame.is-active) { min-height: 560px; }
+}
+@media (max-width: 599px) {
+ .home-page .offer-carousel, .home-page .offer-carousel:has(.vinegar-lineup-frame.is-active) { min-height: 630px; }
+ .home-page .imagefilm.container { padding-top: 25px; }
+ .home-page .imagefilm-shop { padding-inline: 14px; }
+}
+/* The unchanged variant handler can restore the original square Shopify uploads.
+   Crop their photographic margins in CSS as well, keeping original label pixels opaque. */
+.home-page .balsamico-apple .product-image img[src*="1000007749"] {
+  height: 109.7%; top: 52.1%;
+}
+.home-page .balsamico-pear .product-image img[src*="1000007619"] {
+  height: 125.6%; top: 50.2%;
+}
+/* Keep Mosti in the control gutter, clear of both mobile purchase buttons. */
+@media (max-width: 599px) {
+ .home-page .vinegar-lineup-frame.has-mosti .mosti-domino {
+  right: 42%; bottom: -46px; top: auto; width: 30px; height: 34px;
+ }
+}
+
+/* Seasonal originals get the same generous, cardless stage as the Balsamicos. */
+.home-page .offer-carousel .hero-offer-image.seasonal-offer-products{
+ left:40%;width:60%;inset-block:0;padding:35px 5% 50px 1%;gap:24px;
+ grid-template-columns:repeat(3,minmax(0,1fr));background:var(--paper)
+}
+.home-page .seasonal-offer-products:has(>.seasonal-offer-card:only-child){grid-template-columns:minmax(0,1fr)}
+.home-page .seasonal-offer-products:has(>.seasonal-offer-card:nth-child(2):last-child){grid-template-columns:repeat(2,minmax(0,1fr))}
+.home-page .seasonal-offer-card{height:100%;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:visible}
+.home-page .seasonal-offer-image{flex:1 1 0;min-height:0;padding:0;overflow:hidden}
+.home-page .seasonal-offer-image img{width:100%;height:100%;max-height:none;object-fit:contain;mix-blend-mode:multiply}
+.home-page .seasonal-offer-details{flex:0 0 auto;gap:7px;padding:12px 0 0;border-top:1px solid var(--rule)}
+.home-page .seasonal-offer-details h3{font-size:clamp(20px,1.8vw,27px);line-height:1.15;min-height:0}
+.home-page .seasonal-offer-price{font-size:17px;font-weight:400}
+.home-page .seasonal-offer-card .product-form .button{font-size:15px;min-height:44px;padding:10px 12px;white-space:normal}
+.home-page .offer-carousel:has(.seasonal-offer-products.is-active) .hero-content{width:40%;max-width:none;padding:95px 16px 90px 4%}
+@media(min-width:1200px){.home-page .header{gap:16px}.home-page .nav-list{gap:clamp(10px,1vw,16px);font-size:14px}.home-page .brand img.bundled-logo{width:clamp(210px,20vw,300px)}}
+@media(max-width:899px) and (min-width:600px){
+ .home-page .offer-carousel .hero-offer-image.seasonal-offer-products{left:44%;width:56%;padding:30px 4% 55px 0}
+ .home-page .offer-carousel:has(.seasonal-offer-products.is-active) .hero-content{width:44%;padding:55px 15px 70px 4%}
+ .home-page .offer-carousel:has(.seasonal-offer-products.is-active) .hero-offer.is-active>a{display:inline-flex}
+}
+@media(max-width:599px){
+ .home-page .offer-carousel .hero-offer-image.seasonal-offer-products{left:5%;width:90%;top:185px;bottom:65px;height:auto;padding:0;gap:14px}
+ .home-page .offer-carousel:has(.seasonal-offer-products.is-active) .hero-content{width:100%;max-width:none;padding:24px 5% 0}
+ .home-page .seasonal-offer-details h3{font-size:18px}
+ .home-page .seasonal-offer-price{font-size:15px}
+ .home-page .seasonal-offer-card .product-form .button{font-size:13px}
+ .home-page .seasonal-offer-image img{max-height:none}
+}
+.home-page .seasonal-offer-image{position:relative}
+.home-page .seasonal-offer-image img{position:absolute;inset:0}
+/* Reset the legacy top anchor so controls sit below the product on small screens. */
+@media(max-width:899px){
+ .home-page .offer-carousel:has(.seasonal-offer-products.is-active) .hero-offer-controls{top:auto;bottom:9px}
+}
+
+/* Reuse existing variant and image hooks without inheriting catalog card dimensions. */
+.home-page .seasonal-offer-card.product-card{min-height:0}
+.home-page .seasonal-offer-image.product-image{aspect-ratio:auto}
+.home-page .seasonal-offer-card .product-form select{width:100%;min-width:0;font-size:13px;padding:8px 5px;min-height:40px;margin-bottom:8px}
+/* Give the three original hero photographs a consistent visual weight. */
+.home-page .offer-carousel .lucia-offer-banner{
+ left:42%;width:55%;top:30px;bottom:30px;height:calc(100% - 60px);
+ object-fit:cover;object-position:52% center;background:var(--paper)
+}
+.home-page .offer-carousel .product-offer-banner{
+ left:50%;width:38%;top:25px;bottom:25px;height:calc(100% - 50px);
+ object-fit:cover;object-position:center 74%;background:var(--paper)
+}
+/* Render the intact original trio as three CSS crops on its existing click targets. */
+.home-page .offer-carousel .hero-image.most-trio-banner{
+ left:41%;width:57%;top:30px;bottom:30px;height:calc(100% - 60px);padding:0
+}
+.home-page .offer-carousel .most-trio-art{opacity:0}
+.home-page .offer-carousel .most-size-hotspot{top:12%;height:82%}
+.home-page .offer-carousel .most-size-3{left:6%;width:26%}
+.home-page .offer-carousel .most-size-5{left:35%;width:26%}
+.home-page .offer-carousel .most-size-10{left:64%;width:31%}
+.home-page .offer-carousel .most-size-hotspot::before{
+ content:"";position:absolute;inset:0;pointer-events:none;
+ background-image:url('/assets/suessmost-trio.webp?v=spaced-2');background-repeat:no-repeat;
+ background-size:500% auto;background-position:left center
+}
+.home-page .offer-carousel .most-size-5::before{background-position:center}
+.home-page .offer-carousel .most-size-10::before{background-size:420% auto;background-position:right center}
+.home-page .offer-carousel .most-trio-hint{top:4px}
+@media(max-width:899px) and (min-width:600px){
+ .home-page .offer-carousel .lucia-offer-banner{left:45%;width:53%;top:30px;bottom:30px;height:calc(100% - 60px)}
+ .home-page .offer-carousel .product-offer-banner{left:44%;width:54%;top:25px;bottom:25px;height:calc(100% - 50px)}
+ .home-page .offer-carousel .hero-image.most-trio-banner{left:43%;width:55%}
+ .home-page .offer-carousel .most-trio-hint{white-space:normal;text-align:center;width:90%}
+}
+@media(max-width:599px){
+ .home-page .offer-carousel .lucia-offer-banner{
+  left:5%;width:90%;top:180px;bottom:65px;height:calc(100% - 245px);object-position:50% center
+ }
+ .home-page .offer-carousel .product-offer-banner{
+  left:5%;width:90%;top:180px;bottom:65px;height:calc(100% - 245px);object-fit:contain;object-position:center
+ }
+ .home-page .offer-carousel .hero-image.most-trio-banner{
+  left:2%;width:96%;top:190px;bottom:65px;height:calc(100% - 255px)
+ }
+ .home-page .offer-carousel .most-size-hotspot{top:5%;height:90%}
+}
+
+/* Detailed vector silhouettes retain the original photographs and opaque labels. */
+.home-page .vinegar-lineup-item img{clip-path:none;mask-size:100% 100%;mask-repeat:no-repeat;-webkit-mask-size:100% 100%;-webkit-mask-repeat:no-repeat}
+.home-page .balsamico-apple img{mask-image:url('/assets/balsamico-apple-mask.svg');-webkit-mask-image:url('/assets/balsamico-apple-mask.svg')}
+.home-page .balsamico-pear img{mask-image:url('/assets/balsamico-pear-mask.svg');-webkit-mask-image:url('/assets/balsamico-pear-mask.svg')}
+.home-page .balsamico-apple img[src*="1000007749"]{mask-image:url('/assets/balsamico-apple-original-mask.svg');-webkit-mask-image:url('/assets/balsamico-apple-original-mask.svg')}
+.home-page .balsamico-pear img[src*="1000007619"]{mask-image:url('/assets/balsamico-pear-original-mask.svg');-webkit-mask-image:url('/assets/balsamico-pear-original-mask.svg')}
+/* Mobile photographs need no left-hand text fade. */
+@media(max-width:599px){
+ .home-page .offer-carousel:has(.lucia-offer-banner.is-active):before,
+ .home-page .offer-carousel:has(.product-offer-banner.is-active):before{background:none}
+}
+
+.home-page .balsamico-pear img[src*="1000006936"]{height:106%;top:51.2%;mask-image:url('/assets/balsamico-pear-250-mask.svg');-webkit-mask-image:url('/assets/balsamico-pear-250-mask.svg')}
