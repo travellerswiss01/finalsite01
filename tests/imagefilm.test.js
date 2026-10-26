@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {home,listing,productPage,imageFilm} from '../src/render.js';
 import {normalizedProduct} from './fixtures.js';
 test('film follows homepage products and waits for an explicit play action',()=>{
- const html=home([normalizedProduct]);assert.ok(html.indexOf('class="imagefilm container"')>html.indexOf('class="featured container"'));
+ const html=home([normalizedProduct]);assert.ok(html.indexOf('class="discover"')>html.indexOf('class="featured container"'));
  assert.match(html,/preload="none" playsinline controls/);assert.match(html,/data-src="\/assets\/imagefilm.mp4"/);assert.ok(!html.includes('autoplay'));assert.ok(!html.includes('<source'));assert.match(html,/imagefilm-poster.webp/);
 });
 test('film purchase uses live variants, disables sold-out sizes and has a unique selector ID',()=>{
