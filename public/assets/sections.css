@@ -361,3 +361,12 @@
 
 .offer-carousel:has(.vinegar-lineup-frame.is-active){min-height:340px}
 @media(max-width:599px){.offer-carousel:has(.vinegar-lineup-frame.is-active){min-height:650px}}
+
+/* Direct access to the existing category, visible on every route. */
+.header .nav-list a.nav-balsamico{padding:11px 14px;border-radius:7px;background:#244c34;color:#faf9f6;font-weight:600;white-space:nowrap;text-decoration:none}
+.header .nav-list a.nav-balsamico:hover{background:#365c40}
+.header .nav-list a.nav-balsamico:focus-visible{outline:3px solid #b18a4c;outline-offset:4px}
+@media(min-width:1200px){
+ .header{gap:16px}.header .nav-list{gap:16px;font-size:15px}.header .brand img.bundled-logo{width:clamp(200px,20vw,320px)}.header-actions{gap:12px}
+}
+@media(max-width:1199px){.header .nav-list a.nav-balsamico{margin:8px 0;padding:12px 14px}}
