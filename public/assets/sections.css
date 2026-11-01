@@ -450,3 +450,12 @@
  .vinegar-lineup .vinegar-lineup-item img{top:0;left:0;width:100%;height:calc(100% - 64px);max-width:100%;object-fit:contain;transform:none}
  .vinegar-lineup .vinegar-lineup-item figcaption{font-size:clamp(12px,3.2vw,15px);min-height:52px;max-height:none;left:0;right:0;bottom:0;overflow:visible;-webkit-line-clamp:unset}
 }
+
+/* Fill each column with the bottle; crop only the square photo's side whitespace. */
+.vinegar-lineup-item img{object-fit:cover;object-position:center}
+@media(max-width:599px){
+ .offer-carousel:has(.vinegar-lineup-frame.is-active){min-height:560px}
+ .vinegar-lineup,.vinegar-lineup.is-mosti-sequence{height:270px;bottom:76px}
+ .vinegar-lineup .vinegar-lineup-item img{height:calc(100% - 54px);object-fit:cover;object-position:center}
+ .vinegar-lineup .vinegar-lineup-item figcaption{font-size:clamp(11px,3vw,14px);min-height:44px;hyphens:none;overflow-wrap:normal}
+}
