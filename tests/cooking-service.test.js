@@ -37,15 +37,17 @@ test('homepage rotates matching gift and cooking photos without changing the her
  assert.match(page,/Firmengeschenke anfragen/);
  assert.match(page,/(?:src|data-src)="\/assets\/essig-original-cutout\.svg/);
  assert.match(page,/class="vinegar-lineup"/);
- assert.equal((page.match(/class="vinegar-lineup-item"/g)||[]).length,7);
- const colorOrder=['essig-birnen','essig-holunder','essig-balsamico','essig-original','essig-kirsch','essig-himbeer','essig-kirschen-birnen'];
+ assert.equal((page.match(/class="vinegar-lineup-item"/g)||[]).length,3);
+ const sources=['/assets/essig-original-cutout.svg','https://cdn.shopify.com/s/files/1/0967/9559/0922/files/1000007749.png','/assets/essig-balsamico-cutout.svg'];
  for(const className of ['vinegar-lineup','vinegar-detail-grid']){
   const images=page.match(new RegExp(`<div class="${className}"[^>]*>([\\s\\S]*?)</div>`))[1];
-  assert.deepEqual([...images.matchAll(/<img (?:src|data-src)="\/assets\/([^"]+)-cutout\.svg/g)].map(match=>match[1]),colorOrder);
+  const positions=sources.map(source=>images.indexOf(source));
+  assert.ok(positions.every(position=>position>=0));
+  assert.ok(positions[0]<positions[1]&&positions[1]<positions[2]);
  }
  assert.match(page,/data-vinegar-dialog/);
  assert.match(page,/data-vinegar-open/);
- for(const name of ["essig-birnen","essig-balsamico","essig-himbeer","essig-holunder","essig-kirschen-birnen","essig-kirsch"])assert.ok(page.includes(`/assets/${name}-cutout.svg`));
+
  assert.doesNotMatch(page,/src="\/assets\/essig-liegend-cutout\.svg"/);
  assert.match(page,/Saisonales entdecken/);
 });
