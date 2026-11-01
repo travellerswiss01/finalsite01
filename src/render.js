@@ -18,9 +18,9 @@ export const productUrl=p=>`/produkte/${encodeURIComponent(p.handle)}`;
 export function lowestPrice(p){return p.variants.reduce((a,v)=>Number(v.price.amount)<Number(a.price.amount)?v:a,p.variants[0]).price;}
 const subtitles={'chli-fii':'3 Fläschchen à 250 ml','fein-guet':'5 Spezialitäten','gross-guet':'7 Spezialitäten'};
 const vinegarLineupItems=[
- ['Apfelessig','/assets/essig-original-cutout.svg?v=mosti-cutout-3','apfelessig'],
+ ['Apfelessig','https://cdn.shopify.com/s/files/1/0967/9559/0922/files/rn-image_picker_lib_temp_ff2a8155-abdd-460b-845d-4b608fc97d57.png?v=1791927478','apfelessig'],
  ['Apfelbalsamico','https://cdn.shopify.com/s/files/1/0967/9559/0922/files/1000007749.png?v=1792606864','apfelbalsamico'],
- ['Birnen-Balsamico','/assets/essig-balsamico-cutout.svg?v=mosti-cutout-3','birnen-balsamico']
+ ['Birnen-Balsamico','https://cdn.shopify.com/s/files/1/0967/9559/0922/files/1000007619.png?v=1792507104','birnen-balsamico']
 ];
 function vinegarDetails(){
  return vinegarLineupItems.map(([label,source])=>`<figure><a href="${escape(source)}" target="_blank" rel="noopener" aria-label="${escape(label)} – Originalfoto in voller Grösse öffnen"><img src="${escape(source)}" alt="${escape(label)} mit unverändertem Originaletikett" loading="lazy" decoding="async"></a><figcaption>${escape(label)}</figcaption></figure>`).join('');

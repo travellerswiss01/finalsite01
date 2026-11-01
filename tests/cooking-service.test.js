@@ -25,7 +25,7 @@ test('homepage rotates matching gift and cooking photos without changing the her
  assert.match(page,/src="\/assets\/lucia-hero-banner\.webp"/);
  assert.match(page,/src="\/assets\/suessmost-trio\.webp\?v=spaced-2"/);
  assert.match(page,/class="hero-image bundled-hero hero-offer-image product-offer-banner" data-offer-image data-src="\/assets\/firmen-geschenke\.webp"/);
- assert.ok(page.indexOf('/assets/suessmost-trio.webp')<page.indexOf('/assets/essig-original-cutout.svg'));
+ assert.ok(page.indexOf('/assets/suessmost-trio.webp')<page.indexOf('https://cdn.shopify.com/'));
  assert.doesNotMatch(page,/src="\/assets\/saison-aepfel\.webp"/);
  assert.match(page,/<h1 id="HeroHeading">Geschenke aus<br>dem Thurgau<\/h1>/);
  assert.match(page,/Süssmost entdecken/);
@@ -35,10 +35,10 @@ test('homepage rotates matching gift and cooking photos without changing the her
  assert.match(page,/aria-hidden="true" inert/);
  for(const path of ["/kontakt","/geschenk-konfigurator","/saisonales"])assert.ok(page.includes(`href="${path}"`));
  assert.match(page,/Firmengeschenke anfragen/);
- assert.match(page,/(?:src|data-src)="\/assets\/essig-original-cutout\.svg/);
+ assert.match(page,/cdn\.shopify\.com/);
  assert.match(page,/class="vinegar-lineup"/);
  assert.equal((page.match(/class="vinegar-lineup-item"/g)||[]).length,3);
- const sources=['/assets/essig-original-cutout.svg','https://cdn.shopify.com/s/files/1/0967/9559/0922/files/1000007749.png','/assets/essig-balsamico-cutout.svg'];
+ const sources=["https://cdn.shopify.com/s/files/1/0967/9559/0922/files/rn-image_picker_lib_temp_ff2a8155-abdd-460b-845d-4b608fc97d57.png", "https://cdn.shopify.com/s/files/1/0967/9559/0922/files/1000007749.png", "https://cdn.shopify.com/s/files/1/0967/9559/0922/files/1000007619.png"];
  for(const className of ['vinegar-lineup','vinegar-detail-grid']){
   const images=page.match(new RegExp(`<div class="${className}"[^>]*>([\\s\\S]*?)</div>`))[1];
   const positions=sources.map(source=>images.indexOf(source));
