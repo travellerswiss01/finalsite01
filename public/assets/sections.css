@@ -452,7 +452,7 @@
 }
 
 /* Fill each column with the bottle; crop only the square photo's side whitespace. */
-.vinegar-lineup-item img{object-fit:cover;object-position:center}
+.vinegar-lineup-item img{object-fit:contain;object-position:center}
 @media(max-width:599px){
  .offer-carousel:has(.vinegar-lineup-frame.is-active){min-height:560px}
  .vinegar-lineup,.vinegar-lineup.is-mosti-sequence{height:270px;bottom:76px}
