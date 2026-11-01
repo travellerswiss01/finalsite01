@@ -25,7 +25,7 @@ test('homepage rotates matching gift and cooking photos without changing the her
  assert.match(page,/src="\/assets\/lucia-hero-banner\.webp"/);
  assert.match(page,/src="\/assets\/suessmost-trio\.webp\?v=spaced-2"/);
  assert.match(page,/class="hero-image bundled-hero hero-offer-image product-offer-banner" data-offer-image data-src="\/assets\/firmen-geschenke\.webp"/);
- assert.ok(page.indexOf('/assets/suessmost-trio.webp')<page.indexOf('/assets/essig-original-cutout.svg'));
+ assert.ok(page.indexOf('/assets/suessmost-trio.webp')<page.indexOf('https://cdn.shopify.com/'));
  assert.doesNotMatch(page,/src="\/assets\/saison-aepfel\.webp"/);
  assert.match(page,/<h1 id="HeroHeading">Geschenke aus<br>dem Thurgau<\/h1>/);
  assert.match(page,/Süssmost entdecken/);
@@ -35,17 +35,19 @@ test('homepage rotates matching gift and cooking photos without changing the her
  assert.match(page,/aria-hidden="true" inert/);
  for(const path of ["/kontakt","/geschenk-konfigurator","/saisonales"])assert.ok(page.includes(`href="${path}"`));
  assert.match(page,/Firmengeschenke anfragen/);
- assert.match(page,/(?:src|data-src)="\/assets\/essig-original-cutout\.svg/);
+ assert.match(page,/cdn\.shopify\.com/);
  assert.match(page,/class="vinegar-lineup"/);
- assert.equal((page.match(/class="vinegar-lineup-item"/g)||[]).length,7);
- const colorOrder=['essig-birnen','essig-holunder','essig-balsamico','essig-original','essig-kirsch','essig-himbeer','essig-kirschen-birnen'];
+ assert.equal((page.match(/class="vinegar-lineup-item"/g)||[]).length,3);
+ const sources=["https://cdn.shopify.com/s/files/1/0967/9559/0922/files/rn-image_picker_lib_temp_ff2a8155-abdd-460b-845d-4b608fc97d57.png", "https://cdn.shopify.com/s/files/1/0967/9559/0922/files/1000007749.png", "https://cdn.shopify.com/s/files/1/0967/9559/0922/files/1000007619.png"];
  for(const className of ['vinegar-lineup','vinegar-detail-grid']){
   const images=page.match(new RegExp(`<div class="${className}"[^>]*>([\\s\\S]*?)</div>`))[1];
-  assert.deepEqual([...images.matchAll(/<img (?:src|data-src)="\/assets\/([^"]+)-cutout\.svg/g)].map(match=>match[1]),colorOrder);
+  const positions=sources.map(source=>images.indexOf(source));
+  assert.ok(positions.every(position=>position>=0));
+  assert.ok(positions[0]<positions[1]&&positions[1]<positions[2]);
  }
  assert.match(page,/data-vinegar-dialog/);
  assert.match(page,/data-vinegar-open/);
- for(const name of ["essig-birnen","essig-balsamico","essig-himbeer","essig-holunder","essig-kirschen-birnen","essig-kirsch"])assert.ok(page.includes(`/assets/${name}-cutout.svg`));
+
  assert.doesNotMatch(page,/src="\/assets\/essig-liegend-cutout\.svg"/);
  assert.match(page,/Saisonales entdecken/);
 });
