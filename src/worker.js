@@ -5,6 +5,9 @@ const handler = httpServerHandler(createApp());
 
 export default {
   async fetch(request, env, context) {
+    if (new URL(request.url).pathname.startsWith('/assets/')) {
+      return env.ASSETS.fetch(request);
+    }
     const headers = new Headers(request.headers);
     headers.set('x-forwarded-proto', new URL(request.url).protocol.slice(0, -1));
     const response = await handler.fetch(new Request(request, {headers}), env, context);
