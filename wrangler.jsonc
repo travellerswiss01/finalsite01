@@ -9,9 +9,7 @@
   "assets": {
     "directory": "./public",
     "html_handling": "none",
-    "run_worker_first": [
-      "/*",
-      "!/assets/*"
-    ]
+    "binding": "ASSETS",
+    "run_worker_first": true
   }
 }
