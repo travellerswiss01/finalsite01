@@ -6,7 +6,6 @@ import path from 'node:path';
 import {createStorefront,StorefrontError} from './storefront.js';
 import * as view from './render.js';
 
-const publicDir=path.resolve(fileURLToPath(new URL('../public/',import.meta.url)));
 const types={'.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml','.ico':'image/x-icon'};
 const COOKIE='biottos_cart';
 const emptyCart={totalQuantity:0,lines:{nodes:[],pageInfo:{hasNextPage:false}},cost:{subtotalAmount:{amount:'0',currencyCode:'CHF'},totalAmount:{amount:'0',currencyCode:'CHF'}},checkoutUrl:null};
@@ -58,6 +57,7 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
   try {
    if(pathname.startsWith('/assets/')){
     if(req.method!=='GET'&&req.method!=='HEAD'){sendJson(res,405,{error:'Methode nicht erlaubt.'});return;}
+    const publicDir=fileURLToPath(new URL('../public',import.meta.url));
     const requested=path.resolve(publicDir,'.'+decodeURIComponent(pathname));
     if(!requested.startsWith(publicDir+path.sep)||requested.includes('\0'))throw new StorefrontError('Datei nicht gefunden.',404);
     let file;try{file=await stat(requested);}catch{throw new StorefrontError('Datei nicht gefunden.',404);}
@@ -181,6 +181,6 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
   }
  });
 }
-if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
+if(process.argv?.[1]&&import.meta.url?.startsWith('file:')&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  const port=Number(process.env.PORT||3000);createApp().listen(port,'0.0.0.0',()=>console.log(`Biottos Lädeli läuft auf Port ${port}.`));
 }
