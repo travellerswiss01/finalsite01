@@ -8,6 +8,7 @@ import * as view from './render.js';
 
 const publicDir=path.resolve(fileURLToPath(new URL('../public/',import.meta.url)));
 const types={'.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml','.ico':'image/x-icon'};
+const pageRoutes=new Set(['/','/sortiment','/saisonales','/geschenkkoerbe','/suche','/geschenk-konfigurator','/garten','/kochservice','/kontakt','/ueber-uns','/warenkorb']);
 const COOKIE='biottos_cart';
 const emptyCart={totalQuantity:0,lines:{nodes:[],pageInfo:{hasNextPage:false}},cost:{subtotalAmount:{amount:'0',currencyCode:'CHF'},totalAmount:{amount:'0',currencyCode:'CHF'}},checkoutUrl:null};
 export function readCartCookie(header='') { const value=header.split(';').map(s=>s.trim()).find(s=>s.startsWith(COOKIE+'='));if(!value)return null;try{const id=decodeURIComponent(value.slice(COOKIE.length+1));return id.startsWith('gid://shopify/Cart/')&&id.length<1000?id:null;}catch{return null;} }
@@ -58,13 +59,26 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
   try {
    if(pathname.startsWith('/assets/')){
     if(req.method!=='GET'&&req.method!=='HEAD'){sendJson(res,405,{error:'Methode nicht erlaubt.'});return;}
-    const requested=path.resolve(publicDir,'.'+decodeURIComponent(pathname));
+    let decoded;try{decoded=decodeURIComponent(pathname);}catch{throw new StorefrontError('Ungültige Adresse.',400);}
+    const requested=path.resolve(publicDir,'.'+decoded);
     if(!requested.startsWith(publicDir+path.sep)||requested.includes('\0'))throw new StorefrontError('Datei nicht gefunden.',404);
     let file;try{file=await stat(requested);}catch{throw new StorefrontError('Datei nicht gefunden.',404);}
     if(!file.isFile())throw new StorefrontError('Datei nicht gefunden.',404);
+    // Revalidate unchanged assets without transferring the body again.
+    // Weak validators deliberately cannot be used to satisfy If-Range.
+    const etag=`W/"${file.size.toString(16)}-${Math.trunc(file.mtimeMs).toString(16)}"`;
+    const modified=file.mtime.toUTCString();
+    const assetHeaders={'Cache-Control':'public, max-age=3600',ETag:etag,'Last-Modified':modified};
+    const noneMatch=req.headers['if-none-match'];
+    const modifiedSince=req.headers['if-modified-since'];
+    const unchanged=noneMatch
+     ? noneMatch.split(',').some(value=>value.trim()==='*'||value.trim().replace(/^W\//,'')===etag.replace(/^W\//,''))
+     : modifiedSince&&Math.floor(file.mtimeMs/1000)*1000<=Date.parse(modifiedSince);
+    if(unchanged){res.writeHead(304,assetHeaders);res.end();return;}
     if(path.extname(requested)==='.mp4'){
-     const headers={'Content-Type':'video/mp4','Accept-Ranges':'bytes','Cache-Control':'public, max-age=3600'};
-     const range=req.headers.range;
+     const headers={...assetHeaders,'Content-Type':'video/mp4','Accept-Ranges':'bytes'};
+     const ifRange=req.headers['if-range'];
+     const range=(!ifRange||Date.parse(ifRange)>=Math.floor(file.mtimeMs/1000)*1000)?req.headers.range:null;
      let start=0,end=file.size-1,status=200;
      if(range){
       const match=/^bytes=(\d*)-(\d*)$/.exec(range);
@@ -78,7 +92,7 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
      if(req.method==='HEAD'){res.end();return;}
      const stream=createReadStream(requested,{start,end});res.on('close',()=>stream.destroy());stream.on('error',()=>res.destroy());stream.pipe(res);return;
     }
-    res.writeHead(200,{'Content-Type':types[path.extname(requested)]||'application/octet-stream','Cache-Control':'public, max-age=3600'});res.end(req.method==='HEAD'?undefined:await readFile(requested));return;
+    res.writeHead(200,{...assetHeaders,'Content-Type':types[path.extname(requested)]||'application/octet-stream','Content-Length':file.size});res.end(req.method==='HEAD'?undefined:await readFile(requested));return;
    }
    if(pathname.startsWith('/api/')){
     let cartId=readCartCookie(req.headers.cookie);
@@ -142,6 +156,11 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
     res.writeHead(200,{'Content-Type':'application/xml; charset=utf-8','Cache-Control':'public, max-age=300'});
     res.end(req.method==='HEAD'?undefined:xml);return;
    }
+   // Scanner paths are not storefront pages: do not wake Shopify for a 404.
+   if(!pageRoutes.has(pathname)&&!/^\/produkte\/[^/]+$/.test(pathname)&&!/^\/rechtliches\/[^/]+$/.test(pathname)){
+    res.writeHead(404,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});
+    res.end(req.method==='HEAD'?undefined:view.shell('<section class="container page-content service-error"><h1>Diese Seite wurde nicht gefunden.</h1><p>Entdecke unsere aktuellen Produkte im Sortiment.</p><a class="button" href="/sortiment">Zum Sortiment</a></section>',{path:pathname,title:'Seite nicht gefunden',origin:publicOrigin,status:404}));return;
+   }
    const shop=await store.shop();let content,title,description,product,status=200;
    // Descriptions reflect existing page copy; they never change visible content.
    const descriptions={
@@ -165,7 +184,7 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
     const q=(url.searchParams.get('q')||'').slice(0,200);const category=(url.searchParams.get('kategorie')||'').slice(0,100);
     const seasonal=pathname==='/saisonales';content=view.listing(await store.catalog(),{q,category,gifts:pathname==='/geschenkkoerbe',search:pathname==='/suche',seasonal});title=seasonal?'Saisonales':pathname==='/geschenkkoerbe'?'Geschenkkörbe aus dem Thurgau':pathname==='/suche'?'Produkte suchen':'Sortiment';
    }else if(pathname.startsWith('/produkte/')){
-    const handle=decodeURIComponent(pathname.slice('/produkte/'.length));product=(await store.catalog()).find(p=>p.handle===handle);
+    let handle;try{handle=decodeURIComponent(pathname.slice('/produkte/'.length));}catch{throw new StorefrontError('Ungültige Adresse.',400);}product=(await store.catalog()).find(p=>p.handle===handle);
     if(product){content=view.productPage(product);title=product.title;description=(product.description.trim()||product.title).replace(/\s+/g,' ').slice(0,160);}
    }else if(pathname==='/kontakt'){content=view.contact();title='Kontakt & individuelle Geschenke';}
    else if(pathname==='/ueber-uns'){content=view.about();title='Über Biottos Lädeli';}
