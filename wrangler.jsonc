@@ -6,6 +6,9 @@
     "nodejs_compat",
     "enable_nodejs_http_server_modules"
   ],
+  "build": {
+    "command": "node scripts/build-worker-assets.js"
+  },
   "assets": {
     "directory": "./public",
     "html_handling": "none",

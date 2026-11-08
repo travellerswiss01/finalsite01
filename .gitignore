@@ -5,3 +5,5 @@ node_modules/
 .DS_Store
 playwright-report/
 test-results/
+
+/src/worker-assets.generated.js

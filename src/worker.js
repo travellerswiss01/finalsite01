@@ -1,6 +1,7 @@
 import {httpServerHandler} from 'cloudflare:node';
 import {createApp} from './server.js';
 import {serveVideoRange} from './worker-video.js';
+import {imageFilmSize} from './worker-assets.generated.js';
 
 const handler = httpServerHandler(createApp());
 const productionHost = 'biottoslaedeli.ch';
@@ -20,8 +21,8 @@ export default {
       return Response.redirect(url, 301);
     }
     if (url.pathname.startsWith('/assets/')) {
-      if (url.pathname.endsWith('.mp4') && request.method === 'GET' && request.headers.has('Range')) {
-        return serveVideoRange(request, env.ASSETS);
+      if (url.pathname === '/assets/imagefilm.mp4' && request.method === 'GET' && request.headers.has('Range')) {
+        return serveVideoRange(request, env.ASSETS, imageFilmSize);
       }
       return env.ASSETS.fetch(request);
     }

@@ -1,11 +1,11 @@
 // Workers Static Assets serve the whole file even when the browser requests a byte range.
-export async function serveVideoRange(request, assets) {
+export async function serveVideoRange(request, assets, fallbackSize) {
   const assetHeaders = new Headers(request.headers);
   assetHeaders.delete('Range');
   assetHeaders.delete('If-Range');
   assetHeaders.set('Accept-Encoding', 'identity');
   const asset = await assets.fetch(new Request(request, {headers: assetHeaders}));
-  const size = Number(asset.headers.get('Content-Length'));
+  const size = Number(asset.headers.get('Content-Length') ?? fallbackSize);
   if (asset.status !== 200 || !asset.body || !Number.isSafeInteger(size) || size < 1 ||
       asset.headers.has('Content-Encoding')) return asset;
 
