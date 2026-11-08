@@ -186,7 +186,7 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
    }else if(pathname.startsWith('/produkte/')){
     let handle;try{handle=decodeURIComponent(pathname.slice('/produkte/'.length));}catch{throw new StorefrontError('Ungültige Adresse.',400);}product=(await store.catalog()).find(p=>p.handle===handle);
     if(product){content=view.productPage(product);title=product.title;description=(product.description.trim()||product.title).replace(/\s+/g,' ').slice(0,160);}
-   }else if(pathname==='/kontakt'){content=view.contact();title='Kontakt & individuelle Geschenke';}
+   }else if(pathname==='/kontakt'){content=view.contact();title='Laden & Kontakt';}
    else if(pathname==='/ueber-uns'){content=view.about();title='Über Biottos Lädeli';}
    else if(pathname==='/warenkorb'){content=view.cartPage();title='Warenkorb';}
    else if(pathname.startsWith('/rechtliches/')){const result=view.legal(shop,pathname.split('/').pop());if(result){content=result.content;title=result.title;description=`${result.title} – Informationen von Biottos Lädeli.`;}}

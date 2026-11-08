@@ -13,8 +13,8 @@ test('Saisonales list shows Shopify products with a case-insensitive seasonal ta
  assert.match(html,/href="\/saisonales" aria-current="page">Saisonales<\/a>/);
 });
 
-test('Saisonales explains the Shopify tag when no products are tagged yet',()=>{
+test('Saisonales offers the full catalog when no products are tagged yet',()=>{
  const html=listing([normalizedProduct],{seasonal:true});
- assert.match(html,/Schlagwort <strong>Saisonal<\/strong>/);
+ assert.match(html,/href="\/sortiment">Alle Produkte ansehen/);
  assert.doesNotMatch(html,/Testprodukt/);
 });
