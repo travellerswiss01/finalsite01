@@ -4,13 +4,19 @@ import {serveVideoRange} from './worker-video.js';
 
 const handler = httpServerHandler(createApp());
 const productionHost = 'biottoslaedeli.ch';
+const aliasHosts = new Set([
+  'www.biottoslaedeli.ch',
+  'xn--biottosldeli-ncb.ch',
+  'www.xn--biottosldeli-ncb.ch'
+]);
 
 export default {
   async fetch(request, env, context) {
     const url = new URL(request.url);
     const isProduction = url.hostname === productionHost;
-    if (isProduction && url.protocol === 'http:') {
+    if (aliasHosts.has(url.hostname) || (isProduction && url.protocol === 'http:')) {
       url.protocol = 'https:';
+      url.host = productionHost;
       return Response.redirect(url, 301);
     }
     if (url.pathname.startsWith('/assets/')) {
