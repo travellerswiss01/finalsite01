@@ -142,10 +142,12 @@ export function giftConfigurator(products){
 }
 
 export function listing(products,{q='',category='',gifts=false,search=false,seasonal=false}={}){
- const categories=[...new Set(products.map(p=>p.productType).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'de'));
+ const categoryOf=product=>product.productType||
+  (vinegarLineupItems.some(([, ,handle])=>handle===product.handle)?'Essig & Balsamico':'');
+ const categories=[...new Set(products.map(categoryOf).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'de'));
  const normalized=q.toLocaleLowerCase('de');
  const isSeasonal=p=>(p.tags||[]).some(tag=>['saisonal','saisonales'].includes(String(tag).trim().toLocaleLowerCase('de')));
- const filtered=products.filter(p=>(!gifts||p.productType==='Geschenkskorb')&&(!seasonal||isSeasonal(p))&&(!category||p.productType===category)&&(!q||`${p.title} ${p.description} ${p.productType}`.toLocaleLowerCase('de').includes(normalized)));
+ const filtered=products.filter(p=>(!gifts||p.productType==='Geschenkskorb')&&(!seasonal||isSeasonal(p))&&(!category||categoryOf(p)===category)&&(!q||`${p.title} ${p.description} ${categoryOf(p)}`.toLocaleLowerCase('de').includes(normalized)));
  const heading=search?'Produkte suchen':gifts?'Geschenkkörbe aus dem Thurgau':seasonal?'Saisonales':'Unser Sortiment';
  const path=search?'/suche':gifts?'/geschenkkoerbe':seasonal?'/saisonales':'/sortiment';
  const filterLink=(route,label,value,active)=>{

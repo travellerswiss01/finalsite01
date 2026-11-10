@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {productPage} from '../src/render.js';
+import {listing,productPage} from '../src/render.js';
 import {normalizedProduct} from './fixtures.js';
 
 test('each vinegar detail page keeps its matching original label with the product photos',()=>{
@@ -16,4 +16,13 @@ test('each vinegar detail page keeps its matching original label with the produc
   assert.ok(html.indexOf('Nur Abholung in Guntershausen')<html.indexOf('In den Warenkorb'));
  }
  assert.doesNotMatch(productPage(normalizedProduct),/Originaletikett ansehen/);
+});
+
+test('the vinegar category includes Apfelbalsamico when Shopify omits its product type',()=>{
+ const appleBalsamic={...normalizedProduct,handle:'apfelbalsamico',title:'Apfelbalsamico',productType:''};
+ const untypedProduct={...normalizedProduct,productType:''};
+ const html=listing([appleBalsamic,untypedProduct],{category:'Essig & Balsamico'});
+ assert.match(html,/aria-current="page">Essig &amp; Balsamico<\/a>/);
+ assert.match(html,/href="\/produkte\/apfelbalsamico">Apfelbalsamico<\/a>/);
+ assert.doesNotMatch(html,/Testprodukt/);
 });
