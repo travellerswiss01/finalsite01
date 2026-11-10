@@ -20,6 +20,8 @@ test('configurator renders live catalog product, variant, accessible selection a
  assert.match(html,/data-greeting-preset/);
  assert.match(html,/data-gift-message-jump/);
  assert.match(html,/aria-live="polite"/);
+ assert.ok(html.indexOf("Testprodukt")<html.indexOf("2. Grusskarte ergänzen"));
+ assert.ok(html.indexOf("2. Grusskarte ergänzen")<html.indexOf("3. Auswahl prüfen"));
 });
 
 test('cart add accepts multiple Shopify variants and keeps the single product form compatible',()=>{
