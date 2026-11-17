@@ -20,7 +20,7 @@ test('imagefilm supports byte ranges, seeking and HEAD without downloading the w
 test('serves styles, scripts and original images with correct MIME types',()=>run(async({origin})=>{for(const [file,type] of [['base.css','text/css'],['app.js','text/javascript'],['logo.png','image/png'],['hero.jpg','image/jpeg'],['suessmost-3-liter.webp','image/webp'],['lucia-kocht.jpg','image/jpeg'],['lucia-salate.webp','image/webp'],['lucia-hero-banner.webp','image/webp'],['firmen-geschenke.webp','image/webp'],['geschenk-auswahl.webp','image/webp'],['troepfli-heimat.webp','image/webp'],['essig-liegend.webp','image/webp'],['essig-original.webp','image/webp'],['essig-birnen.webp','image/webp'],['essig-balsamico.webp','image/webp'],['essig-himbeer.webp','image/webp'],['essig-holunder.webp','image/webp'],['essig-kirschen-birnen.webp','image/webp'],['essig-kirsch.webp','image/webp'],['saison-aepfel.webp','image/webp'],...Array.from({length:7},(_,i)=>[`lucia-menu-${i+1}.webp`,'image/webp'])]){const response=await fetch(origin+'/assets/'+file);assert.equal(response.status,200,file);assert.ok(response.headers.get('content-type').startsWith(type));assert.ok((await response.arrayBuffer()).byteLength>0);}assert.equal((await fetch(origin+'/assets/missing.css')).status,404);}));
 
 test('serverless adapter accepts a body already parsed by the platform',async()=>{
- const app=createApp({store:{mutateCart:async()=>({cart:cartFixture(),warnings:[]})}});
+ const app=createApp({store:{catalog:async()=>[normalizedProduct],mutateCart:async()=>({cart:cartFixture(),warnings:[]})}});
  const handler=app.listeners('request')[0];
  const server=createServer((req,res)=>{req.body={variantId:'gid://shopify/ProductVariant/1',quantity:1};handler(req,res);});
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
@@ -29,7 +29,7 @@ test('serverless adapter accepts a body already parsed by the platform',async()=
 
 // Render terminates TLS at its proxy; the Node server receives HTTP behind HTTPS.
 test('accepts same-origin HTTPS cart requests behind Render proxy',async()=>{
- const store={catalog:async()=>[],shop:async()=>null,cart:async()=>null,mutateCart:async()=>({cart:cartFixture(),warnings:[]})};
+ const store={catalog:async()=>[normalizedProduct],shop:async()=>null,cart:async()=>null,mutateCart:async()=>({cart:cartFixture(),warnings:[]})};
  const app=createApp({store,origin:''});
  await new Promise(resolve=>app.listen(0,'127.0.0.1',resolve));
  const base='http://127.0.0.1:'+app.address().port;
@@ -48,7 +48,7 @@ test('accepts same-origin HTTPS cart requests behind Render proxy',async()=>{
 
 
 test('uses the request host for cart checks while keeping the configured canonical origin',async()=>{
- const store={catalog:async()=>[],shop:async()=>null,cart:async()=>null,mutateCart:async()=>({cart:cartFixture(),warnings:[]})};
+ const store={catalog:async()=>[normalizedProduct],shop:async()=>null,cart:async()=>null,mutateCart:async()=>({cart:cartFixture(),warnings:[]})};
  const app=createApp({store,origin:'https://canonical.example'});
  const handler=app.listeners('request')[0];
  const server=createServer((req,res)=>{req.headers.host='alias.example';handler(req,res);});

@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {createStorefront,StorefrontError} from './storefront.js';
 import * as view from './render.js';
+import {hasPrice} from './pricing.js';
 
 const types={'.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml','.ico':'image/x-icon'};
 const pageRoutes=new Set(['/','/sortiment','/saisonales','/geschenkkoerbe','/suche','/geschenk-konfigurator','/garten','/kochservice','/kontakt','/ueber-uns','/warenkorb']);
@@ -109,12 +110,15 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
     const body=await readJson(req);
     if(pathname==='/api/cart/checkout'){
       const cart=await store.cart(cartId);if(!cart?.totalQuantity)throw new StorefrontError('Dein Warenkorb ist leer.',422);
+      if(cart.lines.nodes.some(line=>!hasPrice(line.merchandise)))throw new StorefrontError('Ein Produkt im Warenkorb hat noch keinen Preis. Bitte entferne es vor dem Checkout.',422);
       const target=new URL(cart.checkoutUrl);if(target.protocol!=='https:')throw new StorefrontError('Der Checkout konnte nicht geöffnet werden.');
       sendJson(res,200,{checkoutUrl:cart.checkoutUrl,cart:publicCart(cart)});return;
     }
     let result;
     if(pathname==='/api/cart/add'){
       const lines=normalizeCartAddLines(body);
+      const variants=(await store.catalog()).flatMap(product=>product.variants);
+      for(const line of lines){const variant=variants.find(item=>item.id===line.merchandiseId);if(!variant||!hasPrice(variant))throw new StorefrontError('Für dieses Produkt folgt der Preis noch. Bitte frage es bei uns an.',422);}
       const greeting=normalizeGreetingCard(body.greetingCard);
       const existingCart=cartId?await store.cart(cartId):null;
       if(cartId&&!existingCart)cartId=null;

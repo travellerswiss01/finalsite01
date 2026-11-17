@@ -122,7 +122,11 @@ document.addEventListener('change',async e=>{
  if(e.target.matches('[data-cart-quantity]')){const value=Number(e.target.value);if(!Number.isInteger(value)||value<1||value>250){e.target.reportValidity();return;}await changeLine(e.target.closest('[data-line]').dataset.line,value);}
  if(e.target.matches('[data-variant-select]')){
   const option=e.target.selectedOptions[0];const root=e.target.closest('.imagefilm-shop')||e.target.closest('.product-detail')||e.target.closest('.product-card');root.querySelector('[data-price]').textContent=option.dataset.price;
-  const image=root.querySelector('.detail-main-image')||root.querySelector('.product-image img');if(image&&option.dataset.image){image.removeAttribute('srcset');image.src=option.dataset.image;}
+  const gallery=root.querySelector('[data-product-gallery]');
+  if(gallery){const thumb=[...gallery.querySelectorAll('[data-gallery-image]')].find(item=>item.dataset.galleryImage===option.dataset.image);if(thumb)thumb.click();}
+  else{const image=root.querySelector('.detail-main-image')||root.querySelector('.product-image img');if(image&&option.dataset.image){image.removeAttribute('srcset');image.src=option.dataset.image;image.alt=option.dataset.alt||image.alt;}}
+  const button=e.target.closest('form').querySelector('button[type="submit"]');
+  if(button){button.disabled=option.dataset.available!=='true';button.textContent=option.dataset.pricePending==='true'?'Preis folgt':button.disabled?'Ausverkauft':button.dataset.purchaseLabel||'In den Warenkorb';}
  }
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.nav-dropdown[open],.mobile-nav[open]').forEach(el=>el.open=false);});
@@ -280,3 +284,15 @@ if(offerCarousel){
  show(3);updateToggle();start();
 }
 
+
+// Keep front/back image selection independent of the purchasable variant.
+document.addEventListener('click',event=>{
+ const thumb=event.target.closest('[data-gallery-image]');if(!thumb)return;
+ if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+ event.preventDefault();
+ const gallery=thumb.closest('[data-product-gallery]');const image=gallery.querySelector('.detail-main-image');
+ image.removeAttribute('srcset');image.src=thumb.dataset.galleryImage;image.alt=thumb.dataset.galleryAlt;
+ gallery.querySelector('[data-gallery-full]').href=thumb.dataset.galleryImage;
+ gallery.querySelector('[data-gallery-caption]').textContent=thumb.dataset.galleryLabel;
+ gallery.querySelectorAll('[data-gallery-image]').forEach(item=>{if(item===thumb)item.setAttribute('aria-current','true');else item.removeAttribute('aria-current');});
+});
