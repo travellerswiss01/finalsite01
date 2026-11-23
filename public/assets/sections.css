@@ -459,3 +459,26 @@
  .vinegar-lineup .vinegar-lineup-item img{height:calc(100% - 54px);object-fit:cover;object-position:center}
  .vinegar-lineup .vinegar-lineup-item figcaption{font-size:clamp(11px,3vw,14px);min-height:44px;hyphens:none;overflow-wrap:normal}
 }
+
+.journal-index,
+.journal-article {
+  max-width: 760px;
+}
+
+.journal-photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+  object-fit: cover;
+  margin: 1.5rem 0;
+}
+
+.journal-entries article {
+  border-bottom: 1px solid currentColor;
+  padding-block: 1rem;
+}
+
+.journal-products {
+  padding-inline-start: 1.2rem;
+}
