@@ -1,3 +1,4 @@
+import {articles,journalPage,journalPath} from './articles.js';
 import {createServer as httpServer} from 'node:http';
 import {readFile,stat} from 'node:fs/promises';
 import {createReadStream} from 'node:fs';
@@ -9,7 +10,7 @@ import {hasPrice} from './pricing.js';
 
 const publicDir=path.resolve(fileURLToPath(new URL('../public/',import.meta.url)));
 const types={'.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml','.ico':'image/x-icon'};
-const pageRoutes=new Set(['/','/sortiment','/saisonales','/geschenkkoerbe','/suche','/geschenk-konfigurator','/garten','/kochservice','/kontakt','/ueber-uns','/warenkorb']);
+const pageRoutes=new Set(['/','/sortiment','/saisonales','/geschenkkoerbe','/suche','/geschenk-konfigurator','/garten','/kochservice','/kontakt','/ueber-uns','/warenkorb',journalPath,...articles.keys()]);
 const COOKIE='biottos_cart';
 const emptyCart={totalQuantity:0,lines:{nodes:[],pageInfo:{hasNextPage:false}},cost:{subtotalAmount:{amount:'0',currencyCode:'CHF'},totalAmount:{amount:'0',currencyCode:'CHF'}},checkoutUrl:null};
 export function readCartCookie(header='') { const value=header.split(';').map(s=>s.trim()).find(s=>s.startsWith(COOKIE+'='));if(!value)return null;try{const id=decodeURIComponent(value.slice(COOKIE.length+1));return id.startsWith('gid://shopify/Cart/')&&id.length<1000?id:null;}catch{return null;} }
@@ -155,7 +156,7 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
     }catch(err){
      console.warn('Sitemap: Shopify catalog unavailable; serving last known products or static routes.',err?.message||'Unknown error');
     }
-    const routes=[...new Set(['/','/sortiment','/saisonales','/geschenkkoerbe','/geschenk-konfigurator','/kochservice','/garten','/ueber-uns','/kontakt',...productRoutes])];
+    const routes=[...new Set(['/','/sortiment','/saisonales','/geschenkkoerbe','/geschenk-konfigurator','/kochservice','/garten','/ueber-uns','/kontakt',journalPath,...articles.keys(),...productRoutes])];
     const xml=`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${routes.map(route=>`<url><loc>${view.escape(publicOrigin+route)}</loc></url>`).join('')}</urlset>`;
     res.writeHead(200,{'Content-Type':'application/xml; charset=utf-8','Cache-Control':'public, max-age=300'});
     res.end(req.method==='HEAD'?undefined:xml);return;
@@ -182,6 +183,7 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
 
    if(pathname==='/'){content=view.home(await store.catalog());title='Spezialitäten & Geschenkharassen aus dem Thurgau';}
    else if(pathname==='/geschenk-konfigurator'){content=view.giftConfigurator(await store.catalog());title='Geschenk zusammenstellen';description='Wähle Thurgauer Spezialitäten und stelle dein persönliches Geschenk zusammen.';}
+   else if(pathname===journalPath||articles.has(pathname)){({content,title,description}=journalPage(articles.get(pathname)));}
    else if(pathname==='/garten'){content=view.gardenService();title='Garten & Obstbäume mit Otto';description='Otto, gelernter Baumschulist mit 40 Jahren Erfahrung: Obstbaumschnitt, Sortenberatung und Veredelung. Direkt anrufen: 079 935 00 64.';}
    else if(pathname==='/kochservice'){content=view.cookingService();title='Kochen mit Lucia im Thurgau';description='Kochservice bei dir zu Hause für private Anlässe, Geburtstage und Familienfeiern bis 20 Personen im Kanton Thurgau.';}
    else if(['/sortiment','/saisonales','/geschenkkoerbe','/suche'].includes(pathname)){
