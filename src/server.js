@@ -1,3 +1,4 @@
+import {BLOG_PATH,articles,articleUrl,blogIndex,articlePage,plainText} from './blog.js';
 import {createServer as httpServer} from 'node:http';
 import {readFile,stat} from 'node:fs/promises';
 import {createReadStream} from 'node:fs';
@@ -8,7 +9,7 @@ import * as view from './render.js';
 import {hasPrice} from './pricing.js';
 
 const types={'.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml','.ico':'image/x-icon'};
-const pageRoutes=new Set(['/','/sortiment','/saisonales','/geschenkkoerbe','/suche','/geschenk-konfigurator','/garten','/kochservice','/kontakt','/ueber-uns','/warenkorb']);
+const pageRoutes=new Set(['/','/sortiment','/saisonales','/geschenkkoerbe','/suche','/geschenk-konfigurator','/garten','/kochservice','/kontakt','/firmengeschenke','/ueber-uns','/warenkorb']);
 const COOKIE='biottos_cart';
 const emptyCart={totalQuantity:0,lines:{nodes:[],pageInfo:{hasNextPage:false}},cost:{subtotalAmount:{amount:'0',currencyCode:'CHF'},totalAmount:{amount:'0',currencyCode:'CHF'}},checkoutUrl:null};
 export function readCartCookie(header='') { const value=header.split(';').map(s=>s.trim()).find(s=>s.startsWith(COOKIE+'='));if(!value)return null;try{const id=decodeURIComponent(value.slice(COOKIE.length+1));return id.startsWith('gid://shopify/Cart/')&&id.length<1000?id:null;}catch{return null;} }
@@ -155,10 +156,21 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
     }catch(err){
      console.warn('Sitemap: Shopify catalog unavailable; serving last known products or static routes.',err?.message||'Unknown error');
     }
-    const routes=[...new Set(['/','/sortiment','/saisonales','/geschenkkoerbe','/geschenk-konfigurator','/kochservice','/garten','/ueber-uns','/kontakt',...productRoutes])];
+    const routes=[...new Set(['/','/sortiment','/saisonales','/geschenkkoerbe','/geschenk-konfigurator','/kochservice','/garten','/ueber-uns','/kontakt','/firmengeschenke',BLOG_PATH,...articles.map(articleUrl),...productRoutes])];
     const xml=`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${routes.map(route=>`<url><loc>${view.escape(publicOrigin+route)}</loc></url>`).join('')}</urlset>`;
     res.writeHead(200,{'Content-Type':'application/xml; charset=utf-8','Cache-Control':'public, max-age=300'});
     res.end(req.method==='HEAD'?undefined:xml);return;
+   }
+   // Editorial routes do not depend on a Shopify catalog request.
+   if(pathname===BLOG_PATH||pathname===BLOG_PATH+'/'){
+    if(pathname.endsWith('/')){res.writeHead(301,{Location:BLOG_PATH});res.end();return;}
+    const content=view.shell(blogIndex(),{path:BLOG_PATH,title:'Aus dem Lädeli – Küchenideen & Geschichten',description:'Küchenideen mit Apfelbalsamico und Birnel, Geschenkideen aus dem Thurgau und Einblicke in unsere Spezialitäten.',origin:publicOrigin});
+    res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end(req.method==='HEAD'?undefined:content);return;
+   }
+   const article=articles.find(item=>articleUrl(item)===pathname);
+   if(article){
+    const content=view.shell(articlePage(article),{path:pathname,title:article.title,description:plainText(article.summary),article,origin:publicOrigin});
+    res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end(req.method==='HEAD'?undefined:content);return;
    }
    // Scanner paths are not storefront pages: do not wake Shopify for a 404.
    if(!pageRoutes.has(pathname)&&!/^\/produkte\/[^/]+$/.test(pathname)&&!/^\/rechtliches\/[^/]+$/.test(pathname)){
@@ -190,7 +202,8 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
    }else if(pathname.startsWith('/produkte/')){
     let handle;try{handle=decodeURIComponent(pathname.slice('/produkte/'.length));}catch{throw new StorefrontError('Ungültige Adresse.',400);}product=(await store.catalog()).find(p=>p.handle===handle);
     if(product){content=view.productPage(product);title=product.title;description=(product.description.trim()||product.title).replace(/\s+/g,' ').slice(0,160);}
-   }else if(pathname==='/kontakt'){content=view.contact();title='Kontakt & individuelle Geschenke';}
+   }else if(pathname==='/firmengeschenke'){content=view.corporateGifts();title='Firmengeschenke aus dem Thurgau';description='Regionale Geschenkharassen und Spezialitäten für Mitarbeitende und Kunden. Individuelle Firmengeschenke bei Biottos Lädeli in Guntershausen anfragen.';}
+   else if(pathname==='/kontakt'){content=view.contact();title='Kontakt & individuelle Geschenke';}
    else if(pathname==='/ueber-uns'){content=view.about();title='Über Biottos Lädeli';}
    else if(pathname==='/warenkorb'){content=view.cartPage();title='Warenkorb';}
    else if(pathname.startsWith('/rechtliches/')){const result=view.legal(shop,pathname.split('/').pop());if(result){content=result.content;title=result.title;description=`${result.title} – Informationen von Biottos Lädeli.`;}}
