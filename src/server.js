@@ -1,3 +1,4 @@
+import {BLOG_PATH,articles,articleUrl,blogIndex,articlePage,plainText} from './blog.js';
 import {createServer as httpServer} from 'node:http';
 import {readFile,stat} from 'node:fs/promises';
 import {createReadStream} from 'node:fs';
@@ -155,10 +156,21 @@ export function createApp({store=createStorefront(),origin=process.env.PUBLIC_OR
     }catch(err){
      console.warn('Sitemap: Shopify catalog unavailable; serving last known products or static routes.',err?.message||'Unknown error');
     }
-    const routes=[...new Set(['/','/sortiment','/saisonales','/geschenkkoerbe','/geschenk-konfigurator','/kochservice','/garten','/ueber-uns','/kontakt',...productRoutes])];
+    const routes=[...new Set(['/','/sortiment','/saisonales','/geschenkkoerbe','/geschenk-konfigurator','/kochservice','/garten','/ueber-uns','/kontakt',BLOG_PATH,...articles.map(articleUrl),...productRoutes])];
     const xml=`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${routes.map(route=>`<url><loc>${view.escape(publicOrigin+route)}</loc></url>`).join('')}</urlset>`;
     res.writeHead(200,{'Content-Type':'application/xml; charset=utf-8','Cache-Control':'public, max-age=300'});
     res.end(req.method==='HEAD'?undefined:xml);return;
+   }
+   // Editorial routes do not depend on a Shopify catalog request.
+   if(pathname===BLOG_PATH||pathname===BLOG_PATH+'/'){
+    if(pathname.endsWith('/')){res.writeHead(301,{Location:BLOG_PATH});res.end();return;}
+    const content=view.shell(blogIndex(),{path:BLOG_PATH,title:'Aus dem Lädeli – Küchenideen & Geschichten',description:'Küchenideen mit Apfelbalsamico und Birnel, Geschenkideen aus dem Thurgau und Einblicke in unsere Spezialitäten.',origin:publicOrigin});
+    res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end(req.method==='HEAD'?undefined:content);return;
+   }
+   const article=articles.find(item=>articleUrl(item)===pathname);
+   if(article){
+    const content=view.shell(articlePage(article),{path:pathname,title:article.title,description:plainText(article.summary),origin:publicOrigin});
+    res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end(req.method==='HEAD'?undefined:content);return;
    }
    // Scanner paths are not storefront pages: do not wake Shopify for a 404.
    if(!pageRoutes.has(pathname)&&!/^\/produkte\/[^/]+$/.test(pathname)&&!/^\/rechtliches\/[^/]+$/.test(pathname)){
